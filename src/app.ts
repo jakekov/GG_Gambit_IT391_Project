@@ -9,7 +9,7 @@ const app = express();
 app.use(session({
   secret: 'your-secret-key',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: false, //this only creates a session if the session obj is modified
   cookie: {
     maxAge: 60000 //1 minute expire time
   },
