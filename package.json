@@ -4,6 +4,7 @@
   "description": "We are making an app to bet on live Esport Valorant games. This is our project for our IT 391 course at Illinois State University.",
   "main": "index.js",
   "scripts": {
+    "start": "npx tsx src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
