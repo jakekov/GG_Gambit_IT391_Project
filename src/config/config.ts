@@ -1,7 +1,7 @@
 interface Config {
-    port: number;
+  port: number;
 }
 const config: Config = {
-    port: 3000,
+  port: 3000,
 };
 export default config;
