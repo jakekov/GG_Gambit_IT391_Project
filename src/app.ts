@@ -10,7 +10,10 @@ app.use(
     resave: false,
     saveUninitialized: false, //this only creates a session if the session obj is modified
     cookie: {
-      maxAge: 60000, //1 minute expire time
+      maxAge: 900000, //15 minute expire time
+      secure: true, //only create cookie if over https
+      sameSite: true,
+      httpOnly: true, //blocks client javascript from seeing cookie
     },
   }),
 );
