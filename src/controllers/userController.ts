@@ -13,7 +13,11 @@ import {
 } from "../errors";
 
 const scrypt = promisify(_scrypt);
-
+/**
+ * Checks if the input credentials are in the database and are correct
+ * @param account_name email or username
+ * @param password plaintext password
+ */
 async function checkUser(
   account_name: string,
   password: string,
@@ -42,8 +46,15 @@ async function checkUser(
   //now get the user information from the other table
   return user[0];
 }
-
-async function createUnverifiedUser(email: string, password: string) {
+/**
+ *
+ * Creates an Unverified user if none exists already in unverified or verified users.
+ * @returns email verification token | undefined
+ */
+async function createUnverifiedUser(
+  email: string,
+  password: string,
+): Promise<string | undefined> {
   let user, unverified;
   try {
     user = await User.getUserByEmail(email);

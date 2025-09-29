@@ -8,7 +8,12 @@ import {
   UserNotFoundError,
 } from "../errors";
 const router = express.Router();
-
+/**
+ * Login Post Route
+ * Should include account_name (email or username) and password
+ * checks if the user is correct and gives the session a user meant for authentication checks
+ *
+ */
 router.post("/login", async (req: Request, res: Response) => {
   //TODO check the verifification / resend
   //if the email fails to send the email wont be usable for expiration time
@@ -33,9 +38,27 @@ router.post("/login", async (req: Request, res: Response) => {
   req.session.user = { id: acc.id, username: acc.username }; //create the auth session info
   res.json({ email: acc.email, username: acc.username });
 });
-// router.post("/logout", (req: Request, res: Response) => {
-//   res.send("logged in as " + req.session.user?.username);
-// });
+/**
+ * Logout from the auth session
+ * destroys the session
+ */
+router.post("/logout", (req: Request, res: Response) => {
+  // Destroy session
+  req.session.destroy((err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Error logging out");
+    } else {
+      res.send("Logged out");
+    }
+  });
+});
+
+/**
+ * Singup Post Route
+ * takes an email and password
+ * checks if the email is already in use then takes token and sends an email with the otken in the link
+ */
 router.post("/signup", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   let token: string | undefined;
@@ -80,3 +103,4 @@ router.post("/signup", async (req: Request, res: Response) => {
   //send to whatever page is after signup needs to be a site waiting for the email authentication
   //so i guess do nothing for right now
 });
+export default router;

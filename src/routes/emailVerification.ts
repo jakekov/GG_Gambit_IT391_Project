@@ -16,6 +16,11 @@ const router = express.Router();
 //make a table with the id to verified status cause you only need to check it on login / register
 //or maybe just do it with username so users doesnt have a null value
 //
+/**
+ * Get route for email verfication link
+ * Email is sent with the token at the end of the link
+ * this will take a user from unverfied table to verified
+ */
 (router.get("/verify-email/:token"),
   async (req: Request<{ token: string }>, res: Response) => {
     let users;
@@ -44,3 +49,4 @@ const router = express.Router();
     }
     //try to send the browser waiting on verification into login or log them in automatically
   });
+export default router;

@@ -2,6 +2,8 @@
 //npm install  --save-dev @types/express
 import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
+import user_routes from "./routes/authUser";
+import email_routes from "./routes/emailVerification";
 const app = express();
 
 app.use(
@@ -25,23 +27,9 @@ app.get("/hello", (req: Request, res: Response, next: NextFunction) => {
   res.send("hello response");
 });
 
-// fake login
-app.get("/login", (req: Request, res: Response) => {
-  req.session.user = { id: 1, username: "alice" }; //im pretty sure in js this just creates a new field for session at runtime but you just have to declare extradata first with typescript
-  res.send("Logged in!");
-});
-app.get("/logout", (req: Request, res: Response) => {
-  // Destroy session
-  req.session.destroy((err) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("Error logging out");
-    } else {
-      res.send("Logged out");
-    }
-  });
-});
 import profileRoutes from "./routes/profile";
+app.use("/user", user_routes);
+app.use("email/verification", email_routes);
 app.use("/profile", profileRoutes);
 // Server setup
 app.listen(3000, () => {
