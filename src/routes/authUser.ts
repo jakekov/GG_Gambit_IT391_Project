@@ -10,8 +10,8 @@ import {
 const router = express.Router();
 
 router.post("/login", async (req: Request, res: Response) => {
-    //TODO check the verifification / resend
-    //if the email fails to send the email wont be usable for expiration time
+  //TODO check the verifification / resend
+  //if the email fails to send the email wont be usable for expiration time
   const { account_name, password } = req.body;
   let acc;
   try {
@@ -53,9 +53,9 @@ router.post("/signup", async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
   if (!token) {
-    console.log("User returned null unexpected error")
+    console.log("User returned null unexpected error");
     return res.status(500).json({ error: "Internal server error" });
-  } 
+  }
   //send mail with nodemailer
   //setup get(:id)
   //the get needs to redirect the window waiting to enter username
@@ -64,16 +64,17 @@ router.post("/signup", async (req: Request, res: Response) => {
   //id want the login to be successful but redirect to enter username
   //or the email verificaiton could just fail and you redo it
   //
-  const from: string = '<from email ID>';
-const to: string = email;
-const subject: string = '<subject>';
-const mailTemplate: string = '<html string either defined, or loaded from a html file>';
-try {
-    await sendMail( from, to, subject, mailTemplate);
-} catch (err) {
-    console.log('error sending verification email');
+  const from: string = "<from email ID>";
+  const to: string = email;
+  const subject: string = "<subject>";
+  const mailTemplate: string =
+    "<html string either defined, or loaded from a html file>";
+  try {
+    await sendMail(from, to, subject, mailTemplate);
+  } catch (err) {
+    console.log("error sending verification email");
     return res.status(500).json({ error: "Internal server error" });
-}
+  }
 
   res.send("Check your email");
   //send to whatever page is after signup needs to be a site waiting for the email authentication

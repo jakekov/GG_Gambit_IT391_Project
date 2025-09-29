@@ -3,9 +3,9 @@ import { RowDataPacket } from "mysql2";
 import { UserNotFoundError } from "../errors";
 
 export interface UnverifiedUser extends RowDataPacket {
-    token: string; 
+  token: string;
   email: string;
-  
+
   hash: string;
   salt: string;
   created: string;
@@ -32,7 +32,12 @@ export async function getUserByEmail(email: string) {
   return rows;
 }
 
-async function createUser(hash: string, email: string, token: string, salt: string) {
+async function createUser(
+  hash: string,
+  email: string,
+  token: string,
+  salt: string,
+) {
   const [result] = await pool.query(
     "INSERT INTO unverified_users (hash, email, token, salt) VALUES (?, ?, ?, ?)",
     [hash, email, token, salt],
@@ -41,11 +46,16 @@ async function createUser(hash: string, email: string, token: string, salt: stri
 }
 //since token is just hmac it is possible for two users info to collide but you can just resend verification
 async function removeUser(token: string) {
-    const [result] = await pool.query(
+  const [result] = await pool.query(
     "DELETE FROM unverified_users WHERE token = ?",
     [token],
   );
   return result;
-
 }
-export default { getUserByToken, getUserByEmail, getUserByUsername, createUser, removeUser };
+export default {
+  getUserByToken,
+  getUserByEmail,
+  getUserByUsername,
+  createUser,
+  removeUser,
+};

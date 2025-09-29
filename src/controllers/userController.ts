@@ -46,18 +46,18 @@ async function checkUser(
 async function createUnverifiedUser(email: string, password: string) {
   let user, unverified;
   try {
-    user = await User.getUserByEmail(email); 
+    user = await User.getUserByEmail(email);
     unverified = await unverifiedUser.getUserByEmail(email);
   } catch (err) {
     console.error(err);
     throw new DatabaseError("Database error");
   }
   //and im not sure how good it would be to prompt a username after signing up
-  
+
   if (unverified.length != 0) {
     let date = new Date(unverified[0].created);
     //if the verify request creation time + timeout exceeds date now the email is still waiting to be verified
-    if ( Date.now() < (date.getTime()+ config.verification_timeout) ) {
+    if (Date.now() < date.getTime() + config.verification_timeout) {
       throw new EmailInUseError("Email is waiting for verification");
     }
   }
@@ -67,17 +67,17 @@ async function createUnverifiedUser(email: string, password: string) {
   if (user.length != 0) {
     throw new EmailInUseError("Email is already in use");
   }
-  let salt = randomBytes(16).toString('base64');
+  let salt = randomBytes(16).toString("base64");
   const derivedKey = ((await scrypt(password, salt, 64)) as Buffer).toString(
     "base64",
   );
- 
+
   //it might be bettwe to use JWT but i dont really see a point
   //ive got to save the unverified data somewhere anyway unless i include hash salt email in the jwt but i think that would be in plain text
 
-  let token = randomBytes(16).toString('base64url');
+  let token = randomBytes(16).toString("base64url");
   try {
-    await unverifiedUser.createUser(derivedKey, email, token ,salt);
+    await unverifiedUser.createUser(derivedKey, email, token, salt);
   } catch (err) {
     console.error(err);
     throw new DatabaseError("Database error");
