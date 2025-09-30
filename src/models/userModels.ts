@@ -4,6 +4,18 @@ import pool from "../databases/mysql";
 import { RowDataPacket } from "mysql2";
 import { UnverifiedUser } from "./unverifiedUser";
 
+export async function createUnverifiedUserTable() {
+  let query = `CREATE TABLE IF NOT EXISTS users(
+  id int PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  hash VARCHAR(255) NOT NULL,
+  salt VARCHAR(255) NOT NULL,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+)`
+  await pool.query(query); 
+}
 export interface AuthUser extends RowDataPacket {
   id: number;
   email: string;

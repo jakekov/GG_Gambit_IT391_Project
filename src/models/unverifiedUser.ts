@@ -2,6 +2,17 @@ import pool from "../databases/mysql";
 import { RowDataPacket } from "mysql2";
 import { UserNotFoundError } from "../errors";
 
+export async function createUnverifiedUserTable() {
+  let query = `CREATE TABLE IF NOT EXISTS unverified_users(
+  token VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  hash VARCHAR(255) NOT NULL,
+  salt VARCHAR(255) NOT NULL,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+)`
+  await pool.query(query); 
+}
 export interface UnverifiedUser extends RowDataPacket {
   token: string;
   email: string;
