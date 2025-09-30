@@ -1,0 +1,38 @@
+.logoNav {
+    width: 2rem;
+}
+
+
+.hero-section {
+  height: 100vh; /* full screen height */
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(0,0,0,0) 70%, #212529 100%), 
+    url("images/heroImage.jpg") no-repeat center center;
+  background-size: cover;
+  position: relative;
+}
+
+    .login-card {
+      max-width: 400px;
+      margin: auto;
+      margin-top: 10vh;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 10px;
+      color: #fff;
+    }
+    .form-control {
+      background-color: #222;
+      border: none;
+      color: #fff;
+    }
+    .form-control:focus {
+      background-color: #333;
+      color: #fff;
+      box-shadow: none;
+    }
+    .btn-primary {
+      width: 100%;
+    }
+ 
