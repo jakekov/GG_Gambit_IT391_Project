@@ -21,7 +21,7 @@ const router = express.Router();
  * Email is sent with the token at the end of the link
  * this will take a user from unverfied table to verified
  */
-(router.get("/verify-email/:token"),
+router.get("/verify-email/:token",
   async (req: Request<{ token: string }>, res: Response) => {
     let users;
     try {

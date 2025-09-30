@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
 import user_routes from "./routes/authUser";
 import email_routes from "./routes/emailVerification";
+import path from "path";
 const app = express();
 
 app.use(
@@ -19,8 +20,14 @@ app.use(
     },
   }),
 );
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.send("express server");
+
+const publicPath = path.join(__dirname, "../static");
+
+// Serve static files
+app.use(express.static(publicPath));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicPath, "home.html"));
 });
 
 app.get("/hello", (req: Request, res: Response, next: NextFunction) => {
@@ -36,8 +43,8 @@ app.listen(3000, () => {
   console.log("Server is Running");
 });
 // Serve everything inside the "public" folder at the root URL
-const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
+
+
 
 //if i wanted an auth check for a directory of sites i just add a middleware function for each request in a specific path
 export default app;
