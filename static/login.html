@@ -10,10 +10,8 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
-  
-  <!-- Navbar -->
+<!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="home.html"><img src="images//whiteLogo.svg" class="img-fluid logoNav" alt="Main Logo"> Gambit</a>
@@ -27,10 +25,10 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="home.html">Home</a>
+            <a class="nav-link" aria-current="page" href="home.html">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="login.html">Login</a>
+            <a class="nav-link active" href="login.html">Login</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="account.html">Account</a>
@@ -43,14 +41,30 @@
     </div>
   </nav>
 
-   <!--Hero Image-->
-  <div class="hero-section d-flex align-items-center justify-content-center text-white bg-dark">
-  <div class="text-center">
-    <h1>Welcome to <img src="images//whiteLogo.svg" class="img-fluid logoHero" alt="Main Logo"> Gambit</h1>
-    <p class="lead">Climb the ranks to the top</p>
-    <a href="login.html" class="btn btn-lg mt-3 button">Join Now</a>
+  <!-- Login Form -->
+   <div class="login-section d-flex align-items-center justify-content-center text-white">
+  <div class="container">
+    <div class="login-card shadow">
+      <h2 class="text-center mb-4">Login</h2>
+      <form>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="email" placeholder="Enter your email">
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" placeholder="Enter your password">
+        </div>
+        <a href="home.html" class="btn btn-lg mt-3 w-100 buttonLogin">Join Now</a>
+      </form>
+      <div class="text-center mt-3">
+        <a href="#" class="text-light">Forgot password?</a><br>
+        <span>Don't have an account? <a href="signup.html" class="text-light">Sign up</a></span>
+      </div>
+    </div>
   </div>
-  </div>
+</div>
+
 
   <!-- Footer -->
   <footer class="bg-dark text-white text-center py-3">
@@ -60,7 +74,5 @@
     <a href="#" class="text-white">Terms of Service</a>
   </div>
 </footer>
-
-
 </body>
 </html>
