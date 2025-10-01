@@ -8,16 +8,28 @@ import {
   UserNotFoundError,
 } from "../errors";
 const router = express.Router();
+interface LoginForm {
+  email: string;
+  password: string;
+}
 /**
  * Login Post Route
  * Should include account_name (email or username) and password
  * checks if the user is correct and gives the session a user meant for authentication checks
  *
  */
-router.post("/login", async (req: Request, res: Response) => {
+router.use(express.urlencoded({extended: true}))
+router.post("/login", async (req: Request<{},{},LoginForm>, res: Response) => {
   //TODO check the verifification / resend
   //if the email fails to send the email wont be usable for expiration time
-  const { account_name, password } = req.body;
+  const { email, password } = req.body 
+  if (!email) {
+    res.send("Email is null");
+  }
+  if (!password) {
+    res.send("password is null");
+  }
+  const account_name = email;
   let acc;
   try {
     acc = await user.checkUser(account_name, password);
@@ -60,6 +72,12 @@ router.post("/logout", (req: Request, res: Response) => {
  * checks if the email is already in use then takes token and sends an email with the otken in the link
  */
 router.post("/signup", async (req: Request, res: Response) => {
+    //this should just be error handling middleware
+    // try {
+
+    // } catch(err) {
+    //     console.log(err);
+    // }
   const { email, password } = req.body;
   let token: string | undefined;
   try {

@@ -35,7 +35,7 @@ app.get("/hello", (req: Request, res: Response, next: NextFunction) => {
 });
 
 import profileRoutes from "./routes/profile";
-app.use("/user", user_routes);
+app.use("/", user_routes);
 app.use("email/verification", email_routes);
 app.use("/profile", profileRoutes);
 // Server setup
