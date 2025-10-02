@@ -45,7 +45,8 @@ app.listen(3000, () => {
 });
 // Serve everything inside the "public" folder at the root URL
 
-
+import {create_if_not_exists} from "./databases/mysql";
+(async () =>  await create_if_not_exists())();
 
 //if i wanted an auth check for a directory of sites i just add a middleware function for each request in a specific path
 export default app;

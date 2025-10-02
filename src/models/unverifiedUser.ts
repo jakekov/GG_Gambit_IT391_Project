@@ -8,7 +8,7 @@ export async function createUnverifiedUserTable() {
   email VARCHAR(255) NOT NULL,
   hash VARCHAR(255) NOT NULL,
   salt VARCHAR(255) NOT NULL,
-  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 
 )`
   await pool.query(query); 
