@@ -71,6 +71,8 @@ async function createUnverifiedUser(
     if (Date.now() < date.getTime() + config.verification_timeout) {
       throw new EmailInUseError("Email is waiting for verification");
     }
+    await unverifiedUser.removeUser(unverified[0].token);
+    console.log("removed expired entry");
   }
   //check the email in user after the time check for verify
   //I think this somewhat prevents users very slim chance that user clicks verification and register at the same time

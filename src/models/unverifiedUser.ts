@@ -5,7 +5,7 @@ import { UserNotFoundError } from "../errors";
 export async function createUnverifiedUserTable() {
   let query = `CREATE TABLE IF NOT EXISTS unverified_users(
   token VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
   hash VARCHAR(255) NOT NULL,
   salt VARCHAR(255) NOT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -23,7 +23,7 @@ export interface UnverifiedUser extends RowDataPacket {
 }
 async function getUserByToken(token: string) {
   const [rows] = await pool.query<UnverifiedUser[]>(
-    "SELECT * FROM unverified_users WHERE id = ?",
+    "SELECT * FROM unverified_users WHERE token = ?",
     [token],
   );
   return rows;
@@ -57,7 +57,7 @@ async function createUser(
 }
 //since token is just hmac it is possible for two users info to collide but you can just resend verification
 async function removeUser(token: string) {
-  const [result] = await pool.query(
+  const [result] = await pool.query<UnverifiedUser[]>(
     "DELETE FROM unverified_users WHERE token = ?",
     [token],
   );

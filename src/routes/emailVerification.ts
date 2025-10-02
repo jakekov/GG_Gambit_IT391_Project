@@ -12,7 +12,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { sendMail } from "../nodemailer/mailing";
 
 const router = express.Router();
-router.get("/hello", (req: Request, res: Response, next: NextFunction) => {
+router.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.send("hello response");
 });
 router.get("/testemail", async(req: Request, res: Response) => {
@@ -40,9 +40,10 @@ router.get("/testemail", async(req: Request, res: Response) => {
  */
 router.get("/verify-email/:token",
   async (req: Request<{ token: string }>, res: Response) => {
+    console.log("token link clicked");
     let users;
     try {
-      users = await UnverifiedUser.getUserByToken(req.params.token);
+      users = await UnverifiedUser.removeUser(req.params.token); //if the link is clicked its getting removed either way
     } catch (err) {
       return res.status(500).json({ error: "Database Error" });
     }
@@ -58,12 +59,14 @@ router.get("/verify-email/:token",
     //might be worth to do one last sanity check that no username or email exists already
     //maybe make username nullable then login could redirect to set username prompt
     try {
-      Verified.createUser(user, "TEMPORARY");
+      await Verified.createUser(user, "TEMPORARY");
     } catch (err) {
       return res
         .status(500)
         .json({ error: "Database Error, Could not insert" });
     }
+    console.log("verification success ", user );
+    res.send("Account verified");
     //try to send the browser waiting on verification into login or log them in automatically
   });
 export default router;

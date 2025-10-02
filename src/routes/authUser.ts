@@ -109,14 +109,14 @@ router.post("/signup", async (req: Request, res: Response) => {
   const to: string = email;
   const subject: string = "<subject>";
   const mailTemplate: string =
-    "<html string either defined, or loaded from a html file>";
+    "http://10.111.21.84:3000/email/verification/verify-email/" + token; //TODO change this back from 3000 when config changes
   try {
     await sendMail(from, to, subject, mailTemplate);
   } catch (err) {
     console.log("error sending verification email" + err);
     return res.status(500).json({ error: "Internal server error" });
   }
-
+  console.log("sent email to ", email);
   res.send("Check your email");
   //send to whatever page is after signup needs to be a site waiting for the email authentication
   //so i guess do nothing for right now

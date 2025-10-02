@@ -106,9 +106,7 @@ export const sendMail = async (
     //service: to determine which email platform to use
     //auth contains the senders email and password which are all saved in the .env
     //it says this will get a access token by itself
-    console.log(process.env.GOOGLE_REFRESH_TOKEN);
-    console.log(process.env.GOOGLE_CLIENT_ID);
-    console.log(process.env.GOOGLE_CLIENT_SECRET);
+      
     const Transporter = nodemailer.createTransport({
         service: "gmail",
   auth: {
