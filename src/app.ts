@@ -1,5 +1,6 @@
 //save in devDependencies
 //npm install  --save-dev @types/express
+require('dotenv').config();
 import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
 import user_routes from "./routes/authUser";
@@ -36,7 +37,7 @@ app.get("/hello", (req: Request, res: Response, next: NextFunction) => {
 
 import profileRoutes from "./routes/profile";
 app.use("/", user_routes);
-app.use("email/verification", email_routes);
+app.use("/email/verification", email_routes);
 app.use("/profile", profileRoutes);
 // Server setup
 app.listen(3000, () => {

@@ -9,9 +9,26 @@ import UnverifiedUser from "../models/unverifiedUser";
 import Verified from "../models/userModels";
 
 import express, { Request, Response, NextFunction } from "express";
+import { sendMail } from "../nodemailer/mailing";
 
 const router = express.Router();
-
+router.get("/hello", (req: Request, res: Response, next: NextFunction) => {
+  res.send("hello response");
+});
+router.get("/testemail", async(req: Request, res: Response) => {
+     const from: string = "Gg.gambit.noreply@gmail.com";
+      const to: string = "shfloopyuh@gmail.com";
+      const subject: string = "TEST";
+      const mailTemplate: string =
+        "<html string either defined, or loaded from a html file>";
+      try {
+        await sendMail(from, to, subject, mailTemplate);
+      } catch (err) {
+        console.log("error sending verification email" + err);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+    res.send("Sent email");
+});
 //you knwo what a much better idea is
 //make a table with the id to verified status cause you only need to check it on login / register
 //or maybe just do it with username so users doesnt have a null value

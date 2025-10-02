@@ -113,7 +113,7 @@ router.post("/signup", async (req: Request, res: Response) => {
   try {
     await sendMail(from, to, subject, mailTemplate);
   } catch (err) {
-    console.log("error sending verification email");
+    console.log("error sending verification email" + err);
     return res.status(500).json({ error: "Internal server error" });
   }
 
