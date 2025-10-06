@@ -7,6 +7,10 @@ import {
   InvalidPasswordError,
   UserNotFoundError,
 } from "../errors";
+import Verified from "../models/userModels";
+import UnverifiedUser from "../models/unverifiedUser";
+import config from "../config/config"
+const EMAIL_LINK = `https://${config.server_addr}:${config.server_port}/email/verification/verify-email/`;
 const router = express.Router();
 interface LoginForm {
   email: string;
@@ -47,6 +51,7 @@ router.post("/login", async (req: Request<{},{},LoginForm>, res: Response) => {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });
   }
+  console.log(`logged in ${acc.email}`);
   req.session.user = { id: acc.id, username: acc.username }; //create the auth session info
   res.json({ email: acc.email, username: acc.username });
 });
@@ -79,6 +84,10 @@ router.post("/signup", async (req: Request, res: Response) => {
     //     console.log(err);
     // }
   const { email, password } = req.body;
+
+
+
+  
   let token: string | undefined;
   try {
     token = await user.createUnverifiedUser(email, password);
@@ -97,6 +106,28 @@ router.post("/signup", async (req: Request, res: Response) => {
     console.log("User returned null unexpected error");
     return res.status(500).json({ error: "Internal server error" });
   }
+  if (config.email_verification === false) {
+    let users;
+        try {
+          users = await UnverifiedUser.removeUser(token); //if the link is clicked its getting removed either way
+        } catch (err) {
+          return res.status(500).json({ error: "Database Error" });
+        }
+        if (users.length == 0) {
+          return res.status(403).json({ error: "Token is not valid" });
+        }
+        const new_user = users[0];
+    try {
+          await Verified.createUser(new_user, "TEMPORARY");
+        } catch (err) {
+          return res
+            .status(500)
+            .json({ error: "Database Error, Could not insert" });
+        }
+        console.log("verification success ", user );
+        res.send("Account verified");
+        return;
+  }
   //send mail with nodemailer
   //setup get(:id)
   //the get needs to redirect the window waiting to enter username
@@ -109,11 +140,13 @@ router.post("/signup", async (req: Request, res: Response) => {
   const to: string = email;
   const subject: string = "<subject>";
   const mailTemplate: string =
-    "http://10.111.21.84:3000/email/verification/verify-email/" + token; //TODO change this back from 3000 when config changes
+    EMAIL_LINK + token; //TODO change this back from 3000 when config changes
+    res.send("Check your email"); //just send the response early before checking
   try {
     await sendMail(from, to, subject, mailTemplate);
   } catch (err) {
     console.log("error sending verification email" + err);
+    //then send another response if it goes bad
     return res.status(500).json({ error: "Internal server error" });
   }
   console.log("sent email to ", email);

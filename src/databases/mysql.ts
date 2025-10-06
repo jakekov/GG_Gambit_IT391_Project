@@ -1,12 +1,13 @@
 import mysql from "mysql2/promise";
 import {createUnverifiedUserTable} from "../models/unverifiedUser";
 import { createVerifiedUserTable } from "../models/userModels";
-require('dotenv').config();
+//require('dotenv').config();
+import {db} from "../config/config"
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || "10.111.21.84",
-  user: process.env.DB_USER || "remote_user",
-  password: process.env.DB_PASS || "ab12cd34",
-  database: process.env.DB_NAME || "test_db",
+  host: db.DB_HOST ,
+  user: db.DB_USER ,
+  password: db.DB_PASS ,
+  database: db.DB_NAME ,
   waitForConnections: true,
   connectionLimit: 5,
   queueLimit: 0,

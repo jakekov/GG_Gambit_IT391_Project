@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import {google} from "googleapis";
+import {email} from "../config/config"
 // const REDIRECT_URI = 'http://localhost';
 // const oAuth2Client = new google.auth.OAuth2(
 //   process.env.GOOGLE_CLIENT_ID,
@@ -110,8 +111,8 @@ export const sendMail = async (
     const Transporter = nodemailer.createTransport({
         service: "gmail",
   auth: {
-    user: "Gg.gambit.noreply@gmail.com",
-    pass: process.env.APP_PASSWORD
+    user: email.email_user,
+    pass: email.app_password
    
   },
     });

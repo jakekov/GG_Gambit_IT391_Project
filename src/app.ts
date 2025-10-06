@@ -1,6 +1,6 @@
 //save in devDependencies
 //npm install  --save-dev @types/express
-require('dotenv').config();
+//require('dotenv').config();
 import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
 import user_routes from "./routes/authUser";
@@ -15,7 +15,7 @@ app.use(
     saveUninitialized: false, //this only creates a session if the session obj is modified
     cookie: {
       maxAge: 900000, //15 minute expire time
-      secure: true, //only create cookie if over https
+      secure: false, //only create cookie if over https TODO ADD HTTPS AND SWITCH THIS TO TRUE
       sameSite: true,
       httpOnly: true, //blocks client javascript from seeing cookie
     },
@@ -40,9 +40,9 @@ app.use("/", user_routes);
 app.use("/email/verification", email_routes);
 app.use("/profile", profileRoutes);
 // Server setup
-app.listen(3000, () => {
-  console.log("Server is Running");
-});
+// app.listen(3000, () => {
+//   console.log("Server is Running");
+// });
 // Serve everything inside the "public" folder at the root URL
 
 import {create_if_not_exists} from "./databases/mysql";

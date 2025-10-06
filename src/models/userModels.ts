@@ -47,6 +47,15 @@ export async function getUserByEmail(email: string) {
   );
   return rows;
 }
+ async function getByIndexedEmail<K extends keyof AuthUser>(
+    email: string,
+    columns: K[],
+ ): Promise<Pick<AuthUser, K>[]> {
+  const cols = columns.join(", ");
+  const sql = 'SELECT ${cols} FROM users WHERE email = ?';
+  const [rows] = await pool.query<AuthUser[]>(sql, [email]);
+  return rows as Pick<AuthUser,K>[];
+ }
 
 async function createUser(verified_user: UnverifiedUser, username: String) {
   const [result] = await pool.query(
