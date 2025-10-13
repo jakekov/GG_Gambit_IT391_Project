@@ -40,6 +40,7 @@ router.get("/testemail", async(req: Request, res: Response) => {
  */
 router.get("/verify-email/:token",
   async (req: Request<{ token: string }>, res: Response) => {
+    //store tokens as hashses
     console.log("token link clicked");
     let users;
     try {
@@ -69,4 +70,8 @@ router.get("/verify-email/:token",
     res.send("Account verified");
     //try to send the browser waiting on verification into login or log them in automatically
   });
+  router.get("/password/reset/:token",
+  async (req: Request<{ token: string }>, res: Response) => {
+
+  }); 
 export default router;

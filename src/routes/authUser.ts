@@ -10,12 +10,15 @@ import {
 import Verified from "../models/userModels";
 import UnverifiedUser from "../models/unverifiedUser";
 import config from "../config/config"
+import path from "path";
+const staticPath = path.join(__dirname, "../../static");
 const EMAIL_LINK = `https://${config.server_addr}:${config.server_port}/email/verification/verify-email/`;
 const router = express.Router();
 interface LoginForm {
   email: string;
   password: string;
 }
+
 /**
  * Login Post Route
  * Should include account_name (email or username) and password
@@ -153,5 +156,13 @@ router.post("/signup", async (req: Request, res: Response) => {
   res.send("Check your email");
   //send to whatever page is after signup needs to be a site waiting for the email authentication
   //so i guess do nothing for right now
+});
+
+router.get("/login", (req: Request, res: Response) => {
+  if (req.session.user != null) {
+    //user is already logged in go to default ie dashboard account home whatever it is
+    res.send("Already logged in");
+  }
+  res.sendFile(path.join(staticPath, 'login.html'));
 });
 export default router;
