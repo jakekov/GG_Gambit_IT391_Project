@@ -16,6 +16,11 @@ interface Email {
   email_user: string,
   app_password: string,
 }
+interface GoogleSignIn {
+  ENABLED: boolean,
+  GOOGLE_CLIENT_ID: string,
+  GOOGLE_CLIENT_SECRET: string,
+}
 const config: Config = {
   server_addr: getEnvVar('SERVER_ADDR'),
   server_port: getEnvVar('SERVER_PORT'),
@@ -32,6 +37,29 @@ export const db: DB = {
   DB_NAME: getEnvVar('DB_NAME'),
   DB_PASS: getEnvVar('DB_PASS'),
 }
+export const google_sign_in  = load_google_sign_in();
+function load_google_sign_in(): GoogleSignIn {
+  var output: GoogleSignIn | undefined ;
+  
+  try {
+    output = {
+      ENABLED: true,
+      GOOGLE_CLIENT_ID: getEnvVar('GOOGLE_CLIENT_ID'),
+      GOOGLE_CLIENT_SECRET: getEnvVar('GOOGLE_CLIENT_SECRET'),
+
+    }
+  } catch (err) {
+    console.log('Google Sign In config could not be created');
+    return {
+      ENABLED: false,
+GOOGLE_CLIENT_ID:"",
+GOOGLE_CLIENT_SECRET: "",
+
+    };
+  }
+  return output;
+} 
+
 function getEnvVar(key: string): string {
     const value = process.env[key];
     if (!value) {

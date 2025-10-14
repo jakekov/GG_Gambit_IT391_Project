@@ -5,6 +5,7 @@ import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
 import user_routes from "./routes/authUser";
 import email_routes from "./routes/emailVerification";
+import google_routes from "./routes/authGoogle";
 import path from "path";
 const app = express();
 
@@ -39,6 +40,7 @@ import profileRoutes from "./routes/profile";
 app.use("/", user_routes);
 app.use("/email/verification", email_routes);
 app.use("/profile", profileRoutes);
+app.use("/auth", google_routes);
 // Server setup
 // app.listen(3000, () => {
 //   console.log("Server is Running");
