@@ -6,6 +6,7 @@ interface Config {
   verification_timeout: number,
   email_verification: boolean,
   jwt_secret: string,
+  http: string,
 }
 interface DB {
   DB_HOST: string,
@@ -27,7 +28,8 @@ const config: Config = {
   server_port: getEnvVar('SERVER_PORT'),
   verification_timeout: 900_000, //15 minutes
   email_verification: getEnvVar('REQUIRE_EMAIL_VERIFICATION') === 'true',
-  jwt_secret: getEnvVar('JWT_SECRET')
+  jwt_secret: getEnvVar('JWT_SECRET'),
+  http: "http", //until or if we use a certificate
 };
 export const email: Email = {
   email_user: getEnvVar('EMAIL_USER'),

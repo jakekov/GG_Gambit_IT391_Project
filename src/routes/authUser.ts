@@ -15,7 +15,7 @@ import email_controller from "../controllers/emailController";
 import { EmailConformationString } from "../models/email_tokens";
 import { stringify as uuidStringify } from "uuid";
 const staticPath = path.join(__dirname, "../../static");
-const EMAIL_LINK = `https://${config.server_addr}:${config.server_port}/email/verification/verify-email/`;
+const EMAIL_LINK = `${config.http}://${config.server_addr}:${config.server_port}/email/verification/verify-email/`;
 const router = express.Router();
 interface LoginForm {
   email: string;
