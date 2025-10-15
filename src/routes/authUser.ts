@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import user from "../controllers/userController";
+import { User } from "../models/user";
 import { sendMail } from "../nodemailer/mailing";
 import {
   DatabaseError,
@@ -7,10 +8,12 @@ import {
   InvalidPasswordError,
   UserNotFoundError,
 } from "../errors";
-import Verified from "../models/userModels";
-import UnverifiedUser from "../models/unverifiedUser";
+import  { AuthProvider } from "../models/authProviders";
 import config from "../config/config"
 import path from "path";
+import email_controller from "../controllers/emailController";
+import { EmailConformationString } from "../models/email_tokens";
+import { stringify as uuidStringify } from "uuid";
 const staticPath = path.join(__dirname, "../../static");
 const EMAIL_LINK = `https://${config.server_addr}:${config.server_port}/email/verification/verify-email/`;
 const router = express.Router();
@@ -37,9 +40,9 @@ router.post("/login", async (req: Request<{},{},LoginForm>, res: Response) => {
     res.send("password is null");
   }
   const account_name = email;
-  let acc;
+  let acc: AuthProvider | undefined;
   try {
-    acc = await user.checkUser(account_name, password);
+    acc = await user.checkUserCredentials(account_name, password);
   } catch (err) {
     if (
       err instanceof UserNotFoundError ||
@@ -54,15 +57,32 @@ router.post("/login", async (req: Request<{},{},LoginForm>, res: Response) => {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });
   }
-  console.log(`logged in ${acc.email}`);
-  req.session.user = { id: acc.id, username: acc.username }; //create the auth session info
-  res.json({ email: acc.email, username: acc.username });
+  let profile: User;
+  try {
+    profile = await user.verifyAccount(acc); 
+  } catch (err) {
+    if (err instanceof UserNotFoundError) {
+      return res.status(401).json({ error: err.message });
+    } else if (err instanceof DatabaseError) {
+      console.log(err);
+      return res.status(500).json({ error: err.message });
+    }
+    console.log("unexpected error ");
+    console.log(err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+  
+  console.log(`logged in ${profile.email}`);
+  req.session.user = { id: uuidStringify(profile.id), username: profile.username }; //create the auth session info
+  
+  res.json({ email: profile.email, username: profile.username });
+
 });
 /**
  * Logout from the auth session
  * destroys the session
  */
-router.post("/logout", (req: Request, res: Response) => {
+router.get("/logout", (req: Request, res: Response) => {
   // Destroy session
   req.session.destroy((err) => {
     if (err) {
@@ -79,21 +99,15 @@ router.post("/logout", (req: Request, res: Response) => {
  * takes an email and password
  * checks if the email is already in use then takes token and sends an email with the otken in the link
  */
-router.post("/signup", async (req: Request, res: Response) => {
-    //this should just be error handling middleware
-    // try {
+router.post("/signup", async (req: Request<{},{},LoginForm>, res: Response) => {
 
-    // } catch(err) {
-    //     console.log(err);
-    // }
   const { email, password } = req.body;
-
-
-
-  
-  let token: string | undefined;
   try {
-    token = await user.createUnverifiedUser(email, password);
+    //need to create an account if none exists using the password
+    //createLocalAuth checks if localAuth already exists
+    //but i need to remove the account if localAuth fails
+    
+    await user.LocalAuthOrNewAccount(email, password);
   } catch (err) {
     if (err instanceof EmailInUseError) {
       // Expected auth errors → send 401
@@ -105,41 +119,20 @@ router.post("/signup", async (req: Request, res: Response) => {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });
   }
-  if (!token) {
-    console.log("User returned null unexpected error");
-    return res.status(500).json({ error: "Internal server error" });
-  }
-  if (config.email_verification === false) {
-    let users;
-        try {
-          users = await UnverifiedUser.removeUser(token); //if the link is clicked its getting removed either way
-        } catch (err) {
-          return res.status(500).json({ error: "Database Error" });
-        }
-        if (users.length == 0) {
-          return res.status(403).json({ error: "Token is not valid" });
-        }
-        const new_user = users[0];
+  if (config.email_verification === true) {
+    //update the email_verified for the account
+    var token = null;
     try {
-          await Verified.createUser(new_user, "TEMPORARY");
-        } catch (err) {
-          return res
-            .status(500)
-            .json({ error: "Database Error, Could not insert" });
-        }
-        console.log("verification success ", user );
-        res.send("Account verified");
-        return;
-  }
-  //send mail with nodemailer
-  //setup get(:id)
-  //the get needs to redirect the window waiting to enter username
-  //when the username is received the account needs to go into the actual users table
-  //but what happens if they fail to enter usename and go to login
-  //id want the login to be successful but redirect to enter username
-  //or the email verificaiton could just fail and you redo it
-  //
-  const from: string = "<from email ID>";
+       token = await email_controller.generateEmailVerificationToken(email, EmailConformationString.verify_account);
+    } catch (err) {
+      console.log("email verification failed but account created");
+      return res.status(500).json({ error: "Internal server error" });
+    }
+    if (!token) {
+      console.log("token is null but account is created");
+      return res.status(500).json({ error: "Internal server error" });
+    }
+    const from: string = "<from email ID>";
   const to: string = email;
   const subject: string = "<subject>";
   const mailTemplate: string =
@@ -153,7 +146,9 @@ router.post("/signup", async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
   console.log("sent email to ", email);
-  res.send("Check your email");
+  return;
+}
+  res.send("Creation success");
   //send to whatever page is after signup needs to be a site waiting for the email authentication
   //so i guess do nothing for right now
 });

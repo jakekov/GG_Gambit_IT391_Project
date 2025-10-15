@@ -6,8 +6,9 @@
 //2FA?
 import config from "../config/config";
 import UnverifiedUser from "../models/unverifiedUser";
-import Verified from "../models/userModels";
-
+import user_model from "../models/authProviders";
+import email_verify from "../controllers/emailController";
+import email_tokens from "../models/email_tokens";
 import express, { Request, Response, NextFunction } from "express";
 import { sendMail } from "../nodemailer/mailing";
 
@@ -43,30 +44,19 @@ router.get("/verify-email/:token",
     //store tokens as hashses
     console.log("token link clicked");
     let users;
+    let token = req.params.token;
     try {
-      users = await UnverifiedUser.removeUser(req.params.token); //if the link is clicked its getting removed either way
+       let status = await email_verify.verifyEmailVerificationToken(token);
+    if (!status) {
+      return res.send("invalid token");
+    } 
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ error: "Database Error" });
     }
-    if (users.length == 0) {
-      return res.status(403).json({ error: "Token is not valid" });
-    }
-    const user = users[0];
-    let date = new Date(user.created);
-    //if the verify request creation time + timeout exceeds date now the email dont accept the verification
-    if (Date.now() >= date.getTime() + config.verification_timeout) {
-      return res.status(403).json({ error: "Token is expired" });
-    }
-    //might be worth to do one last sanity check that no username or email exists already
-    //maybe make username nullable then login could redirect to set username prompt
-    try {
-      await Verified.createUser(user, "TEMPORARY");
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ error: "Database Error, Could not insert" });
-    }
-    console.log("verification success ", user );
+   
+   
+    console.log("verification success" );
     res.send("Account verified");
     //try to send the browser waiting on verification into login or log them in automatically
   });

@@ -5,6 +5,7 @@ interface Config {
   server_port: string,
   verification_timeout: number,
   email_verification: boolean,
+  jwt_secret: string,
 }
 interface DB {
   DB_HOST: string,
@@ -25,7 +26,8 @@ const config: Config = {
   server_addr: getEnvVar('SERVER_ADDR'),
   server_port: getEnvVar('SERVER_PORT'),
   verification_timeout: 900_000, //15 minutes
-  email_verification: false
+  email_verification: getEnvVar('REQUIRE_EMAIL_VERIFICATION') === 'true',
+  jwt_secret: getEnvVar('JWT_SECRET')
 };
 export const email: Email = {
   email_user: getEnvVar('EMAIL_USER'),

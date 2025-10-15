@@ -3,18 +3,71 @@ import { RowDataPacket } from "mysql2";
 import { UserNotFoundError } from "../errors";
 
 //the hash might not be necessary
-//if they somehow get access to db couldnt they just set the token to what they want
 //
-export async function createUnverifiedUserTable() {
+// but check if the token is still active by if it exists in the table
+//then check expiration
+//i might also want to assign an account to this not just email
+//that way if email changes this isnt still active
+export async function createEmailTokensTable() {
   let query = `CREATE TABLE IF NOT EXISTS email_tokens(
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  user_id BINARY(16) NOT NULL,
   token_hash VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-
+  email VARCHAR(64) NOT NULL,
+  conformation_type VARCHAR(32) NOT NULL,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(email, conformation_type), 
+  CONSTRAINT fk_user_token
+   FOREIGN KEY (user_id) REFERENCES users(id)
+   ON DELETE CASCADE
+  
 )`
+  await pool.query(query); 
 }
+//only one type of email confirmation is allowed so only one account verify at a time , one password reset
 export interface EmailUserToken extends RowDataPacket {
-  token: string;
-  email: string;
+  id: string;
+  user_id: Buffer, // the 
+  token_hash: string,
+  email: string
+  conformationType: EmailConformationString, // sign in  / email verification, new session/ emaail change? etc 
   created: string;
 }
+export interface TokenOptions {
+  userId: Buffer, // the 
+  token_hash: string,
+  email: string
+  conformationType: EmailConformationString
+}
+export enum EmailConformationString {
+  verify_account=  "verify_account",
+}
+
+async function createEmailToken(options: TokenOptions) {
+  
+  const [result] = await pool.query(
+    "INSERT INTO email_tokens (email, conformation_type, token_hash, user_id) VALUES (?, ?, ?, ?)",
+    [
+      options.email,
+      options.conformationType,
+      options.token_hash,
+      options.userId,
+    ],
+  );
+  return result;
+}
+ async function getTokenByEmail(email: string, provider: EmailConformationString) {
+  const [rows] = await pool.query<EmailUserToken[]>(
+    "SELECT * FROM email_tokens WHERE email = ? AND conformation_type = ?",
+    [email, provider],
+  );
+  return rows;
+}
+export async function removeAuthByEmail(conformation_type: EmailConformationString, email: string) {
+  const [rows] = await pool.query(
+    "DELETE FROM email_tokens WHERE email = ? AND conformation_type = ?",
+    [email, conformation_type],
+  );
+  return rows;
+}
+export default {createEmailToken, getTokenByEmail, removeAuthByEmail}

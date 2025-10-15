@@ -58,7 +58,7 @@ function check_csrf_token(req: Request, res: Response, next: NextFunction) {
   }
   next();
 }
-function sha_timing_safe_equals(a: string, b: string) {
+export function sha_timing_safe_equals(a: string, b: string) {
   if (a.length != b.length) {
     //returning early is okay because its a sha256 length doesnt really matter
     return false;
