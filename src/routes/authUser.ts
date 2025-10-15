@@ -74,7 +74,7 @@ router.post("/login", async (req: Request<{},{},LoginForm>, res: Response) => {
   
   console.log(`logged in ${profile.email}`);
   req.session.user = { id: uuidStringify(profile.id), username: profile.username }; //create the auth session info
-  
+  res.cookie('isAuthenticated', 'true', {sameSite: "lax", });
   res.json({ email: profile.email, username: profile.username });
 
 });
@@ -89,6 +89,7 @@ router.get("/logout", (req: Request, res: Response) => {
       console.error(err);
       res.status(500).send("Error logging out");
     } else {
+      res.clearCookie('isAuthenticated');
       res.send("Logged out");
     }
   });
