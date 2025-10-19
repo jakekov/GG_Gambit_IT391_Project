@@ -11,7 +11,7 @@ import {
 } from "../errors";
 import { generateUUIDBuffer, UserOptions } from "../models/user";
 //this is definitly not the best way to do this but im not sure what is
-const GOOGLE_REDIRECT_LINK = `https://${config.server_addr}:${config.server_port}/auth/google/callback/`;
+const GOOGLE_REDIRECT_LINK = `${config.http}://${config.server_addr}:${config.server_port}/auth/google/callback/`;
 const client = new OAuth2Client();
 
 export function check_sign_in_enabled(req: Request, res: Response, next: NextFunction) {

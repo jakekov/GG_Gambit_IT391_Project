@@ -1,7 +1,7 @@
 //database calls for users
 
 import pool from "../databases/mysql";
-import { RowDataPacket } from "mysql2";
+import { FieldPacket, RowDataPacket } from "mysql2";
 import { UnverifiedUser } from "./unverifiedUser";
 
 export async function createUserTable() {
@@ -56,6 +56,14 @@ export function generateUUIDBuffer(): Buffer {
   );
   return rows;
 }
+export async function getUserByUsername( username: string) {
+  
+   const [rows] = await pool.query<User[]>(
+    "SELECT * FROM users WHERE username = ?",
+    [username],
+  );
+  return rows;
+}
 async function createUser(user_options: UserOptions) {
   const [result] = await pool.query(
     "INSERT INTO users (id, email, username, display_name, avatar) VALUES (UUID_TO_BIN(UUID()), ?, ?, ?, ?)",
@@ -100,4 +108,4 @@ async function removeUserByUUID(uuid: Buffer) {
   return result;
 }
 
-export default {getUserByEmail, getUserByUuid, createUserWithUUID, updateUserEmailVerification, removeUserByUUID}
+export default {getUserByEmail, getUserByUuid, createUserWithUUID, updateUserEmailVerification, removeUserByUUID, getUserByUsername}

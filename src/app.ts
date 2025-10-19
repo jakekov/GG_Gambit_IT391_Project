@@ -6,6 +6,7 @@ import session from "express-session";
 import user_routes from "./routes/authUser";
 import email_routes from "./routes/emailVerification";
 import google_routes from "./routes/authGoogle";
+import api_user_routes from "./routes/api/user/router";
 import path from "path";
 const app = express();
 
@@ -41,6 +42,7 @@ app.use("/", user_routes);
 app.use("/email/verification", email_routes);
 app.use("/profile", profileRoutes);
 app.use("/auth", google_routes);
+app.use("/api/user", api_user_routes );//make a secondary route file for /api
 // Server setup
 // app.listen(3000, () => {
 //   console.log("Server is Running");
