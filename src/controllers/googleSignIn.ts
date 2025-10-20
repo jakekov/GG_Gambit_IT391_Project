@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import auth_providers, { AuthOptions, AuthProvidersStrings } from "../models/authProviders";
 import user_model from "../models/user";
+import bet_info from "../models/userBetInfo";
 import {
   UserNotFoundError,
   DatabaseError,
@@ -111,6 +112,7 @@ async function getOrCreateGoogleAuthBasedAccount(payload: TokenPayload) {
               }
               try {
               await auth_providers.createAuthEntry(auth_options);
+              await bet_info.createUserBetInfo(uuid);
               //if this fails i need to get rid of the new user account
               // i think i could juts use a transaction instead
 

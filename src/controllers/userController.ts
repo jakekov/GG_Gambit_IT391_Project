@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { scrypt as _scrypt, randomBytes } from "crypto";
 import user_model, {generateUUIDBuffer, User, UserOptions} from "../models/user";
 import crypto from "crypto";
+import bet_info from "../models/userBetInfo";
 import { promisify } from "util";
 import config from "../config/config";
 import { stringify as uuidStringify } from "uuid";
@@ -181,6 +182,7 @@ async function LocalAuthOrNewAccount(email: string, password: string) {
       
       try {
         await createLocalAuth(email, password, uuid);
+        await bet_info.createUserBetInfo(uuid);
       } catch (err) {
         console.log(err)
         //Need to remove the created account because there is no auth provider for it
