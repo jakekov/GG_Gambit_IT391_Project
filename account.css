@@ -1,0 +1,136 @@
+/* --- Body & Background --- */
+body {
+  background: 
+    linear-gradient(to bottom, 
+      rgba(33,37,41,1) 0%,
+      rgba(0,0,0,0) 20%,
+      rgba(112,28,28,0) 80%,
+      rgba(33,37,41,1) 100%
+    ),
+    url("images/Account-bgrnd.jpg") no-repeat center;
+  background-size: cover;
+  font-family: Arial, sans-serif;
+  color: white;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+/* --- Navbar --- */
+.navbar {
+  position: relative; /* explicitly fixed */
+  top: 0;
+  left: 100;
+  right: 100;
+  z-index: 9999;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+}
+
+/* --- Credit Container --- */
+.credit-container {
+  position: absolute;     /* keep it fixed on scroll */
+  top: 130px;           /* adjust as needed below navbar */
+  right: 20px;         /* move to right corner */
+  background: rgba(0,0,0,0.6);
+  padding: 15px 25px;
+  border-radius: 10px;
+  text-align: right;
+  box-shadow: 0 0 15px rgba(0,188,212,0.4);
+  z-index: 1000;       /* make sure it's above other content */
+}
+
+
+/* --- Account Card --- */
+.account-card {
+  background: rgba(0,0,0,0.6);
+  border-radius: 12px;
+  padding: 30px;
+  width: 400px;
+  /*box-shadow: 0 0 20px rgba(0,188,212,0.5);*/
+  margin: 40px auto 40px; /* pushes content below fixed navbar */
+}
+
+/* --- Profile Card --- */
+#profileCard {
+  background: rgba(34,34,34,0.9);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#avatarPreview img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #00bcd4;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+}
+
+#avatarPreview.saved img {
+  animation: pulse 1s;
+}
+
+/* --- Avatar Selection --- */
+.agent-option {
+  display: inline-block;
+  margin: 5px;
+  text-align: center;
+}
+
+.agent-option input {
+  display: none;
+}
+
+.agent-option img {
+  width: 80px;
+  height: auto;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: border 0.2s, transform 0.2s;
+}
+
+.agent-option img:hover {
+  transform: scale(1.05);
+}
+
+.agent-option input:checked + img {
+  border-color: #00bcd4;
+}
+
+/* --- Buttons --- */
+.btn-custom, .button, .buttonLogin {
+  background-color: #212529;
+  color: #f8f9fa;
+  border: 1px solid #343a40;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-custom:hover, .button:hover, .buttonLogin:hover {
+  background-color: #343a40;
+  border-color: #495057;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.btn-custom:active, .button:active, .buttonLogin:active {
+  background-color: #1c1f23;
+  border-color: #212529;
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 15px 0;
+  margin-top: 40px; /* separate from content */
+}
