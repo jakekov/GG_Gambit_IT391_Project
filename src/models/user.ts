@@ -99,7 +99,28 @@ async function updateUserEmailVerification(email_verified: boolean, id: Buffer) 
     [email_verified, id],
   );
   return rows;
-} 
+}
+async function updateUsername(username: string, id: Buffer) {
+    const [rows] = await pool.query(
+    "UPDATE users SET username = ? WHERE id = ?",
+    [username, id],
+  );
+  return rows;
+}
+async function updateDisplayName(display_name: string, id: Buffer) {
+    const [rows] = await pool.query(
+    "UPDATE users SET display_name = ? WHERE id = ?",
+    [display_name, id],
+  );
+  return rows;
+}
+async function updateAvatar(avatar: string, id: Buffer) {
+    const [rows] = await pool.query(
+    "UPDATE users SET avatar = ? WHERE id = ?",
+    [avatar, id],
+  );
+  return rows;
+}  
 async function removeUserByUUID(uuid: Buffer) {
   const [result] = await pool.query(
     "DELETE FROM users WHERE id = ?",
@@ -108,4 +129,6 @@ async function removeUserByUUID(uuid: Buffer) {
   return result;
 }
 
-export default {getUserByEmail, getUserByUuid, createUserWithUUID, updateUserEmailVerification, removeUserByUUID, getUserByUsername}
+export default {getUserByEmail, getUserByUuid, createUserWithUUID, updateUserEmailVerification, removeUserByUUID, getUserByUsername,
+  updateAvatar,updateDisplayName,updateUsername
+}

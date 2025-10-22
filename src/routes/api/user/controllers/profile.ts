@@ -3,6 +3,8 @@ import { UserProfileData } from "../../../../types/user";
 
 import {  parse as UuidParse, stringify as UuidStringify } from "uuid";
 import { HTTP_STATUS } from "../../../../http";
+import { PatchUserForm } from "../router";
+import { DatabaseError } from "../../../../errors";
 
 export async function getUserProfileData(slug: string) {
     var id = null;
@@ -30,4 +32,25 @@ export async function getUserProfileData(slug: string) {
     } satisfies UserProfileData;
 
     return { data: dataObj, status: HTTP_STATUS.OK };
+}
+export async function updateUserProfile(form: PatchUserForm, user_id: Buffer) {
+
+    
+    if (form.username)  {
+      let rows = await UserModel.getUserByUsername(form.username);
+    if (rows.length != 0) return { data: { success: false, message: "Username already taken" }, status: HTTP_STATUS.BAD_REQUEST };
+        await UserModel.updateUsername(form.username, user_id);
+        //since its only three i think this is okay but i could just get the user and replace whatever is null
+        //and just update all three at once
+    }
+    if (form.display_name) {
+        await UserModel.updateDisplayName(form.display_name,user_id);
+    }
+    if (form.avatar) {
+        await UserModel.updateAvatar(form.avatar, user_id)
+    }
+    let rows = await UserModel.getUserByUuid(user_id);
+    if (rows.length == 0) throw new DatabaseError(" user id doesnt exist somehow");
+
+    return  { data: { success: true, message: "Profile updated Succesfully", user: JSON.stringify(rows[0])}, status: HTTP_STATUS.OK };
 }

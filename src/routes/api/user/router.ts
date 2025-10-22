@@ -11,14 +11,17 @@
 //index by uuid
 
 import express, { Request, Response, NextFunction } from "express";
-import { getUserProfileData } from "./controllers/profile";
+import { getUserProfileData, updateUserProfile } from "./controllers/profile";
 import bet_info from "../../../models/userBetInfo";
 import user_model, { User } from "../../../models/user";
+import { parse as uuidParse } from "uuid";
+import { HTTP_STATUS } from "../../../http";
 const router = express.Router();
 
 router.get("/", getUser);
 router.get("/get/:slug", getUser);
 router.get("/leaderboard", getLeaderboard);
+router.patch("/", patchUser);
 async function getUser(req: Request<{ slug: string | undefined }>, res: Response) {
     try {
         const id = req.params.slug || req.session.user?.id;
@@ -64,6 +67,28 @@ async function getLeaderboard(req: Request, res: Response) {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });
 }
+}
+ export interface PatchUserForm {
+    username: string,
+    display_name: string,
+    avatar: string,
+}
+//add express.json and urlencoded extended true to app.use
+async function patchUser(req: Request<{},{}, PatchUserForm>, res: Response) {
+   const user_form = req.body;
+   let user_id = req.session.user?.id_buf
+   if (!user_id) return res.status(HTTP_STATUS.UNAUTHENTICATED).json({ error: "Not authenticated" });
+   
+   try {
+    let data = await updateUserProfile(user_form, user_id);
+    return res.status(data.status).json(data.data);
+   } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal server error" });
+   }
+
+    
+    
 }
 
 export default router;
