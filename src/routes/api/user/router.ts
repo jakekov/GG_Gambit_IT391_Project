@@ -16,11 +16,13 @@ import bet_info from "../../../models/userBetInfo";
 import user_model, { User } from "../../../models/user";
 import { parse as uuidParse } from "uuid";
 import { HTTP_STATUS } from "../../../http";
+import BetInfo from "../../../models/userBetInfo";
 const router = express.Router();
 
 router.get("/", getUser);
 router.get("/get/:slug", getUser);
 router.get("/leaderboard", getLeaderboard);
+router.get("/balance", getUserBalance); //only session user can get
 router.patch("/", patchUser);
 async function getUser(req: Request<{ slug: string | undefined }>, res: Response) {
     try {
@@ -86,9 +88,43 @@ async function patchUser(req: Request<{},{}, PatchUserForm>, res: Response) {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });
    }
-
-    
-    
 }
+async function getUserBalance(req: Request, res: Response) {
+    let user_id = req.session.user?.id_buf
+   if (!user_id) return res.status(HTTP_STATUS.UNAUTHENTICATED).json({ error: "Not authenticated" });
+   try {
+    const info = await BetInfo.getInfoByUuid(user_id);
+   if (info.length == 0) return res.status(500).json({ error: "Info does not exist" });
+   const data = {
+    points: info[0].points,
+    balance: info[0].balance,
+   };
+   return res.status(HTTP_STATUS.OK).json(data);
+   } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal server error" });
+   }
+   
 
+}
+async function addUserBalance(req: Request, res: Response) {
+    
+    let user_id = req.session.user?.id_buf
+   if (!user_id) return res.status(HTTP_STATUS.UNAUTHENTICATED).json({ error: "Not authenticated" });
+
+   try {
+    const info = await BetInfo.getInfoByUuid(user_id);
+   if (info.length == 0) return res.status(500).json({ error: "Info does not exist" });
+   const data = {
+    points: info[0].points,
+    balance: info[0].balance,
+   };
+   return res.status(HTTP_STATUS.OK).json(data);
+   } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal server error" });
+   }
+   
+
+}
 export default router;

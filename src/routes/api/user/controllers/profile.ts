@@ -5,6 +5,7 @@ import {  parse as UuidParse, stringify as UuidStringify } from "uuid";
 import { HTTP_STATUS } from "../../../../http";
 import { PatchUserForm } from "../router";
 import { DatabaseError } from "../../../../errors";
+import BetInfo from "../../../../models/userBetInfo";
 
 export async function getUserProfileData(slug: string) {
     var id = null;
@@ -23,12 +24,15 @@ export async function getUserProfileData(slug: string) {
     
     if (users.length == 0) return { data: { success: false, message: "User not found" }, status: HTTP_STATUS.NOT_FOUND };
     let user = users[0];
+    let bet_info = await BetInfo.getInfoByUuid(user.id);
+    let points = bet_info.length == 0 ? null : bet_info[0].points;
     const dataObj = {
         id: UuidStringify(user.id),
         username: user.username,
         display_name: user.display_name || user.username,
         avatar: user.avatar, //userFileUrl(user.id, user.avatar),
         date_joined: new Date(user.created),
+        points: points
     } satisfies UserProfileData;
 
     return { data: dataObj, status: HTTP_STATUS.OK };
