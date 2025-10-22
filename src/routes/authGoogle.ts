@@ -64,7 +64,7 @@ router.get("/google/callback/", async (req: Request<{},{},{}>, res: Response) =>
     let profile= await google_controller.getOrCreateGoogleAuthBasedAccount(payload);
     //use session helper to create account
     console.log(`logged in ${profile.email}`);
-  req.session.user = { id: uuidStringify(profile.id), username: profile.username }; //create the auth session info
+  req.session.user = { id: uuidStringify(profile.id), username: profile.username, id_buf: profile.id }; //create the auth session info
   res.send()
   res.json({ email: profile.email, username: profile.username });
     res.send("success");
