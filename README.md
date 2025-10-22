@@ -5,5 +5,7 @@ We are making an app to bet on live Esport Valorant games. This is our project f
 ### Run
 
 -clone git repo
+-create .env file from teams
+-vpn into isunet for database access
 -'npm install'
 -'npm start'
