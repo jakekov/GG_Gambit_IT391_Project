@@ -51,6 +51,10 @@ export async function updateUserProfile(form: PatchUserForm, user_id: Buffer) {
     }
     let rows = await UserModel.getUserByUuid(user_id);
     if (rows.length == 0) throw new DatabaseError(" user id doesnt exist somehow");
-
-    return  { data: { success: true, message: "Profile updated Succesfully", user: JSON.stringify(rows[0])}, status: HTTP_STATUS.OK };
+    let user = {
+        username: rows[0].username,
+        display_name: rows[0].display_name,
+        avatar: rows[0].avatar,
+    }
+    return  { data: { success: true, message: "Profile updated Succesfully", user: user}, status: HTTP_STATUS.OK };
 }

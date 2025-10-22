@@ -62,7 +62,7 @@ async function getLeaderboard(req: Request, res: Response) {
             }
             user_list.push(stat);
     }
-    return res.status(200).json({data: {user_list: JSON.stringify(user_list) , page: "not implemented"}});
+    return res.status(200).json({data: {user_list: user_list , page: "not implemented"}});
 } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });

@@ -1,97 +1,11 @@
 // --- server.js ---
-import express from "express";
-import mysql from "mysql2";
-import cors from "cors";
-
-const app = express();
-app.use(express.json());
-app.use(cors()); // allow frontend to call API
-app.use(express.static("public")); // serve HTML from ./public folder
-
-// --- Connect to MySQL ---
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "mydb"
-});
-
-db.connect((err) => {
-  if (err) console.error("❌ Database connection failed:", err);
-  else console.log("✅ Connected to MySQL");
-});
-
-// --- SAVE USER ---
-app.post("/api/saveUser", (req, res) => {
-  const { username } = req.body;
-  db.query("INSERT INTO users (name) VALUES (?)", [username], (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Error saving user" });
-    }
-    res.json({ message: "User saved successfully!" });
-  });
-});
-
-// --- GET USER BY USERNAME ---
-app.get("/api/user/get/:username", (req, res) => {
-  const { username } = req.params;
-  db.query(
-    "SELECT name AS username, display_name, avatar, points FROM users WHERE name = ?",
-    [username],
-    (err, results) => {
-      if (err) return res.status(500).json({ message: "Database error" });
-      if (results.length === 0)
-        return res.status(404).json({ message: "User not found" });
-      res.json(results[0]);
-    }
-  );
-});
-
-// --- MOCK: CURRENT LOGGED-IN USER ---
-app.get("/api/user", (req, res) => {
-  const currentUser = "test_user"; // placeholder
-  db.query(
-    "SELECT name AS username, display_name, avatar, points FROM users WHERE name = ?",
-    [currentUser],
-    (err, results) => {
-      if (err) return res.status(500).json({ message: "Database error" });
-      if (results.length === 0)
-        return res.status(404).json({ message: "User not found" });
-      res.json(results[0]);
-    }
-  );
-});
-
-// --- LEADERBOARD ---
-app.get("/api/user/leaderboard", (req, res) => {
-  const limit = parseInt(req.query.limit) || 10;
-  const page = parseInt(req.query.page) || 0;
-  const offset = page * limit;
-
-  db.query(
-    `SELECT name AS username, display_name, avatar, points
-     FROM users
-     ORDER BY points DESC
-     LIMIT ? OFFSET ?`,
-    [limit, offset],
-    (err, results) => {
-      if (err) return res.status(500).json({ message: "Database error" });
-      res.json({
-        data: {
-          user_list: results,
-        },
-      });
-    }
-  );
-});
-
-app.listen(3000, () => console.log("🚀 Server running on port 3000"));
 
 async function updateLeaderboard() {
+  console.log("leaderboard");
       try {
-        const response = await fetch("http://localhost:3000/api/user/leaderboard?limit=10&page=0");
+        const response = await fetch('/api/user/leaderboard?limit=10&page=0');
         const data = await response.json();
+        console.log(data);
         const users = data.data.user_list || [];
 
         const getUser = (index) => users[index] || { username: "-", points: 0 };
