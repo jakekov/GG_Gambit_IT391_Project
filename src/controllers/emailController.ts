@@ -1,0 +1,80 @@
+//have the unverified User table have an additional column for the hmac and expiration data
+//or just use jwt
+//generate JWT token
+//
+import jwt from 'jsonwebtoken';
+import config from "../config/config";
+import email_model, {EmailConformationString, TokenOptions} from "../models/email_tokens"
+import user_model from "../models/user";
+import email_tokens from '../models/email_tokens';
+import crypto from "crypto";
+import { DatabaseError } from '../errors';
+//im pretty sure email should be unique for users
+//this would probably be better as a helper file
+interface EmailJWTPayload {
+    email: string,
+    conformation_type: EmailConformationString,
+}
+async function generateEmailVerificationToken(email: string, conformation_type: EmailConformationString): Promise<string | null> {
+    //i thkn the jwt just needs a email
+    let token =jwt.sign({email: email, conformation_type: conformation_type }, config.jwt_secret);
+    
+    try {
+        let users = await user_model.getUserByEmail(email);
+        if (users.length == 0 ) {
+            return null;
+        }
+        let user = users[0];
+        let hash = crypto.createHash('sha256');
+        hash.update(token);
+
+        let token_options: TokenOptions = {
+        userId: user.id,
+        email: email,
+        conformationType: conformation_type,
+        token_hash: hash.digest().toString(),
+    } 
+        await email_tokens.removeAuthByEmail(conformation_type, email);//remove an existing entry if it existed
+        await  email_tokens.createEmailToken(token_options);
+
+    } catch (err) {
+        console.log(err);
+        throw new DatabaseError("Database error");
+    }
+    return token;
+}
+async function verifyEmailVerificationToken(token: string): Promise<boolean> {
+    console.log(token);
+    let payload =jwt.verify(token, config.jwt_secret) as EmailJWTPayload
+
+        let email_entry = await email_tokens.getTokenByEmail( payload.email, payload.conformation_type);
+        
+        console.log(email_entry);
+    if (email_entry.length == 0) {
+        console.log('token does not exist or was revoked')
+        return false;
+    }
+
+    let row = email_entry[0];
+    //check hash //cause this could be an old token sent to the same email
+    let hash = crypto.createHash('sha256');
+        hash.update(token);
+        let token_hash = hash.digest();
+        if (token_hash.toString() !== row.token_hash) {
+            console.log("old email token used");
+            return false;
+        }
+        //if an old token was used dont remove the new one 
+    let huh = await email_tokens.removeAuthByEmail(payload.conformation_type, payload.email);
+    let date = new Date(row.created);
+    //if the verify request creation time + timeout exceeds date now the email dont accept the verification
+    if (Date.now() >= date.getTime() + config.verification_timeout) {
+      console.log("expired token");
+      return false;
+    }
+    
+    await user_model.updateUserEmailVerification(true, row.user_id);
+    return true;
+}
+
+export default {generateEmailVerificationToken, verifyEmailVerificationToken}

@@ -43,9 +43,11 @@ fetch('http://<ip>/api/user/', {
 
 
 async function updateLeaderboard() {
+  console.log("leaderboard");
       try {
-        const response = await fetch("http://localhost:3000/api/user/leaderboard?limit=10&page=0");
+        const response = await fetch('/api/user/leaderboard?limit=10&page=0');
         const data = await response.json();
+        console.log(data);
         const users = data.data.user_list || [];
 
         const getUser = (index) => users[index] || { username: "-", points: 0 };
