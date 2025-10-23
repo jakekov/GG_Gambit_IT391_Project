@@ -21,6 +21,21 @@
   position: relative;
 }
 
+.dash-section {
+  height: 100vh; /* full screen height */
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, 
+      rgba(33,37,41,1) 0%,        /* top fade color (#212529) */
+      rgba(0,0,0,0) 20%,          /* fade to transparent */
+      rgba(0,0,0,0) 80%,          /* keep center transparent */
+      rgba(33,37,41,1) 100%       /* bottom fade color */
+    ),
+    url("images/dash1.webp") no-repeat center;
+  background-size: cover;
+  position: relative;
+}
+
 .login-section {
   height: 100vh; /* full screen height */
   width: 100%;
@@ -115,3 +130,44 @@
   background-color: rgb(105, 105, 105);
   color: #ffffff;
 }
+
+/*div in dashboard*/
+ .bet-card {
+      background-color: #1e1e1e;
+      color: #fff;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .team {
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    .team:hover {
+      transform: scale(1.03);
+      background-color: rgba(255,255,255,0.05);
+    }
+    .team img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .vs {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #ffc107;
+    }
+    .odds {
+      font-size: 1rem;
+      color: #adb5bd;
+    }
+    .bet-btn {
+      background-color: #28a745;
+      border: none;
+      color: white;
+      border-radius: 0.5rem;
+    }
+    .bet-btn:hover {
+      background-color: #218838;
+    }
