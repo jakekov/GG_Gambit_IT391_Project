@@ -10,8 +10,8 @@ export async function createUserBetInfoTable() {
   let query = `CREATE TABLE IF NOT EXISTS user_bet_info(
   id int PRIMARY KEY AUTO_INCREMENT,
   user_id BINARY(16) NOT NULL,
-  points int DEFAULT 0,
-  balance int DEFAULT 0,
+  points int DEFAULT 0 NOT NULL,
+  balance int DEFAULT 0 NOT NULL,
   CONSTRAINT 
    fk_user_bet_info FOREIGN KEY (user_id) REFERENCES users(id)
    ON DELETE CASCADE

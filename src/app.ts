@@ -7,6 +7,7 @@ import user_routes from "./routes/authUser";
 import email_routes from "./routes/emailVerification";
 import google_routes from "./routes/authGoogle";
 import api_user_routes from "./routes/api/user/router";
+import api_match_routes from "./routes/api/match_bet/router";
 import path from "path";
 const app = express();
 
@@ -43,6 +44,7 @@ app.use("/email/verification", email_routes);
 app.use("/profile", profileRoutes);
 app.use("/auth", google_routes);
 app.use("/api/user", api_user_routes );//make a secondary route file for /api
+app.use("/api/matches", api_match_routes);
 // Server setup
 // app.listen(3000, () => {
 //   console.log("Server is Running");
