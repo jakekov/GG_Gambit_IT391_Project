@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GG Gambit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="home.html"><img src="images//whiteLogo.svg" class="img-fluid logoNav"
+                    alt="Main Logo" />
+                Gambit</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="home.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="account.html">Account</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="blank-section d-flex align-items-center justify-content-center text-white">
+        <div class="container">
+            <div class="login-card shadow">
+                <h2 class="text-center mb-4">Signup</h2>
+                <form id="loginForm">
+                    <div id="LoginError"></div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                            placeholder="Enter a username" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" name="email"
+                            placeholder="Enter your email" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Enter your password" />
+                    </div>
+                    <input type="submit" class="btn btn-lg mt-3 w-100 buttonLogin" value="Join Now" />
+                </form>
+
+                <div class="text-center mt-3">
+                    <p>or sign up with:</p>
+
+                    <a href="/auth/google/redirect"
+                        class="btn btn-lg mt-3 w-100 button d-flex align-items-center justify-content-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" aria-label="Google" role="img" viewBox="0 0 512 512"
+                            class="google-icon">
+                            <path d="M0 0h512v512H0z" fill="none" />
+                            <path fill="#34a853" d="m90 341a192 192 0 00296 59v-48h-62c-53 35-141 22-171-60" />
+                            <path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57" />
+                            <path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73" />
+                            <path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55" />
+                        </svg>
+                        Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 Your Company. All rights reserved.</p>
+            <a href="#" class="text-white me-3">Privacy Policy</a>
+            <a href="#" class="text-white">Terms of Service</a>
+        </div>
+    </footer>
+</body>
+
+</html>
+
+<script>
+    const form = document.querySelector("#loginForm");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // prevent default form submission
+
+        const formData = new FormData(form);
+        const res = await fetch("/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", //  tells Express to use express.json()
+            },
+            body: JSON.stringify(Object.fromEntries(formData)),
+        });
+        if (res.ok) {
+            window.location.href = "/dashboard.html"; // redirect on success
+        } else {
+            const data = await res.json();
+            document.getElementById("LoginError").innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          ${data.error || "Login failed"}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+        }
+    });
+</script>
