@@ -4,9 +4,12 @@
   "description": "We are making an app to bet on live Esport Valorant games. This is our project for our IT 391 course at Illinois State University.",
   "main": "index.js",
   "scripts": {
+    "build": "tsc && tsc-alias",
+    "comp_start": "node dist/server.js",
     "start": "npx tsx src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node src/server.ts"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -32,6 +35,7 @@
     "@types/node": "^24.5.2",
     "@types/nodemailer": "^7.0.1",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3"
   }
