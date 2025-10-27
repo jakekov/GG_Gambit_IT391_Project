@@ -75,7 +75,9 @@ router.post("/login", async (req: Request<{},{},LoginForm>, res: Response) => {
   console.log(`logged in ${profile.email}`);
   req.session.user = { id: uuidStringify(profile.id), username: profile.username, id_buf: profile.id }; //create the auth session info
   res.cookie('isAuthenticated', 'true', {sameSite: "lax", });
-  res.json({ email: profile.email, username: profile.username });
+  //Chnage this redirect to new home page with game seleciton options
+  res.redirect("/home.html");
+
 
 });
 /**
