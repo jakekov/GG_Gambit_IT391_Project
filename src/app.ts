@@ -22,13 +22,15 @@ app.use(
       sameSite: true,
       httpOnly: true, //blocks client javascript from seeing cookie
     },
-  }),
+  })
 );
 
 const publicPath = path.join(__dirname, "../static");
 
 // Serve static files
 app.use(express.static(publicPath));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(publicPath, "home.html"));
@@ -43,7 +45,7 @@ app.use("/", user_routes);
 app.use("/email/verification", email_routes);
 app.use("/profile", profileRoutes);
 app.use("/auth", google_routes);
-app.use("/api/user", api_user_routes );//make a secondary route file for /api
+app.use("/api/user", api_user_routes); //make a secondary route file for /api
 app.use("/api/matches", api_match_routes);
 // Server setup
 // app.listen(3000, () => {
@@ -51,8 +53,8 @@ app.use("/api/matches", api_match_routes);
 // });
 // Serve everything inside the "public" folder at the root URL
 
-import {create_if_not_exists} from "./databases/mysql";
-(async () =>  await create_if_not_exists())();
+import { create_if_not_exists } from "./databases/mysql";
+(async () => await create_if_not_exists())();
 
 //if i wanted an auth check for a directory of sites i just add a middleware function for each request in a specific path
 export default app;
