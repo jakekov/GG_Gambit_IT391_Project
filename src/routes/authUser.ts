@@ -98,7 +98,7 @@ router.get("/logout", (req: Request, res: Response) => {
       res.status(500).send("Error logging out");
     } else {
       res.clearCookie("isAuthenticated");
-      res.send("Logged out");
+      res.redirect("/");
     }
   });
 });
@@ -155,7 +155,6 @@ router.post(
       const to: string = email;
       const subject: string = "<subject>";
       const mailTemplate: string = EMAIL_LINK + token; //TODO change this back from 3000 when config changes
-      res.send("Check your email"); //just send the response early before checking
       try {
         await sendMail(from, to, subject, mailTemplate);
       } catch (err) {
@@ -164,18 +163,24 @@ router.post(
         return res.status(500).json({ error: "Internal server error" });
       }
       console.log("sent email to ", email);
-      return;
+      return res.status(200).json({ data: "Signup Success email verification required", url: "/email/verification/waiting" }); 
     }
-    res.send("Creation success");
+    res.status(200).json({ data: "Signup Success" }); //just send the response early before checking
     //send to whatever page is after signup needs to be a site waiting for the email authentication
     //so i guess do nothing for right now
   }
 );
-
+router.get("/signup", (req: Request, res: Response) => {
+  if (req.session.user != null) {
+    //user is already logged in go to default ie dashboard account home whatever it is
+    return res.redirect("/dashboard");
+  }
+  res.sendFile(path.join(staticPath, "signup.html"));
+});
 router.get("/login", (req: Request, res: Response) => {
   if (req.session.user != null) {
     //user is already logged in go to default ie dashboard account home whatever it is
-    res.send("Already logged in");
+    return res.redirect("/dashboard");
   }
   res.sendFile(path.join(staticPath, "login.html"));
 });

@@ -148,8 +148,10 @@ async function verifyAccount(auth: AuthProvider): Promise<User> {
   let acc = rows[0];
   if (config.email_verification === true) {
     //the google sign in doesnt need email verification
+    console.log(acc);
+    console.log(auth);
     if (auth.provider_name == AuthProvidersStrings.LocalAuth) {
-      if (acc.email_verified === false) {
+      if (acc.email_verified == false) {
         console.log("implement something here user not verified");
         throw new UserNotFoundError();
       }

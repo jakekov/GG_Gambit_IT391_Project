@@ -92,13 +92,13 @@ router.get(
     let profile =
       await google_controller.getOrCreateGoogleAuthBasedAccount(payload);
     //use session helper to create account
-    console.log(`logged in ${profile.email}`);
+    console.log(`logged in Google ${profile.email}`);
     req.session.user = {
       id: uuidStringify(profile.id),
       username: profile.username,
       id_buf: profile.id,
     }; //create the auth session info
-    res.redirect("/dashboard.html");
+    res.redirect("/dashboard");
   }
 );
 

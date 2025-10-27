@@ -114,7 +114,7 @@
             body: JSON.stringify(Object.fromEntries(formData)),
         });
         if (res.ok) {
-            window.location.href = "/dashboard.html"; // redirect on success
+            window.location.href = "/login"; // redirect on success
         } else {
             const data = await res.json();
             document.getElementById("LoginError").innerHTML = `

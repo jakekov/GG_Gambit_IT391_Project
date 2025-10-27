@@ -47,6 +47,9 @@ app.use("/profile", profileRoutes);
 app.use("/auth", google_routes);
 app.use("/api/user", api_user_routes); //make a secondary route file for /api
 app.use("/api/matches", api_match_routes);
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(publicPath, "dashboard.html"));
+});
 // Server setup
 // app.listen(3000, () => {
 //   console.log("Server is Running");
