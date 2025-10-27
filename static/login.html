@@ -46,7 +46,9 @@
   <div class="container">
     <div class="login-card shadow">
       <h2 class="text-center mb-4">Login</h2>
-      <form method="post" action="/login">
+      <form id="loginForm">
+          <div id="LoginError"></div>
+
         <div class="mb-3">
           <label for="email" class="form-label">Email address</label>
           <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
@@ -76,3 +78,35 @@
 </footer>
 </body>
 </html>
+
+<script>
+const form = document.querySelector('#loginForm');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault(); // prevent default form submission
+
+
+  const testForm = new FormData();
+  testForm.append("TEST", "WHY DOESNT IT WORK");
+  const formData = new FormData(form);
+  const res = await fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json' //  tells Express to use express.json()
+    },
+    body: JSON.stringify(Object.fromEntries(formData))
+  });
+  if (res.ok) {
+window.location.href = '/dashboard.html'; // redirect on success
+  } else {
+  const data = await res.json();
+      document.getElementById('LoginError').innerHTML =  `
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          ${data.error || "Login failed"}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+  }
+  
+  
+});
+</script>
