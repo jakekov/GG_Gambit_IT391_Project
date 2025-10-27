@@ -1,32 +1,29 @@
-import express, { Request, Response, NextFunction } from "express";
-import user from "../controllers/userController";
-import { sendMail } from "../nodemailer/mailing";
+import express, {Request, Response, NextFunction} from 'express';
+
 import {
   DatabaseError,
   EmailInUseError,
   InvalidPasswordError,
   UserNotFoundError,
-} from "../errors";
-import Verified, { AuthProvidersStrings } from "../models/authProviders";
-import UnverifiedUser from "../models/unverifiedUser";
-import config from "../config/config";
-import path from "path";
+} from '../errors.js';
+import Verified, {AuthProvidersStrings} from '../models/authProviders.js';
+
 import google_controller, {
   check_sign_in_enabled,
-} from "../controllers/googleSignIn";
-import { stringify as uuidStringify } from "uuid";
-import { generateUUIDBuffer } from "../models/user";
+} from '../controllers/googleSignIn.js';
+import {stringify as uuidStringify} from 'uuid';
+import {generateUUIDBuffer} from '../models/user.js';
 
 const router = express.Router();
 
-router.use(express.urlencoded({ extended: true }));
-router.use("/", check_sign_in_enabled);
-router.get("/uuid", async (req: Request<{}, {}, {}>, res: Response) => {
-  console.log("uuid test");
+router.use(express.urlencoded({extended: true}));
+router.use('/', check_sign_in_enabled);
+router.get('/uuid', async (req: Request<{}, {}, {}>, res: Response) => {
+  console.log('uuid test');
   console.log(generateUUIDBuffer());
 });
 router.get(
-  "/google/redirect/",
+  '/google/redirect/',
   async (req: Request<{}, {}, {}>, res: Response) => {
     let search_params = google_controller.redirect_google_sign_in();
     //console.log(`search params: ${search_params}`);
@@ -40,23 +37,23 @@ router.get(
   }
 );
 router.get(
-  "/google/callback/",
+  '/google/callback/',
   async (req: Request<{}, {}, {}>, res: Response) => {
     let code = req.query.code as string | undefined;
     if (!code) {
-      return res.status(403).json({ error: "code not defined" });
+      return res.status(403).json({error: 'code not defined'});
     }
     var payload;
     try {
       payload = await google_controller.server_verify_id(code);
     } catch (err) {
       console.log(err);
-      return res.status(403).json({ error: "unable to verify google account" });
+      return res.status(403).json({error: 'unable to verify google account'});
     }
 
     // This ID is unique to each Google Account, making it suitable for use as a primary key
     // during account lookup. Email is not a good choice because it can be changed by the user.
-    const user_id = payload["sub"];
+    const user_id = payload['sub'];
     // If the request specified a Google Workspace domain:
     // const domain = payload['hd'];
     console.log(user_id);
@@ -72,7 +69,7 @@ router.get(
     //
     //if the email is in use in another authProvider this needs to fail because you need to link accounts then
     if (!payload.email) {
-      throw new Error("email is null");
+      throw new Error('email is null');
     }
     let email_in_user = await Verified.getAnyAuthByEmail(payload.email);
     var email_in_use = false;
@@ -86,7 +83,7 @@ router.get(
     }
     if (email_in_use) {
       return res.send(
-        "Email is in use by an account Please link your accounts in Account settings"
+        'Email is in use by an account Please link your accounts in Account settings'
       );
     }
     let profile =
@@ -98,7 +95,7 @@ router.get(
       username: profile.username,
       id_buf: profile.id,
     }; //create the auth session info
-    res.redirect("/dashboard");
+    res.redirect('/dashboard');
   }
 );
 

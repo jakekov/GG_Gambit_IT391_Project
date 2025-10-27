@@ -1,6 +1,6 @@
-import pool from "../databases/mysql";
-import { RowDataPacket } from "mysql2";
-import { UserNotFoundError } from "../errors";
+import pool from '../databases/mysql.js';
+import {RowDataPacket} from 'mysql2';
+import {UserNotFoundError} from '../errors.js';
 
 //the hash might not be necessary
 //
@@ -40,13 +40,13 @@ export interface TokenOptions {
   conformationType: EmailConformationString;
 }
 export enum EmailConformationString {
-  verify_account = "verify_account",
-  password_reset = "password_reset",
+  verify_account = 'verify_account',
+  password_reset = 'password_reset',
 }
 
 async function createEmailToken(options: TokenOptions) {
   const [result] = await pool.query(
-    "INSERT INTO email_tokens (email, conformation_type, token_hash, user_id) VALUES (?, ?, ?, ?)",
+    'INSERT INTO email_tokens (email, conformation_type, token_hash, user_id) VALUES (?, ?, ?, ?)',
     [
       options.email,
       options.conformationType,
@@ -61,7 +61,7 @@ async function getTokenByEmail(
   provider: EmailConformationString
 ) {
   const [rows] = await pool.query<EmailUserToken[]>(
-    "SELECT * FROM email_tokens WHERE email = ? AND conformation_type = ?",
+    'SELECT * FROM email_tokens WHERE email = ? AND conformation_type = ?',
     [email, provider]
   );
   return rows;
@@ -71,9 +71,9 @@ export async function removeAuthByEmail(
   email: string
 ) {
   const [rows] = await pool.query(
-    "DELETE FROM email_tokens WHERE email = ? AND conformation_type = ?",
+    'DELETE FROM email_tokens WHERE email = ? AND conformation_type = ?',
     [email, conformation_type]
   );
   return rows;
 }
-export default { createEmailToken, getTokenByEmail, removeAuthByEmail };
+export default {createEmailToken, getTokenByEmail, removeAuthByEmail};
