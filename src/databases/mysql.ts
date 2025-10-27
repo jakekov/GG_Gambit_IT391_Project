@@ -6,6 +6,9 @@ import {db} from "../config/config"
 import { createEmailTokensTable } from "../models/email_tokens";
 import { createUserTable } from "../models/user";
 import { createUserBetInfoTable } from "../models/userBetInfo";
+import { createMatchesTable } from "@/models/matches";
+import { createStaticTeamsTable } from "@/models/staticTeams";
+import { createMatcheResultsTable } from "@/models/match_results";
 const pool = mysql.createPool({
   host: db.DB_HOST ,
   user: db.DB_USER ,
@@ -37,6 +40,9 @@ export const create_if_not_exists= async () => {
   console.log("created tokens table");
   await createUserBetInfoTable();
   console.log("creating bet info table");
+  await createMatchesTable();
+  await createStaticTeamsTable();
+  await createMatcheResultsTable();
   
   } catch (err) {
     console.log("error init database tables ", err);
