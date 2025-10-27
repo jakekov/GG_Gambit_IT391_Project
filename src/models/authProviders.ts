@@ -19,65 +19,75 @@ export async function createAuthProvidersTable() {
   CONSTRAINT 
    fk_user FOREIGN KEY (user_id) REFERENCES users(id)
    ON DELETE CASCADE
-)`
-  await pool.query(query); 
+)`;
+  await pool.query(query);
 }
 export interface AuthProvider extends RowDataPacket {
   id: number;
   user_id: Buffer; // not url safe 16 byte binary data references User
-  email: string; //email is not null it will use the email from the oauth2 sign in 
-  provider_name: string, //password, google, other oath2 sign in 
-  provider_id: string,
+  email: string; //email is not null it will use the email from the oauth2 sign in
+  provider_name: string; //password, google, other oath2 sign in
+  provider_id: string;
   hash: string | null;
   salt: string | null; //might just want to convert the hash and salt into the linux format of hashtype:salt:hash
   created: string;
   updated: string;
 }
 export interface AuthOptions {
-  user_id: Buffer,
-  email: string, //email is not null it will use the email from the oauth2 sign in 
-  provider_name: string, //password, google, other oath2 sign in 
-  provider_id: string,
-  hash: string | null,
-  salt: string | null, //might just want to convert the hash and salt into the linux format of hashtype:salt:hash
+  user_id: Buffer;
+  email: string; //email is not null it will use the email from the oauth2 sign in
+  provider_name: string; //password, google, other oath2 sign in
+  provider_id: string;
+  hash: string | null;
+  salt: string | null; //might just want to convert the hash and salt into the linux format of hashtype:salt:hash
 }
 export enum AuthProvidersStrings {
   LocalAuth = "LocalAuth",
-  Google = "Google"
+  Google = "Google",
 }
 //use Pick<> Omit<> and Partial to get variations
 
-async function getAuthByProviderId(provider_id: string, provider: AuthProvidersStrings) {
+async function getAuthByProviderId(
+  provider_id: string,
+  provider: AuthProvidersStrings
+) {
   const [rows] = await pool.query<AuthProvider[]>(
     "SELECT * FROM auth_providers WHERE provider_id = ? AND provider_name = ?",
-    [provider_id, provider],
+    [provider_id, provider]
   );
   return rows;
 }
- async function getAuthByEmail(email: string, provider: AuthProvidersStrings) {
+async function getAuthByEmail(email: string, provider: AuthProvidersStrings) {
   const [rows] = await pool.query<AuthProvider[]>(
     "SELECT * FROM auth_providers WHERE email = ? AND provider_name = ?",
-    [email, provider],
+    [email, provider]
+  );
+  return rows;
+}
+async function getAnyAuthByEmail(email: string) {
+  const [rows] = await pool.query<AuthProvider[]>(
+    "SELECT * FROM auth_providers WHERE email = ?",
+    [email]
   );
   return rows;
 }
 
- async function getUserByEmail(email: string) {
+async function getUserByEmail(email: string) {
   const [rows] = await pool.query<AuthProvider[]>(
     "SELECT * FROM auth_providers WHERE email = ?",
-    [email],
+    [email]
   );
   return rows;
 }
- async function getByIndexedEmail<K extends keyof AuthProvider>(
-    email: string,
-    columns: K[],
- ): Promise<Pick<AuthProvider, K>[]> {
+async function getByIndexedEmail<K extends keyof AuthProvider>(
+  email: string,
+  columns: K[]
+): Promise<Pick<AuthProvider, K>[]> {
   const cols = columns.join(", ");
-  const sql = 'SELECT ${cols} FROM auth_providers WHERE email = ?';
+  const sql = "SELECT ${cols} FROM auth_providers WHERE email = ?";
   const [rows] = await pool.query<AuthProvider[]>(sql, [email]);
-  return rows as Pick<AuthProvider,K>[];
- }
+  return rows as Pick<AuthProvider, K>[];
+}
 
 async function createAuthEntry(auth_options: AuthOptions) {
   const [result] = await pool.query(
@@ -89,17 +99,27 @@ async function createAuthEntry(auth_options: AuthOptions) {
       auth_options.provider_id,
       auth_options.hash,
       auth_options.salt,
-    ],
+    ]
   );
   return result;
 }
 //remove only gives the number of affected rows not the row deleted
- async function removeAuthByProviderID(provider_name: AuthProvidersStrings, provider_id: string) {
+async function removeAuthByProviderID(
+  provider_name: AuthProvidersStrings,
+  provider_id: string
+) {
   const [rows] = await pool.query(
     "DELETE FROM auth_providers WHERE provider_id = ? AND provider_name = ?",
-    [provider_id, provider_name],
+    [provider_id, provider_name]
   );
   return rows;
 }
 
-export default { getAuthByProviderId, getUserByEmail, createAuthEntry, removeAuthByProviderID, getAuthByEmail };
+export default {
+  getAuthByProviderId,
+  getUserByEmail,
+  createAuthEntry,
+  removeAuthByProviderID,
+  getAuthByEmail,
+  getAnyAuthByEmail,
+};

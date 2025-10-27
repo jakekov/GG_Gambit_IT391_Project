@@ -5,7 +5,11 @@
 .logoHero {
     width: 2.4rem
 }
-
+.google-icon {
+  width: 32px;      /* scale */
+  height: 32px;      /* color */
+    flex-shrink: 0;  /* prevent stretching */
+}
 .hero-section {
   height: 100vh; /* full screen height */
   width: 100%;
@@ -35,7 +39,19 @@
   background-size: cover;
   position: relative;
 }
-
+.blank-section {
+  height: 100vh; /* full screen height */
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, 
+      rgba(33,37,41,1) 0%,        /* top fade color (#212529) */
+      rgba(0,0,0,0) 20%,          /* fade to transparent */
+      rgba(112, 28, 28, 0) 80%,          /* keep center transparent */
+      rgba(33,37,41,1) 100%       /* bottom fade color */
+    );
+  background-size: cover;
+  position: relative;
+}
 .login-section {
   height: 100vh; /* full screen height */
   width: 100%;
