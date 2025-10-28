@@ -17,7 +17,7 @@ import {stringify as uuidStringify} from 'uuid';
 import {badRequest, internalServerError} from '@/http.js';
 import {_rootDir} from '@/utils/esm_paths.js';
 const staticPath = path.join(_rootDir, '../static');
-const EMAIL_LINK = `${config.http}://${config.server_addr}:${config.server_port}/email/verification/verify-email/`;
+const EMAIL_LINK = `${config.http}://${config.server_addr}/email/verification/verify-email/`;
 const router = express.Router();
 interface LoginForm {
   email: string;

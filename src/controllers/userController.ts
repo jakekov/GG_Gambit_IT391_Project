@@ -221,7 +221,7 @@ async function LocalAuthOrNewAccount(
 
   console.log('localAuth Created');
 }
-const EMAIL_LINK = `${config.http}://${config.server_addr}:${config.server_port}/email/verification/password/reset/`;
+const EMAIL_LINK = `${config.http}://${config.server_addr}/email/verification/password/reset/`;
 async function passwordResetEmail(email: string) {
   let auth_entry = await AuthCredentials.getAuthByEmail(
     email,
