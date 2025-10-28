@@ -1,9 +1,16 @@
-import AuthCredentials, { AuthProvider, AuthProvidersStrings, AuthOptions } from "../models/authProviders";
-import unverifiedUser from "../models/unverifiedUser";
-import { NextFunction, Request, Response } from "express";
+import AuthCredentials, {
+  AuthProvider,
+  AuthProvidersStrings,
+  AuthOptions,
+} from "../models/authProviders";
+import email_controller from "../controllers/emailController";
 import { scrypt as _scrypt, randomBytes } from "crypto";
-import user_model, {generateUUIDBuffer, User, UserOptions} from "../models/user";
-import crypto from "crypto";
+import user_model, {
+  generateUUIDBuffer,
+  User,
+  UserOptions,
+} from "../models/user";
+import token_model, { EmailConformationString } from "../models/email_tokens";
 import bet_info from "../models/userBetInfo";
 import { promisify } from "util";
 import config from "../config/config";
@@ -14,6 +21,7 @@ import {
   InvalidPasswordError,
   EmailInUseError,
 } from "../errors";
+import { sendMail } from "@/nodemailer/mailing";
 
 const scrypt = promisify(_scrypt);
 /**
@@ -23,7 +31,7 @@ const scrypt = promisify(_scrypt);
  */
 async function checkUserCredentials(
   account_name: string,
-  password: string,
+  password: string
 ): Promise<AuthProvider> {
   //could be a username or email for logging in could also do this in frontent and make a second checkuser
   let contains_at = account_name.includes("@");
@@ -32,7 +40,10 @@ async function checkUserCredentials(
   }
   let user_auth;
   try {
-    user_auth = await AuthCredentials.getAuthByEmail(account_name, AuthProvidersStrings.LocalAuth);
+    user_auth = await AuthCredentials.getAuthByEmail(
+      account_name,
+      AuthProvidersStrings.LocalAuth
+    );
   } catch (err) {
     console.error(err);
     throw new DatabaseError("Database error");
@@ -43,14 +54,14 @@ async function checkUserCredentials(
     //i should remove this
     throw new UserNotFoundError("Username or passward is incorrect");
   }
-  let salt =user_auth[0].salt;
-  let hash =user_auth[0].hash;
+  let salt = user_auth[0].salt;
+  let hash = user_auth[0].hash;
   if (!salt || !hash) {
     throw new DatabaseError("LocalAuth is null");
   }
-  const derivedKey = (
-    (await scrypt(password, salt, 64)) as Buffer
-  ).toString("base64");
+  const derivedKey = ((await scrypt(password, salt, 64)) as Buffer).toString(
+    "base64"
+  );
   //doesnt need to be time safe
   if (derivedKey !== hash)
     throw new InvalidPasswordError("Username or passward is incorrect");
@@ -60,19 +71,21 @@ async function checkUserCredentials(
 /**
  *
  * Creates a localAuth entry for a user id
- * if the localAuthEntry exists already 
+ * if the localAuthEntry exists already
  * this relies on a user account already being made so it should be fine to just check if the localAuth exists
  * @returns email verification token | undefined
  */
 async function createLocalAuth(
   email: string,
   password: string,
-  id: Buffer, // the user tables uuid
+  id: Buffer // the user tables uuid
 ) {
   let user_auth;
   try {
-    user_auth = await AuthCredentials.getAuthByEmail(email, AuthProvidersStrings.LocalAuth);
-    
+    user_auth = await AuthCredentials.getAuthByEmail(
+      email,
+      AuthProvidersStrings.LocalAuth
+    );
   } catch (err) {
     console.error(err);
     throw new DatabaseError("Database error");
@@ -96,23 +109,23 @@ async function createLocalAuth(
   }
   let salt = randomBytes(16).toString("base64");
   const derivedKey = ((await scrypt(password, salt, 64)) as Buffer).toString(
-    "base64",
+    "base64"
   );
   let string_uuid = uuidStringify(id);
-  let auth_options: AuthOptions= {
+  let auth_options: AuthOptions = {
     user_id: id,
     email: email,
     provider_name: AuthProvidersStrings.LocalAuth,
     provider_id: string_uuid, //i think this being the id is okay
     hash: derivedKey,
     salt: salt,
-  } 
+  };
   //it might be bettwe to use JWT but i dont really see a point
   //ive got to save the unverified data somewhere anyway unless i include hash salt email in the jwt but i think that would be in plain text
   //handle email verification in login of unverified user
-  
+
   try {
-    await AuthCredentials.createAuthEntry(auth_options)
+    await AuthCredentials.createAuthEntry(auth_options);
   } catch (err) {
     console.log(err);
     throw new DatabaseError(" Database Error");
@@ -127,77 +140,115 @@ async function createLocalAuth(
   // return token;
 }
 async function verifyAccount(auth: AuthProvider): Promise<User> {
-  
-  let rows = await user_model.getUserByUuid(auth.user_id)
+  let rows = await user_model.getUserByUuid(auth.user_id);
   if (rows.length == 0) {
-    throw new UserNotFoundError;
+    throw new UserNotFoundError();
   }
 
   let acc = rows[0];
   if (config.email_verification === true) {
     //the google sign in doesnt need email verification
+    console.log(acc);
+    console.log(auth);
     if (auth.provider_name == AuthProvidersStrings.LocalAuth) {
-      if (acc.email_verified === false) {
-      console.log("implement something here user not verified");
-      throw new UserNotFoundError;
+      if (acc.email_verified == false) {
+        console.log("implement something here user not verified");
+        throw new UserNotFoundError();
+      }
     }
-    }
-    
   } else {
     console.log("logged in without verified email");
   }
-  
+
   return acc;
 }
-async function LocalAuthOrNewAccount(email: string, password: string) {
-  
-      //need to create an account if none exists using the password
-      //createLocalAuth checks if localAuth already exists
-      //but i need to remove the account if localAuth fails
-      //i dont want it linking to an existing account on signup it needs to only be able to make a new one
-      let existing_account = await user_model.getUserByEmail(email);
-      let existing_local_auth  = await AuthCredentials.getAuthByEmail(email, AuthProvidersStrings.LocalAuth);
-      if (existing_account.length != 0 || existing_local_auth.length != 0) {
-        throw new EmailInUseError("email used in existing account");
-      }
-      var uuid;
-          //create new user
-          //can i just select UUID(); in sql and have it return a uuid for me to use
-          try {
-            let new_uuid = generateUUIDBuffer();
-            
-            let user_options: UserOptions = {
+async function LocalAuthOrNewAccount(
+  username: string,
+  email: string,
+  password: string
+) {
+  //need to create an account if none exists using the password
+  //createLocalAuth checks if localAuth already exists
+  //but i need to remove the account if localAuth fails
+  //i dont want it linking to an existing account on signup it needs to only be able to make a new one
+
+  let existing_username = await user_model.getUserByUsername(username);
+  if (existing_username.length != 0) {
+    throw new EmailInUseError("Username is already in use");
+  }
+  let existing_account = await user_model.getUserByEmail(email);
+  let existing_local_auth = await AuthCredentials.getAuthByEmail(
+    email,
+    AuthProvidersStrings.LocalAuth
+  );
+  if (existing_account.length != 0 || existing_local_auth.length != 0) {
+    throw new EmailInUseError("Email used in existing account");
+  }
+  var uuid;
+  //create new user
+  //can i just select UUID(); in sql and have it return a uuid for me to use
+  try {
+    let new_uuid = generateUUIDBuffer();
+
+    let user_options: UserOptions = {
       email: email,
-      username: "test" + randomBytes(3).toString(), //todo needs to actually check the databse before 
+      username: username, //todo needs to actually check the databse before
       display_name: null,
       avatar: null,
-    }
-      await user_model.createUserWithUUID(user_options, new_uuid);
-    
-            uuid = new_uuid;
-          } catch (err) {
-            console.log(err);
-            throw new DatabaseError("could not create uuid account");
-          }
-      
-      try {
-        await createLocalAuth(email, password, uuid);
-        await bet_info.createUserBetInfo(uuid);
-      } catch (err) {
-        console.log(err)
-        //Need to remove the created account because there is no auth provider for it
-        await user_model.removeUserByUUID(uuid);
-                        
-                        throw new DatabaseError("auth entry failed to create");
-      }
-      
-    
-    //the lis created if it didnt exist
-    //the account may or may not exist
-    //but we have the uuid for an account
-    
-    console.log("localAuth Created");
-    
+    };
+    await user_model.createUserWithUUID(user_options, new_uuid);
+
+    uuid = new_uuid;
+  } catch (err) {
+    console.log(err);
+    throw new DatabaseError("could not create uuid account");
+  }
+
+  try {
+    await createLocalAuth(email, password, uuid);
+    await bet_info.createUserBetInfo(uuid);
+  } catch (err) {
+    console.log(err);
+    //Need to remove the created account because there is no auth provider for it
+    await user_model.removeUserByUUID(uuid);
+
+    throw new DatabaseError("auth entry failed to create");
+  }
+
+  //the lis created if it didnt exist
+  //the account may or may not exist
+  //but we have the uuid for an account
+
+  console.log("localAuth Created");
+}
+const EMAIL_LINK = `${config.http}://${config.server_addr}:${config.server_port}/email/verification/password/reset/`;
+async function passwordResetEmail(email: string) {
+  let auth_entry = await AuthCredentials.getAuthByEmail(
+    email,
+    AuthProvidersStrings.LocalAuth
+  );
+  if (auth_entry.length == 0) throw new UserNotFoundError();
+  //generate email verification token
+  //send them to / reset route which should display a page where you can enter a new password
+  //then i need another post request that includes the token
+
+  let token = email_controller.generateEmailVerificationToken(
+    email,
+    EmailConformationString.password_reset
+  );
+  const from: string = "<from email ID>";
+  const to: string = email;
+  const subject: string = "<subject>";
+  const mailTemplate: string = EMAIL_LINK + token; //TODO change this back from 3000 when config changes
+
+  await sendMail(from, to, subject, mailTemplate);
+
+  console.log("sent email to ", email);
 }
 
-export default { checkUserCredentials, LocalAuthOrNewAccount, verifyAccount };
+export default {
+  checkUserCredentials,
+  LocalAuthOrNewAccount,
+  verifyAccount,
+  passwordResetEmail,
+};

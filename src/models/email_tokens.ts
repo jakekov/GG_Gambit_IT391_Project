@@ -21,30 +21,30 @@ export async function createEmailTokensTable() {
    FOREIGN KEY (user_id) REFERENCES users(id)
    ON DELETE CASCADE
   
-)`
-  await pool.query(query); 
+)`;
+  await pool.query(query);
 }
 //only one type of email confirmation is allowed so only one account verify at a time , one password reset
 export interface EmailUserToken extends RowDataPacket {
   id: string;
-  user_id: Buffer, // the 
-  token_hash: string,
-  email: string
-  conformationType: EmailConformationString, // sign in  / email verification, new session/ emaail change? etc 
+  user_id: Buffer; // the
+  token_hash: string;
+  email: string;
+  conformationType: EmailConformationString; // sign in  / email verification, new session/ emaail change? etc
   created: string;
 }
 export interface TokenOptions {
-  userId: Buffer, // the 
-  token_hash: string,
-  email: string
-  conformationType: EmailConformationString
+  userId: Buffer; // the
+  token_hash: string;
+  email: string;
+  conformationType: EmailConformationString;
 }
 export enum EmailConformationString {
-  verify_account=  "verify_account",
+  verify_account = "verify_account",
+  password_reset = "password_reset",
 }
 
 async function createEmailToken(options: TokenOptions) {
-  
   const [result] = await pool.query(
     "INSERT INTO email_tokens (email, conformation_type, token_hash, user_id) VALUES (?, ?, ?, ?)",
     [
@@ -52,22 +52,28 @@ async function createEmailToken(options: TokenOptions) {
       options.conformationType,
       options.token_hash,
       options.userId,
-    ],
+    ]
   );
   return result;
 }
- async function getTokenByEmail(email: string, provider: EmailConformationString) {
+async function getTokenByEmail(
+  email: string,
+  provider: EmailConformationString
+) {
   const [rows] = await pool.query<EmailUserToken[]>(
     "SELECT * FROM email_tokens WHERE email = ? AND conformation_type = ?",
-    [email, provider],
+    [email, provider]
   );
   return rows;
 }
-export async function removeAuthByEmail(conformation_type: EmailConformationString, email: string) {
+export async function removeAuthByEmail(
+  conformation_type: EmailConformationString,
+  email: string
+) {
   const [rows] = await pool.query(
     "DELETE FROM email_tokens WHERE email = ? AND conformation_type = ?",
-    [email, conformation_type],
+    [email, conformation_type]
   );
   return rows;
 }
-export default {createEmailToken, getTokenByEmail, removeAuthByEmail}
+export default { createEmailToken, getTokenByEmail, removeAuthByEmail };
