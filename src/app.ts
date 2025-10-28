@@ -8,6 +8,7 @@ import email_routes from './routes/emailVerification.js';
 import google_routes from './routes/authGoogle.js';
 import api_user_routes from './routes/api/user/router.js';
 import api_match_routes from './routes/api/match_bet/router.js';
+import {_rootDir} from './utils/esm_paths.js';
 import path from 'path';
 const app = express();
 
@@ -25,7 +26,7 @@ app.use(
   })
 );
 
-const publicPath = path.join(_dirname, '../static');
+const publicPath = path.join(_rootDir, '../static');
 
 // Serve static files
 app.use(express.static(publicPath));
@@ -57,7 +58,6 @@ app.get('/dashboard', (req, res) => {
 // Serve everything inside the "public" folder at the root URL
 
 import {create_if_not_exists} from './databases/mysql.js';
-import {_dirname} from './utils/esm_paths.js';
 (async () => await create_if_not_exists())();
 
 //if i wanted an auth check for a directory of sites i just add a middleware function for each request in a specific path
