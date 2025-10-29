@@ -29,7 +29,7 @@ const config: Config = {
   verification_timeout: 900_000, //15 minutes
   email_verification: getEnvVar('REQUIRE_EMAIL_VERIFICATION') === 'true',
   jwt_secret: getEnvVar('JWT_SECRET'),
-  http: 'http', //until or if we use a certificate
+  http: getEnvVarOr('HTTP_TYPE', 'http'), //until or if we use a certificate
 };
 export const email: Email = {
   email_user: getEnvVar('EMAIL_USER'),
@@ -60,6 +60,13 @@ function load_google_sign_in(): GoogleSignIn {
     };
   }
   return output;
+}
+function getEnvVarOr(key: string, or: string): string {
+  const value = process.env[key];
+  if (!value) {
+    return or;
+  }
+  return value;
 }
 
 function getEnvVar(key: string): string {
