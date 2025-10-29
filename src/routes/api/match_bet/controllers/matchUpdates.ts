@@ -1,5 +1,5 @@
-import match_model, { Match } from "@/models/matches";
-import results_model, { ResultOptions } from "@/models/match_results";
+import match_model, {Match} from '@/models/matches.js';
+import results_model, {ResultOptions} from '@/models/match_results.js';
 export interface VlrMatches {
   status: string;
   size: number;
@@ -25,19 +25,19 @@ export interface VlrTeam {
 
 async function matchEnded(id: number) {
   //needs to check results for the info
-  const response = await fetch("http://10.111.21.84:5000/api/v1/matches")
+  const response = await fetch('http://10.111.21.84:5000/api/v1/matches')
     .then((res) => res.json())
     .then((res) => {
       return res as VlrMatches;
     });
 }
 /**
- * Checks if any current live matches exists if not it means its ended 
+ * Checks if any current live matches exists if not it means its ended
  * Queries vlr results to get end info and moves the match from matches to results table
  * Emits an event with the match id so a system can update bets
  * @param live_matches Matches in matches table that have MachStatus Live
  * @param matches All vlr_match ids returned from api/v1/matches
- * @returns 
+ * @returns
  */
 
 async function checkConclusions(live_matches: Match[], matches: number[]) {
@@ -50,7 +50,7 @@ async function checkConclusions(live_matches: Match[], matches: number[]) {
     ended_matches.push(match);
   }
   if (ended_matches.length == 0) return;
-  const response = await fetch("http://10.111.21.84:5000/api/v1/results")
+  const response = await fetch('http://10.111.21.84:5000/api/v1/results')
     .then((res) => res.json())
     .then((res) => {
       return res as VlrMatches;
@@ -64,7 +64,7 @@ async function checkConclusions(live_matches: Match[], matches: number[]) {
       let a = vlr_result.teams[0].score;
       let b = vlr_result.teams[1].score;
       if (a === null || b === null) {
-        console.log("return result equals");
+        console.log('return result equals');
         console.log(match);
         console.log(vlr_result);
         continue;

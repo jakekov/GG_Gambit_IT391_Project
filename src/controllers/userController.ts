@@ -2,26 +2,26 @@ import AuthCredentials, {
   AuthProvider,
   AuthProvidersStrings,
   AuthOptions,
-} from "../models/authProviders";
-import email_controller from "../controllers/emailController";
-import { scrypt as _scrypt, randomBytes } from "crypto";
+} from '../models/authProviders.js';
+import email_controller from '../controllers/emailController.js';
+import {scrypt as _scrypt, randomBytes} from 'crypto';
 import user_model, {
   generateUUIDBuffer,
   User,
   UserOptions,
-} from "../models/user";
-import token_model, { EmailConformationString } from "../models/email_tokens";
-import bet_info from "../models/userBetInfo";
-import { promisify } from "util";
-import config from "../config/config";
-import { stringify as uuidStringify } from "uuid";
+} from '../models/user.js';
+import token_model, {EmailConformationString} from '../models/email_tokens.js';
+import bet_info from '../models/userBetInfo.js';
+import {promisify} from 'util';
+import config from '../config/config.js';
+import {stringify as uuidStringify} from 'uuid';
 import {
   UserNotFoundError,
   DatabaseError,
   InvalidPasswordError,
   EmailInUseError,
-} from "../errors";
-import { sendMail } from "@/nodemailer/mailing";
+} from '../errors.js';
+import {sendMail} from '@/nodemailer/mailing.js';
 
 const scrypt = promisify(_scrypt);
 /**
@@ -34,9 +34,9 @@ async function checkUserCredentials(
   password: string
 ): Promise<AuthProvider> {
   //could be a username or email for logging in could also do this in frontent and make a second checkuser
-  let contains_at = account_name.includes("@");
+  let contains_at = account_name.includes('@');
   if (!contains_at) {
-    throw new Error("email not valid");
+    throw new Error('email not valid');
   }
   let user_auth;
   try {
@@ -46,25 +46,25 @@ async function checkUserCredentials(
     );
   } catch (err) {
     console.error(err);
-    throw new DatabaseError("Database error");
+    throw new DatabaseError('Database error');
   }
 
   if (user_auth.length == 0) {
-    const val = contains_at ? "email" : "username";
+    const val = contains_at ? 'email' : 'username';
     //i should remove this
-    throw new UserNotFoundError("Username or passward is incorrect");
+    throw new UserNotFoundError('Username or passward is incorrect');
   }
   let salt = user_auth[0].salt;
   let hash = user_auth[0].hash;
   if (!salt || !hash) {
-    throw new DatabaseError("LocalAuth is null");
+    throw new DatabaseError('LocalAuth is null');
   }
   const derivedKey = ((await scrypt(password, salt, 64)) as Buffer).toString(
-    "base64"
+    'base64'
   );
   //doesnt need to be time safe
   if (derivedKey !== hash)
-    throw new InvalidPasswordError("Username or passward is incorrect");
+    throw new InvalidPasswordError('Username or passward is incorrect');
   //now get the user information from the other table
   return user_auth[0];
 }
@@ -88,7 +88,7 @@ async function createLocalAuth(
     );
   } catch (err) {
     console.error(err);
-    throw new DatabaseError("Database error");
+    throw new DatabaseError('Database error');
   }
   //and im not sure how good it would be to prompt a username after signing up
 
@@ -105,11 +105,11 @@ async function createLocalAuth(
   //I think this somewhat prevents users very slim chance that user clicks verification and register at the same time
   //because register would have to expire right as the verification accepted and removed the row
   if (user_auth.length != 0) {
-    throw new EmailInUseError("Email is already in use");
+    throw new EmailInUseError('Email is already in use');
   }
-  let salt = randomBytes(16).toString("base64");
+  let salt = randomBytes(16).toString('base64');
   const derivedKey = ((await scrypt(password, salt, 64)) as Buffer).toString(
-    "base64"
+    'base64'
   );
   let string_uuid = uuidStringify(id);
   let auth_options: AuthOptions = {
@@ -128,7 +128,7 @@ async function createLocalAuth(
     await AuthCredentials.createAuthEntry(auth_options);
   } catch (err) {
     console.log(err);
-    throw new DatabaseError(" Database Error");
+    throw new DatabaseError(' Database Error');
   }
   // let token = randomBytes(16).toString("base64url");
   // try {
@@ -152,12 +152,12 @@ async function verifyAccount(auth: AuthProvider): Promise<User> {
     console.log(auth);
     if (auth.provider_name == AuthProvidersStrings.LocalAuth) {
       if (acc.email_verified == false) {
-        console.log("implement something here user not verified");
+        console.log('implement something here user not verified');
         throw new UserNotFoundError();
       }
     }
   } else {
-    console.log("logged in without verified email");
+    console.log('logged in without verified email');
   }
 
   return acc;
@@ -174,7 +174,7 @@ async function LocalAuthOrNewAccount(
 
   let existing_username = await user_model.getUserByUsername(username);
   if (existing_username.length != 0) {
-    throw new EmailInUseError("Username is already in use");
+    throw new EmailInUseError('Username is already in use');
   }
   let existing_account = await user_model.getUserByEmail(email);
   let existing_local_auth = await AuthCredentials.getAuthByEmail(
@@ -182,7 +182,7 @@ async function LocalAuthOrNewAccount(
     AuthProvidersStrings.LocalAuth
   );
   if (existing_account.length != 0 || existing_local_auth.length != 0) {
-    throw new EmailInUseError("Email used in existing account");
+    throw new EmailInUseError('Email used in existing account');
   }
   var uuid;
   //create new user
@@ -201,7 +201,7 @@ async function LocalAuthOrNewAccount(
     uuid = new_uuid;
   } catch (err) {
     console.log(err);
-    throw new DatabaseError("could not create uuid account");
+    throw new DatabaseError('could not create uuid account');
   }
 
   try {
@@ -212,16 +212,16 @@ async function LocalAuthOrNewAccount(
     //Need to remove the created account because there is no auth provider for it
     await user_model.removeUserByUUID(uuid);
 
-    throw new DatabaseError("auth entry failed to create");
+    throw new DatabaseError('auth entry failed to create');
   }
 
   //the lis created if it didnt exist
   //the account may or may not exist
   //but we have the uuid for an account
 
-  console.log("localAuth Created");
+  console.log('localAuth Created');
 }
-const EMAIL_LINK = `${config.http}://${config.server_addr}:${config.server_port}/email/verification/password/reset/`;
+const EMAIL_LINK = `${config.http}://${config.server_addr}/email/verification/password/reset/`;
 async function passwordResetEmail(email: string) {
   let auth_entry = await AuthCredentials.getAuthByEmail(
     email,
@@ -236,14 +236,14 @@ async function passwordResetEmail(email: string) {
     email,
     EmailConformationString.password_reset
   );
-  const from: string = "<from email ID>";
+  const from: string = '<from email ID>';
   const to: string = email;
-  const subject: string = "<subject>";
+  const subject: string = '<subject>';
   const mailTemplate: string = EMAIL_LINK + token; //TODO change this back from 3000 when config changes
 
   await sendMail(from, to, subject, mailTemplate);
 
-  console.log("sent email to ", email);
+  console.log('sent email to ', email);
 }
 
 export default {

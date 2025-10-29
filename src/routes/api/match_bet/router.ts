@@ -1,18 +1,18 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, {Request, Response, NextFunction} from 'express';
 
 import match_model, {
   Match,
   MatchStatus,
   MatchWithTeams,
-} from "@/models/matches";
-import { randomInt } from "crypto";
-import { VlrMatch, VlrMatches } from "./controllers/matchUpdates";
-import { HTTP_STATUS } from "@/http";
-import { findTeamId } from "./controllers/static_team";
+} from '@/models/matches.js';
+import {randomInt} from 'crypto';
+import {VlrMatch, VlrMatches} from './controllers/matchUpdates.js';
+import {HTTP_STATUS} from '@/http.js';
+import {findTeamId} from './controllers/static_team.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
-router.get("/info", getMatchesInfo);
+router.get('/info', getMatchesInfo);
 
 async function postMatchBet(req: Request, res: Response) {}
 
@@ -31,7 +31,7 @@ interface CombinedMatches {
  */
 async function getMatchesInfo(req: Request, res: Response) {
   try {
-    const response = await fetch("http://10.111.21.84:5000/api/v1/matches")
+    const response = await fetch('http://10.111.21.84:5000/api/v1/matches')
       .then((res1) => res1.json())
       .then((res1) => {
         return res1 as VlrMatches;
@@ -42,7 +42,7 @@ async function getMatchesInfo(req: Request, res: Response) {
     for (const match of response.data) {
       let team_a = match.teams[0];
       let team_b = match.teams[1];
-      if (team_a.name === "TBD" || team_b.name === "TBD") continue; //some of them after still have names
+      if (team_a.name === 'TBD' || team_b.name === 'TBD') continue; //some of them after still have names
       //find match in database from vlr id
 
       let existing_matches = await match_model.getMatchWithTeams(
@@ -72,7 +72,7 @@ async function getMatchesInfo(req: Request, res: Response) {
           continue;
         }
         if (!match.timestamp) {
-          console.log("NO TIMESTAMP");
+          console.log('NO TIMESTAMP');
           continue;
         }
 
@@ -88,7 +88,7 @@ async function getMatchesInfo(req: Request, res: Response) {
         await match_model.createMatchRow(new_match);
         let te = await match_model.getMatchWithTeams(new_match.id);
         if (te.length == 0) {
-          console.log("INSERTION ERROR");
+          console.log('INSERTION ERROR');
           continue;
         }
 
@@ -99,10 +99,10 @@ async function getMatchesInfo(req: Request, res: Response) {
         //add object to return response
       }
     }
-    return res.status(200).json({ data: data_response });
+    return res.status(200).json({data: data_response});
   } catch (err) {
     console.log(err);
-    return res.status(HTTP_STATUS.SERVER_ERROR).json({ error: "ERROR" });
+    return res.status(HTTP_STATUS.SERVER_ERROR).json({error: 'ERROR'});
   }
 }
 export default router;

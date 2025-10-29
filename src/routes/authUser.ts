@@ -1,22 +1,23 @@
-import express, { Request, Response, NextFunction } from "express";
-import user from "../controllers/userController";
-import { User } from "../models/user";
-import { sendMail } from "../nodemailer/mailing";
+import express, {Request, Response, NextFunction} from 'express';
+import user from '../controllers/userController.js';
+import {User} from '../models/user.js';
+import {sendMail} from '../nodemailer/mailing.js';
 import {
   DatabaseError,
   EmailInUseError,
   InvalidPasswordError,
   UserNotFoundError,
-} from "../errors";
-import { AuthProvider } from "../models/authProviders";
-import config from "../config/config";
-import path from "path";
-import email_controller from "../controllers/emailController";
-import { EmailConformationString } from "../models/email_tokens";
-import { stringify as uuidStringify } from "uuid";
-import { badRequest, internalServerError } from "@/http";
-const staticPath = path.join(__dirname, "../../static");
-const EMAIL_LINK = `${config.http}://${config.server_addr}:${config.server_port}/email/verification/verify-email/`;
+} from '../errors.js';
+import {AuthProvider} from '../models/authProviders.js';
+import config from '../config/config.js';
+import path from 'path';
+import email_controller from '../controllers/emailController.js';
+import {EmailConformationString} from '../models/email_tokens.js';
+import {stringify as uuidStringify} from 'uuid';
+import {badRequest, internalServerError} from '@/http.js';
+import {_rootDir} from '@/utils/esm_paths.js';
+const staticPath = path.join(_rootDir, '../static');
+const EMAIL_LINK = `${config.http}://${config.server_addr}/email/verification/verify-email/`;
 const router = express.Router();
 interface LoginForm {
   email: string;
@@ -31,14 +32,14 @@ interface LoginForm {
  */
 
 router.post(
-  "/login",
+  '/login',
   async (req: Request<{}, {}, LoginForm>, res: Response) => {
     //TODO check the verifification / resend
     //if the email fails to send the email wont be usable for expiration time
     if (!req.body) {
-      return badRequest(res, "Body is undefined");
+      return badRequest(res, 'Body is undefined');
     }
-    const { email, password } = req.body;
+    const {email, password} = req.body;
     if (!email || !password) {
       return badRequest(res);
     }
@@ -53,27 +54,27 @@ router.post(
         err instanceof InvalidPasswordError
       ) {
         // Expected auth errors → send 401
-        return res.status(401).json({ error: err.message });
+        return res.status(401).json({error: err.message});
       } else if (err instanceof DatabaseError) {
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({error: err.message});
       }
-      console.log("unexpected error ");
+      console.log('unexpected error ');
       console.log(err);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({error: 'Internal server error'});
     }
     let profile: User;
     try {
       profile = await user.verifyAccount(acc);
     } catch (err) {
       if (err instanceof UserNotFoundError) {
-        return res.status(401).json({ error: err.message });
+        return res.status(401).json({error: err.message});
       } else if (err instanceof DatabaseError) {
         console.log(err);
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({error: err.message});
       }
-      console.log("unexpected error ");
+      console.log('unexpected error ');
       console.log(err);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({error: 'Internal server error'});
     }
 
     console.log(`logged in ${profile.email}`);
@@ -82,23 +83,26 @@ router.post(
       username: profile.username,
       id_buf: profile.id,
     }; //create the auth session info
-    res.cookie("isAuthenticated", "true", { sameSite: "lax" });
-    res.status(200).json({ email: profile.email, username: profile.username });
+    res.cookie('isAuthenticated', 'true', {sameSite: 'lax'});
+    res.status(200).json({
+      email: profile.email,
+      username: profile.username,
+    });
   }
 );
 /**
  * Logout from the auth session
  * destroys the session
  */
-router.get("/logout", (req: Request, res: Response) => {
+router.get('/logout', (req: Request, res: Response) => {
   // Destroy session
   req.session.destroy((err) => {
     if (err) {
       console.error(err);
-      res.status(500).send("Error logging out");
+      res.status(500).send('Error logging out');
     } else {
-      res.clearCookie("isAuthenticated");
-      res.redirect("/");
+      res.clearCookie('isAuthenticated');
+      res.redirect('/');
     }
   });
 });
@@ -114,9 +118,9 @@ interface SignupForm {
  * checks if the email is already in use then takes token and sends an email with the otken in the link
  */
 router.post(
-  "/signup",
+  '/signup',
   async (req: Request<{}, {}, SignupForm>, res: Response) => {
-    const { username, email, password } = req.body;
+    const {username, email, password} = req.body;
     try {
       //need to create an account if none exists using the password
       //createLocalAuth checks if localAuth already exists
@@ -127,13 +131,13 @@ router.post(
     } catch (err) {
       if (err instanceof EmailInUseError) {
         // Expected auth errors → send 401
-        return res.status(401).json({ error: err.message });
+        return res.status(401).json({error: err.message});
       } else if (err instanceof DatabaseError) {
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({error: err.message});
       }
-      console.log("unexpected error ");
+      console.log('unexpected error ');
       console.log(err);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({error: 'Internal server error'});
     }
     if (config.email_verification === true) {
       //update the email_verified for the account
@@ -144,50 +148,53 @@ router.post(
           EmailConformationString.verify_account
         );
       } catch (err) {
-        console.log("email verification failed but account created");
-        return res.status(500).json({ error: "Internal server error" });
+        console.log('email verification failed but account created');
+        return res.status(500).json({error: 'Internal server error'});
       }
       if (!token) {
-        console.log("token is null but account is created");
-        return res.status(500).json({ error: "Internal server error" });
+        console.log('token is null but account is created');
+        return res.status(500).json({error: 'Internal server error'});
       }
-      const from: string = "<from email ID>";
+      const from: string = '<from email ID>';
       const to: string = email;
-      const subject: string = "<subject>";
+      const subject: string = '<subject>';
       const mailTemplate: string = EMAIL_LINK + token; //TODO change this back from 3000 when config changes
       try {
         await sendMail(from, to, subject, mailTemplate);
       } catch (err) {
-        console.log("error sending verification email" + err);
+        console.log('error sending verification email' + err);
         //then send another response if it goes bad
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({error: 'Internal server error'});
       }
-      console.log("sent email to ", email);
-      return res.status(200).json({ data: "Signup Success email verification required", url: "/email/verification/waiting" }); 
+      console.log('sent email to ', email);
+      return res.status(200).json({
+        data: 'Signup Success email verification required',
+        url: '/email/verification/waiting',
+      });
     }
-    res.status(200).json({ data: "Signup Success" }); //just send the response early before checking
+    res.status(200).json({data: 'Signup Success'}); //just send the response early before checking
     //send to whatever page is after signup needs to be a site waiting for the email authentication
     //so i guess do nothing for right now
   }
 );
-router.get("/signup", (req: Request, res: Response) => {
+router.get('/signup', (req: Request, res: Response) => {
   if (req.session.user != null) {
     //user is already logged in go to default ie dashboard account home whatever it is
-    return res.redirect("/dashboard");
+    return res.redirect('/dashboard');
   }
-  res.sendFile(path.join(staticPath, "signup.html"));
+  res.sendFile(path.join(staticPath, 'signup.html'));
 });
-router.get("/login", (req: Request, res: Response) => {
+router.get('/login', (req: Request, res: Response) => {
   if (req.session.user != null) {
     //user is already logged in go to default ie dashboard account home whatever it is
-    return res.redirect("/dashboard");
+    return res.redirect('/dashboard');
   }
-  res.sendFile(path.join(staticPath, "login.html"));
+  res.sendFile(path.join(staticPath, 'login.html'));
 });
 //submit route where user enters email to get a reqeust in their email
-router.post("/password/reset", postPasswordReset);
+router.post('/password/reset', postPasswordReset);
 async function postPasswordReset(
-  req: Request<{}, {}, { email?: string }>,
+  req: Request<{}, {}, {email?: string}>,
   res: Response
 ) {
   let email = req.body.email;
@@ -197,14 +204,14 @@ async function postPasswordReset(
   } catch (err) {
     if (err instanceof UserNotFoundError) {
       return res.status(200).json({
-        data: "If a user exists for the account a password reset email was sent",
+        data: 'If a user exists for the account a password reset email was sent',
       });
     }
     console.log(err);
     internalServerError(res);
   }
   return res.status(200).json({
-    data: "If a user exists for the account a password reset email was sent",
+    data: 'If a user exists for the account a password reset email was sent',
   });
 }
 export default router;

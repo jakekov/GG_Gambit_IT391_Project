@@ -1,6 +1,6 @@
-import pool from "../databases/mysql";
-import { FieldPacket, RowDataPacket } from "mysql2";
-import { Match } from "./matches";
+import pool from '../databases/mysql.js';
+import {FieldPacket, RowDataPacket} from 'mysql2';
+import {Match} from './matches.js';
 //i could maybe just store matches that people placed bets on
 // and then only store results from that
 //cause the path will be make bet fetches matches you can bet on from the vlr.gg
@@ -18,52 +18,58 @@ export async function createMatcheResultsTable() {
   tournament VARCHAR(64),
   img VARCHAR(64),
   match_end TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-)`
-  await pool.query(query); 
+)`;
+  await pool.query(query);
 }
 
 export interface Result extends RowDataPacket {
-    id: number, //vlr.gg key
-    team_a: number, //static teams key
-    team_b: number,
-    score_a: number,
-    score_b: number,
-    odds: number, // likelyhood of a team winning INT 0 is 50/50 - team_1,  + team_b divide by some scalar to get percent
-    event: string,
-    tournament: string,
-    img: string
-    match_start: Date, 
+  id: number; //vlr.gg key
+  team_a: number; //static teams key
+  team_b: number;
+  score_a: number;
+  score_b: number;
+  odds: number; // likelyhood of a team winning INT 0 is 50/50 - team_1,  + team_b divide by some scalar to get percent
+  event: string;
+  tournament: string;
+  img: string;
+  match_start: Date;
 }
 export interface ResultOptions {
-    score_a: number,
-    score_b: number,
-    event: string,
-    tournament: string,
-    img: string
+  score_a: number;
+  score_b: number;
+  event: string;
+  tournament: string;
+  img: string;
 }
 export enum MatchStatus {
-    live = 'Live',
-    upcoming = 'Upcoming'
+  live = 'Live',
+  upcoming = 'Upcoming',
 }
 
 async function getResultById(id: number) {
   const [rows] = await pool.query<Result[]>(
-    "SELECT * FROM match_results WHERE id = ?",
-    [id],
+    'SELECT * FROM match_results WHERE id = ?',
+    [id]
   );
   return rows;
 }
 
-
 //want more info go through the scraper to get players
-async function createResultRow( options: Match, add: ResultOptions) {
+async function createResultRow(options: Match, add: ResultOptions) {
   const [result] = await pool.query(
-    "INSERT INTO match_results (id, team_a, team_b, score_a, score_b, odds, event, tournament, img) VALUES (?,?,?,?,?,?)",
+    'INSERT INTO match_results (id, team_a, team_b, score_a, score_b, odds, event, tournament, img) VALUES (?,?,?,?,?,?)',
     [
-        options.id, options.team_a, options.team_b, add.score_a, add.score_b, options.odds, 
-        add.event, add.tournament, add.img
-    ],
+      options.id,
+      options.team_a,
+      options.team_b,
+      add.score_a,
+      add.score_b,
+      options.odds,
+      add.event,
+      add.tournament,
+      add.img,
+    ]
   );
   return result;
 }
-export default {getResultById, createResultRow }
+export default {getResultById, createResultRow};
