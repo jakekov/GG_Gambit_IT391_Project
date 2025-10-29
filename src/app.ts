@@ -34,7 +34,10 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(publicPath, 'home.html'));
+  if (req.session.user == null) {
+    return res.sendFile(path.join(publicPath, 'home.html'));
+  }
+  return res.sendFile(path.join(publicPath, 'homelogon.html'));
 });
 
 app.get('/hello', (req: Request, res: Response, next: NextFunction) => {

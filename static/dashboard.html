@@ -5,25 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GG Gambit</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
-  
-<!-- Navbar -->
+
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="home.html"><img src="images//whiteLogo.svg" class="img-fluid logoNav" alt="Main Logo"> Gambit</a>
-      
+      <a class="navbar-brand" href="home.html">
+        <img src="images/whiteLogo.svg" class="img-fluid logoNav" alt="Main Logo"> Gambit
+      </a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
               data-bs-target="#navbarNav" aria-controls="navbarNav" 
               aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
@@ -43,73 +45,154 @@
     </div>
   </nav>
 
-  <div class="dash-section d-flex align-items-center justify-content-center text-white bg-dark">
-  <div class="container-fluid py-4">
-    <div class="row">
-      <!-- Left Column -->
-      <div class="col-12 col-md-3  text-white p-2">
-        <div class="container my-4">
-  <div class="card shadow-sm">
-    <div class="card-header bg-success text-white text-center">
-      <h5 class="mb-0">Upcoming Esports Matches</h5>
-    </div>
-    <div class="card-body p-0" style="height: 400px;">
-      <iframe
-        src="https://www.esportsguide.com/widget/upcoming-matches"
-        width="100%"
-        height="100%"
-        frameborder="0"
-        allowfullscreen>
-      </iframe>
-    </div>
-  </div>
-</div>
+  <div class="dash-section bg-dark text-white py-5">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      
+      <!-- Left  -->
+      <div class="col-12 col-md-3">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-success text-white text-center">
+            <h5 class="mb-0">Upcoming Esports Matches</h5>
+          </div>
+          <div class="card-body p-0" style="height: 400px;">
+            <iframe
+              src="https://www.esportsguide.com/widget/upcoming-matches"
+              width="100%"
+              height="100%"
+              frameborder="0"
+              allowfullscreen>
+            </iframe>
+          </div>
+        </div>
       </div>
 
-      <!-- Middle Column -->
-      <div class="bet-card p-2 col-md-6 m-2">
-    <div class="text-center mb-3">
-      <h5 class="text-uppercase text-secondary mb-0">Premier League</h5>
-      <small class="text-muted">Match starts in 2h 45m</small>
+<!-- Middle Column -->
+<div class="col-12 col-md-6">
+  <div class="card shadow-sm bg-dark text-white h-100">
+    <div class="card-header bg-success text-white text-center">
+      <h5 class="mb-0">Selected Bets</h5>
     </div>
-  </div>
-    
 
-      <!-- Right Column -->
+    <!-- Container -->
+    <div class="card-body p-3" id="selectedBetsContainer" style="max-height: 400px; overflow-y: auto;">
       
-          <!-- Right Column Leaderboard-->
-          <!--the positions on the leaderbaord will be updated by calling their classes which is based on leaderbaord position. 
-          for exmaple "fpName" class name will be the name for first place and 2pPoints will be used to update 2nd places points-->
+      <!-- Example Bet Row -->
+      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+        <div class="team-info d-flex align-items-center">
+          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+          <div>
+            <span class="fw-bold">Team A</span> 
+            <span class="text-secondary">vs</span> 
+            <span class="fw-bold">Team B</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="odds text-success fw-bold me-2">+150</span>
+          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
+        </div>
+      </div>
+      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+        <div class="team-info d-flex align-items-center">
+          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+          <div>
+            <span class="fw-bold">Team A</span> 
+            <span class="text-secondary">vs</span> 
+            <span class="fw-bold">Team B</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="odds text-success fw-bold me-2">+150</span>
+          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
+        </div>
+      </div>
+      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+        <div class="team-info d-flex align-items-center">
+          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+          <div>
+            <span class="fw-bold">Team A</span> 
+            <span class="text-secondary">vs</span> 
+            <span class="fw-bold">Team B</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="odds text-success fw-bold me-2">+150</span>
+          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
+        </div>
+      </div>
+      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+        <div class="team-info d-flex align-items-center">
+          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+          <div>
+            <span class="fw-bold">Team A</span> 
+            <span class="text-secondary">vs</span> 
+            <span class="fw-bold">Team B</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="odds text-success fw-bold me-2">+150</span>
+          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
+        </div>
+      </div>
+      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+        <div class="team-info d-flex align-items-center">
+          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+          <div>
+            <span class="fw-bold">Team A</span> 
+            <span class="text-secondary">vs</span> 
+            <span class="fw-bold">Team B</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="odds text-success fw-bold me-2">+150</span>
+        </div>
+      </div>
 
-  <div class=" p-2 col-md-3 m-4">
-  <div class="card shadow-sm">
-    <div class="card-header bg-dark text-white text-center">
-      <h5 class="mb-0">Leaderboard</h5>
     </div>
-    <ul class="leaderList list-group list-group-flush">
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>🥇<strong id="fpName"> Alice</strong></div>
-        <span class="badge bg-success rounded-pill" id="fpPoints">1500</span>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>🥈<strong id="spName"> Bob</strong></div>
-        <span class="badge bg-info rounded-pill" id="spPoints">1200</span>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>🥉<strong id="tpName"> Charlie</strong></div>
-        <span class="badge bg-warning text-dark rounded-pill" id="tpPoints">1000</span>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center"><span id="fourthpName"> Diana</span>
-        <span class="badge bg-secondary text-light rounded-pill" id="fourthpPoints">1000</span>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center" >
-        <span id="fifthpName">Evan</span>
-        <span class="badge bg-secondary text-light rounded-pill" id="fifthpPoints">800</span>
-      </li>
-    </ul>
+
+    <div class="card-footer text-center bg-dark border-top border-secondary">
+      <button class="btn btn-success w-100 fw-bold">Place Bets</button>
+    </div>
   </div>
 </div>
+
+
+
+      <!-- Right -->
+      <div class="col-12 col-md-3">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-dark text-white text-center">
+            <h5 class="mb-0">Leaderboard</h5>
+          </div>
+          <ul class="leaderList list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>🥇 <strong id="fpName">Alice</strong></div>
+              <span class="badge bg-success rounded-pill" id="fpPoints">1500</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>🥈 <strong id="spName">Bob</strong></div>
+              <span class="badge bg-info rounded-pill" id="spPoints">1200</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>🥉 <strong id="tpName">Charlie</strong></div>
+              <span class="badge bg-warning text-dark rounded-pill" id="tpPoints">1000</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span id="fourthpName">Diana</span>
+              <span class="badge bg-secondary text-light rounded-pill" id="fourthpPoints">950</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span id="fifthpName">Evan</span>
+              <span class="badge bg-secondary text-light rounded-pill" id="fifthpPoints">800</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
+
 
     </div>
   </div>
@@ -117,13 +200,14 @@
   
   <!-- Footer -->
   <footer class="bg-dark text-white text-center py-3 mt-4">
-  <div class="container">
-    <p class="mb-1">&copy; 2025 Your Company. All rights reserved.</p>
-    <a href="#" class="text-white me-3">Privacy Policy</a>
-    <a href="#" class="text-white">Terms of Service</a>
-  </div>
-</footer>
-<script src="DomHandler.js"></script>
+    <div class="container">
+      <p class="mb-1">&copy; 2025 Your Company. All rights reserved.</p>
+      <a href="#" class="text-white me-3">Privacy Policy</a>
+      <a href="#" class="text-white">Terms of Service</a>
+    </div>
+  </footer>
+
+  <script src="DomHandler.js"></script>
 </body>
 
 </html>
