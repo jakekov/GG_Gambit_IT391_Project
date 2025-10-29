@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 interface Config {
   server_addr: string;
-  server_port: string;
+  server_port: number;
   verification_timeout: number;
   email_verification: boolean;
   jwt_secret: string;
@@ -25,7 +25,7 @@ interface GoogleSignIn {
 }
 const config: Config = {
   server_addr: getEnvVar('SERVER_ADDR'),
-  server_port: getEnvVar('SERVER_PORT'),
+  server_port: parseInt(getEnvVar('SERVER_PORT')) || 3000,
   verification_timeout: 900_000, //15 minutes
   email_verification: getEnvVar('REQUIRE_EMAIL_VERIFICATION') === 'true',
   jwt_secret: getEnvVar('JWT_SECRET'),
