@@ -5,7 +5,7 @@ import express, {Request, Response, NextFunction} from 'express';
 import session from 'express-session';
 import user_routes from './routes/authUser.js';
 import email_routes from './routes/emailVerification.js';
-import google_routes from './routes/authGoogle.js';
+import auth_routes from './routes/api/auth/router.js';
 import api_user_routes from './routes/api/user/router.js';
 import api_match_routes from './routes/api/match_bet/router.js';
 import {_rootDir} from './utils/esm_paths.js';
@@ -48,7 +48,7 @@ import profileRoutes from '@/routes/profile.js';
 app.use('/', user_routes);
 app.use('/email/verification', email_routes);
 app.use('/profile', profileRoutes);
-app.use('/auth', google_routes);
+app.use('/api/auth', auth_routes);
 app.use('/api/user', api_user_routes); //make a secondary route file for /api
 app.use('/api/matches', api_match_routes);
 app.get('/dashboard', (req, res) => {
