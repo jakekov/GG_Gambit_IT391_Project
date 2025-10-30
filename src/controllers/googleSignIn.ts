@@ -12,7 +12,7 @@ import {
   DatabaseError,
   InvalidPasswordError,
   EmailInUseError,
-} from '../errors.js';
+} from '../utils/errors.js';
 import {generateUUIDBuffer, UserOptions} from '../models/user.js';
 //this is definitly not the best way to do this but im not sure what is
 const GOOGLE_REDIRECT_LINK = `${config.http}://${config.server_addr}/auth/google/callback/`;

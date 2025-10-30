@@ -7,7 +7,7 @@ import match_model, {
 } from '@/models/matches.js';
 import {randomInt} from 'crypto';
 import {VlrMatch, VlrMatches} from './controllers/matchUpdates.js';
-import {HTTP_STATUS} from '@/http.js';
+import {HTTP_STATUS} from '@/utils/http.js';
 import {findTeamId} from './controllers/static_team.js';
 const router = express.Router();
 //needs csrf and authentication for the user session

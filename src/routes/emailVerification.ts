@@ -3,7 +3,7 @@
 import email_verify from '../controllers/emailController.js';
 
 import express, {Request, Response, NextFunction} from 'express';
-import {sendMail} from '../nodemailer/mailing.js';
+import {sendMail} from '../utils/mailing.js';
 
 const router = express.Router();
 router.get('/', (req: Request, res: Response, next: NextFunction) => {

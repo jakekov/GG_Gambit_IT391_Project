@@ -5,7 +5,7 @@ import {
   EmailInUseError,
   InvalidPasswordError,
   UserNotFoundError,
-} from '../errors.js';
+} from '../utils/errors.js';
 import Verified, {AuthProvidersStrings} from '../models/authProviders.js';
 
 import google_controller, {

@@ -20,8 +20,8 @@ import {
   DatabaseError,
   InvalidPasswordError,
   EmailInUseError,
-} from '../errors.js';
-import {sendMail} from '@/nodemailer/mailing.js';
+} from '../utils/errors.js';
+import {sendMail} from '@/utils/mailing.js';
 
 const scrypt = promisify(_scrypt);
 /**

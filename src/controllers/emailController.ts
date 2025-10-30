@@ -11,7 +11,7 @@ import email_model, {
 import user_model from '../models/user.js';
 import email_tokens from '../models/email_tokens.js';
 import crypto from 'crypto';
-import {DatabaseError} from '../errors.js';
+import {DatabaseError} from '../utils/errors.js';
 //im pretty sure email should be unique for users
 //this would probably be better as a helper file
 interface EmailJWTPayload {

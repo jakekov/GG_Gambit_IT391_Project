@@ -2,9 +2,9 @@ import UserModel from '@/models/user.js';
 import {UserProfileData} from '@/types/user.js';
 
 import {parse as UuidParse, stringify as UuidStringify} from 'uuid';
-import {HTTP_STATUS} from '@/http.js';
+import {HTTP_STATUS} from '@/utils/http.js';
 import {PatchUserForm} from '../router.js';
-import {DatabaseError} from '@/errors.js';
+import {DatabaseError} from '@/utils/errors.js';
 import BetInfo from '@/models/userBetInfo.js';
 
 export async function getUserProfileData(slug: string) {

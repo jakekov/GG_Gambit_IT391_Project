@@ -1,6 +1,6 @@
 import pool from '../databases/mysql.js';
 import {RowDataPacket} from 'mysql2';
-import {UserNotFoundError} from '../errors.js';
+import {UserNotFoundError} from '../utils/errors.js';
 
 export async function createUnverifiedUserTable() {
   let query = `CREATE TABLE IF NOT EXISTS unverified_users(

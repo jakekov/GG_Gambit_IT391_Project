@@ -1,6 +1,6 @@
 import pool from '../databases/mysql.js';
 import {RowDataPacket} from 'mysql2';
-import {UserNotFoundError} from '../errors.js';
+import {UserNotFoundError} from '../utils/errors.js';
 
 //the hash might not be necessary
 //

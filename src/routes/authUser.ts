@@ -1,20 +1,20 @@
 import express, {Request, Response, NextFunction} from 'express';
 import user from '../controllers/userController.js';
 import {User} from '../models/user.js';
-import {sendMail} from '../nodemailer/mailing.js';
+import {sendMail} from '../utils/mailing.js';
 import {
   DatabaseError,
   EmailInUseError,
   InvalidPasswordError,
   UserNotFoundError,
-} from '../errors.js';
+} from '../utils/errors.js';
 import {AuthProvider} from '../models/authProviders.js';
 import config from '../config/config.js';
 import path from 'path';
 import email_controller from '../controllers/emailController.js';
 import {EmailConformationString} from '../models/email_tokens.js';
 import {stringify as uuidStringify} from 'uuid';
-import {badRequest, internalServerError} from '@/http.js';
+import {badRequest, internalServerError} from '@/utils/http.js';
 import {_rootDir} from '@/utils/esm_paths.js';
 const staticPath = path.join(_rootDir, '../static');
 const EMAIL_LINK = `${config.http}://${config.server_addr}/email/verification/verify-email/`;

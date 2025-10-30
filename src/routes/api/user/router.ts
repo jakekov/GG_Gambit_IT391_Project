@@ -10,7 +10,7 @@ import express, {Request, Response, NextFunction} from 'express';
 import {getUserProfileData, updateUserProfile} from './controllers/profile.js';
 import bet_info from '@/models/userBetInfo.js';
 import user_model, {User} from '@/models/user.js';
-import {HTTP_STATUS} from '@/http.js';
+import {HTTP_STATUS} from '@/utils/http.js';
 import BetInfo from '@/models/userBetInfo.js';
 const router = express.Router();
 
