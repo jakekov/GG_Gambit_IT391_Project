@@ -17,7 +17,7 @@ interface GoogleTokenResponse {
 /**
  * Creates the google sign in parameters for google oauth
  */
-export function redirect_google_sign_in(): URLSearchParams {
+export function redirect_google_sign_in(state: string): URLSearchParams {
   const params = new URLSearchParams({
     client_id: google_sign_in.GOOGLE_CLIENT_ID,
     redirect_uri: GOOGLE_REDIRECT_LINK,
@@ -25,6 +25,7 @@ export function redirect_google_sign_in(): URLSearchParams {
     scope: 'openid email profile',
     access_type: 'offline',
     prompt: 'consent',
+    state: state,
   });
   return params;
 }

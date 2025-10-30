@@ -20,7 +20,8 @@ app.use(
     cookie: {
       maxAge: 900000, //15 minute expire time
       secure: false, //only create cookie if over https TODO ADD HTTPS AND SWITCH THIS TO TRUE
-      sameSite: true,
+      sameSite: 'lax', //None is needed but secure needs to be true
+      //either setup https on the isu net server or make this env variable so the public facing server can have https cookies
       httpOnly: true, //blocks client javascript from seeing cookie
     },
   })

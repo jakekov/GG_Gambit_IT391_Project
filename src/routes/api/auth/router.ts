@@ -7,7 +7,7 @@ import {
   oath_callback_profile,
   oauth_redirect_links,
 } from './helpers/index.js';
-
+import crypto from 'crypto';
 const router = express.Router();
 /**
  * Makes sure the server can handle sending oauth links
@@ -22,11 +22,19 @@ router.get(
   async (req: Request<{provider?: string}>, res: Response) => {
     const provider = req.params.provider;
     if (!provider) return badRequest(res);
-
-    let url = oauth_redirect_links(provider);
+    let state = crypto.randomBytes(32).toString('hex');
+    console.log(state);
+    req.session.state = state;
+    //include a state query param which oauth forwards with the callback url to prevent csrf
+    let url = oauth_redirect_links(provider, state);
+    console.log(req.session.state);
     res.redirect(url);
   }
 );
+interface OauthCallbackQuery {
+  code?: string;
+  state?: string;
+}
 /**
  * When the user is done authenticating with the Oauth provider it sends the browser to this route
  * this route takes the provider and creates a profile from the helper for each auth provider
@@ -34,10 +42,26 @@ router.get(
  */
 router.get(
   '/callback/:provider/',
-  async (req: Request<{provider?: string}>, res: Response) => {
+  async (
+    req: Request<{provider?: string}, {}, {}, OauthCallbackQuery>,
+    res: Response
+  ) => {
     const provider = req.params.provider;
+
     if (!provider) return badRequest(res);
-    const code = req.query.code as string | undefined;
+    const code = req.query.code;
+    const state = req.query.state;
+
+    if (!state) {
+      return res.status(403).json({error: 'csrf state not defined'});
+    }
+    //do state check to make sure the same session is making the callback
+    if (state !== req.session.state) {
+      console.log(req.session.state + ' ' + state);
+      console.log('possible csrf attack OAuth states do not match');
+      return res.end('State mismatch. Possible CSRF attack');
+    }
+
     if (!code) {
       return res.status(403).json({error: 'code not defined'});
     }

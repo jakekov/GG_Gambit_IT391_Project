@@ -25,11 +25,11 @@ export interface OAuthProfile {
 /**
  * Oauth links for each provider the server supports
  */
-export function oauth_redirect_links(provider: string): string {
+export function oauth_redirect_links(provider: string, state: string): string {
   switch (provider.toLowerCase()) {
     //TODO should make the enum lowercase but would require db updates
     case AuthProvidersStrings.Google.toLowerCase(): {
-      return `https://accounts.google.com/o/oauth2/v2/auth?${redirect_google_sign_in()}`;
+      return `https://accounts.google.com/o/oauth2/v2/auth?${redirect_google_sign_in(state)}`;
     }
     default:
       throw new Error('invalid oAuth type');
