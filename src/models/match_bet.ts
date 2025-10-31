@@ -1,10 +1,6 @@
 import pool from '../databases/mysql.js';
 import {FieldPacket, RowDataPacket} from 'mysql2';
 
-//keeping this extracted means an account can have multiple
-//but it would need a uniaue constraitn on simething by doing something like seasons or like fantasy league
-//thise should just be used to count totals information
-//actual bets should be in a seperate table
 export async function createTeamBetTable() {
   let query = `CREATE TABLE IF NOT EXISTS match_bet(
   id int PRIMARY KEY AUTO_INCREMENT,
@@ -18,6 +14,11 @@ export async function createTeamBetTable() {
 )`;
   await pool.query(query);
 }
+/**
+ * A bet a user placed on a match
+ * the id is the primary key given to a match by vlr.gg so it can be used on their site too
+ *
+ */
 export interface MatchBet extends RowDataPacket {
   id: number;
   user_id: Buffer;

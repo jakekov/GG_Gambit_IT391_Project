@@ -18,6 +18,11 @@ export async function createUserTable() {
 )`;
   await pool.query(query);
 }
+/**
+ * All information about a user account and profile
+ * does not include information relating to bets
+ * This is the primary table for users that authProvider relies on
+ */
 export interface User extends RowDataPacket {
   id: Buffer; //16 byte number  i think keeping it as a string is fine just not url safe
   email: string;

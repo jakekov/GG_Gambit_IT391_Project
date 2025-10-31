@@ -21,7 +21,11 @@ export async function createMatcheResultsTable() {
 )`;
   await pool.query(query);
 }
-
+/**
+ * Used to store information for matches that have ended
+ * vlresports api doesnt have  away to see past matches
+ * this table is used for retrival of information for passed matches
+ */
 export interface Result extends RowDataPacket {
   id: number; //vlr.gg key
   team_a: number; //static teams key

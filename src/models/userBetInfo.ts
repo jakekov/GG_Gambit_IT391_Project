@@ -17,6 +17,10 @@ export async function createUserBetInfoTable() {
 )`;
   await pool.query(query);
 }
+/**
+ * Holds the users betting info like how many points the user accumulates
+ * or how much gambits the user has to spend
+ */
 export interface UserBetInfo extends RowDataPacket {
   id: number;
   user_id: Buffer;

@@ -42,6 +42,13 @@ export async function createMatchesTable() {
 //might also be beneficial to do it in two steps. immidiatly pass through the api request match data from vlr
 //then add the odds from out db / newly calculatd ones
 //needs to add
+/**
+ * This table stores upcoming or live matches for out site
+ * this is where we place info like what the odds are of the team winning
+ * this is used in /api/matches/info
+ * This does not retrieve all information on a match
+ * just the ids that arent retrived by the vlresports matches api
+ */
 export interface Match extends RowDataPacket {
   id: number; //vlr.gg key
   team_a: number; //static teams key

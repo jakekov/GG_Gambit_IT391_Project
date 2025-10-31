@@ -24,7 +24,11 @@ export async function createEmailTokensTable() {
 )`;
   await pool.query(query);
 }
-//only one type of email confirmation is allowed so only one account verify at a time , one password reset
+/**
+ * Used to store JWT token info for any thing that needs email verification
+ * password reset, account signpup verification...
+ * use email controller to create and verify jwt tokens
+ */
 export interface EmailUserToken extends RowDataPacket {
   id: string;
   user_id: Buffer; // the

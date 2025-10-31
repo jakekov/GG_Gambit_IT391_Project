@@ -22,6 +22,12 @@ export async function createAuthProvidersTable() {
 )`;
   await pool.query(query);
 }
+/**
+ * Auth Provider is a table that stores authentication info for a user
+ * It is linked to the users table and is deleted when a user is removed
+ * a user can have multiple AuthProviders but only one from each type
+ * ie have a LocalAuth email password and then link google sign in to the account
+ */
 export interface AuthProvider extends RowDataPacket {
   id: number;
   user_id: Buffer; // not url safe 16 byte binary data references User

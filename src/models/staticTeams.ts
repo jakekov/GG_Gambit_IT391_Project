@@ -14,6 +14,12 @@ export async function createStaticTeamsTable() {
 )`;
   await pool.query(query);
 }
+/**
+ * Holds team ids to name for anyteam ni vlr.gg
+ * vlresports doesnt have a way to get teamids from teamnames
+ * so this allows us to have a mapping where we can use vlresports team api calls
+ *
+ */
 export interface StaticTeam extends RowDataPacket {
   id: number; //vlr.gg key
   name: string;
