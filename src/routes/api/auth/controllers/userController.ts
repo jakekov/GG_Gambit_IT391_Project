@@ -2,25 +2,27 @@ import AuthCredentials, {
   AuthProvider,
   AuthProvidersStrings,
   AuthOptions,
-} from '../models/authProviders.js';
-import email_controller from '../controllers/emailController.js';
+} from '../../../../models/authProviders.js';
+import email_controller from '../../../../controllers/emailController.js';
 import {scrypt as _scrypt, randomBytes} from 'crypto';
 import user_model, {
   generateUUIDBuffer,
   User,
   UserOptions,
-} from '../models/user.js';
-import token_model, {EmailConformationString} from '../models/email_tokens.js';
-import bet_info from '../models/userBetInfo.js';
+} from '../../../../models/user.js';
+import token_model, {
+  EmailConformationString,
+} from '../../../../models/email_tokens.js';
+import bet_info from '../../../../models/userBetInfo.js';
 import {promisify} from 'util';
-import config from '../config/config.js';
+import config from '../../../../config/config.js';
 import {stringify as uuidStringify} from 'uuid';
 import {
   UserNotFoundError,
   DatabaseError,
   InvalidPasswordError,
   EmailInUseError,
-} from '../utils/errors.js';
+} from '../../../../utils/errors.js';
 import {sendMail} from '@/utils/mailing.js';
 
 const scrypt = promisify(_scrypt);

@@ -102,12 +102,8 @@ const form = document.querySelector('#loginForm');
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault(); // prevent default form submission
-
-
-  const testForm = new FormData();
-  testForm.append("TEST", "WHY DOESNT IT WORK");
   const formData = new FormData(form);
-  const res = await fetch('/login', {
+  const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json' //  tells Express to use express.json()
@@ -123,7 +119,7 @@ form.addEventListener('submit', async (e) => {
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>`;
   } else {
-    window.location.href = "/homelogon.html";
+    window.location.href = "/"; //redirect to home page
   }
   
   

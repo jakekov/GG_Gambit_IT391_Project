@@ -74,7 +74,7 @@ They can be used directly inside route handlers.
 Routes are divided into:
 
 - `/api` — [`endpoints`](./endpoints.md) for API calls (JSON responses).
-- `/frontend` — routes that serve or interact with frontend pages.
+- `/frontend` — [`routes`](./frontend.md) that serve or interact with frontend pages.
 
 Each route imports the required controller functions to process requests and responses cleanly.
 
@@ -112,29 +112,12 @@ Session management and token validation helpers live in `/controllers`.
 
 ---
 
-## 🧩 Common Development Commands
+## 🧩 Development Commands
 
 | Command       | Description                                      |
 | ------------- | ------------------------------------------------ |
 | `npm install` | Install dependencies                             |
 | `npm start`   | Run in development mode (with ts-node / nodemon) |
-
----
-
-## 🧠 Tips for Frontend or New Contributors
-
-- The **`/routes`** folder is where requests are defined — look here to see what endpoints exist.
-- Each route uses functions from **`/controllers`**, so that’s where business logic lives.
-- If you’re debugging an issue, trace the flow:
-
-  ```
-  Request → Route Handler → Controller → Model → Database
-  ```
-
-- Add new endpoints by:
-  1. Creating a new route in `/routes/api`.
-  2. Writing logic in `/controllers`.
-  3. (Optionally) adding a new model in `/models` if it needs database access.
 
 ---
 

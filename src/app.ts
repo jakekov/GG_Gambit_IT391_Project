@@ -3,7 +3,7 @@
 //require('dotenv').config();
 import express, {Request, Response, NextFunction} from 'express';
 import session from 'express-session';
-import user_routes from './routes/authUser.js';
+import frontend_routes from './routes/frontend/router.js';
 import email_routes from './routes/emailVerification.js';
 import auth_routes from './routes/api/auth/router.js';
 import api_user_routes from './routes/api/user/router.js';
@@ -46,7 +46,7 @@ app.get('/hello', (req: Request, res: Response, next: NextFunction) => {
 });
 
 import profileRoutes from '@/routes/profile.js';
-app.use('/', user_routes);
+app.use('/', frontend_routes);
 app.use('/email/verification', email_routes);
 app.use('/profile', profileRoutes);
 app.use('/api/auth', auth_routes);

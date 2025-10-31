@@ -106,7 +106,7 @@
         e.preventDefault(); // prevent default form submission
 
         const formData = new FormData(form);
-        const res = await fetch("/signup", {
+        const res = await fetch("/api/auth/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json", //  tells Express to use express.json()

@@ -27,5 +27,8 @@ Dev URL: `http://localhost:3000/api` <br />
 
 | Type | Endpoint                                                          |
 | :--- | :---------------------------------------------------------------- |
-| GET  | [`/auth/redirect/{provider}`](/src/routes/api/auth/router.ts#L16) |
-| GET  | [`/auth/callback/{provider}`](/src/routes/api/auth/router.ts#L16) |
+| GET  | [`/auth/redirect/{provider}`](/src/routes/api/auth/router.ts#L26) |
+| GET  | [`/auth/callback/{provider}`](/src/routes/api/auth/router.ts#L26) |
+| POST | [`/auth/login`](/src/routes/api/auth/router.ts#L26)               |
+| POST | [`/auth/signup`](/src/routes/api/auth/router.ts#L26)              |
+| GET  | [`/auth/logout`](/src/routes/api/auth/router.ts#L26)              |
