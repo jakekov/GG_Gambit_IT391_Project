@@ -125,7 +125,9 @@ async function scrapeSearchVlrTeam(
   team: string
 ): Promise<[number, string | null]> {
   //console.log(`https://vlr.gg/search/?q=${team}&type=teams`);
-  const data = await fetch(`https://vlr.gg/search/?q=${team}&type=teams`);
+  const data = await fetch(
+    `https://vlr.gg/search/?q=${encodeURIComponent(team)}&type=teams`
+  );
   if (data.status != 200) {
     console.log('Scrape error');
     console.log(data);
@@ -138,12 +140,15 @@ async function scrapeSearchVlrTeam(
   $('.wf-card').each((_, el) => {
     const link = $(el).find('a.wf-module-item.search-item').attr('href');
     if (link?.startsWith('/team/')) {
-      var spaceReg = new RegExp('/\s+/', 'g');
-      var andReg = new RegExp('&', 'g');
-      let formatted_team = team.replace(/[^0-9A-Za-z\s]/g, '').toLowerCase();
-      formatted_team = formatted_team.trim().replace(/\s+/g, '-');
+      let formatted_team = team.replace(/[^0-9A-Za-z\s.-]/g, '').toLowerCase();
+      formatted_team = formatted_team.trim().replace(/[.\s]+/g, '-');
       let end_idx = link.indexOf(formatted_team, 5);
-      if (end_idx < 7) return true; //continue next iter
+      if (end_idx < 7) {
+        console.log(data);
+        console.log(formatted_team);
+        console.log(link);
+        return true;
+      } //continue next iter
 
       let id = link.substring(6, end_idx - 1);
       found_id = parseInt(id);
