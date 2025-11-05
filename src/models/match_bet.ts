@@ -1,14 +1,14 @@
 import pool from '../databases/mysql.js';
 import {FieldPacket, RowDataPacket} from 'mysql2';
 
-export async function createTeamBetTable() {
+export async function createMatchBetTable() {
   let query = `CREATE TABLE IF NOT EXISTS match_bet(
   id int PRIMARY KEY AUTO_INCREMENT,
   user_id BINARY(16) NOT NULL,
-  match_id int NOT NULL
+  match_id int NOT NULL,
   prediction CHAR(1) NOT NULL,
-  bet int NOT NULL,
-  payout NOT NULL,
+  bet FLOAT NOT NULL,
+  payout FLOAT NOT NULL,
   ended boolean NOT NULL DEFAULT 0,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )`;
@@ -39,23 +39,15 @@ export interface MatchBetOptions {
 
 async function getInfoByUuid(uuid: Buffer) {
   const [rows] = await pool.query<MatchBet[]>(
-    'SELECT * FROM match_bet_info WHERE user_id = ?',
+    'SELECT * FROM match_bet WHERE user_id = ?',
     [uuid]
   );
   return rows;
 }
 
-//get info by uuid then update from the primary key id, i think id should be indexed
-async function updatePoints(points: number, id: number) {
-  const [rows] = await pool.query(
-    'UPDATE match_bet_info SET points = ? WHERE id = ?',
-    [points, id]
-  );
-  return rows;
-}
-async function createUserBetInfo(options: MatchBetOptions) {
+async function createUserBet(options: MatchBetOptions) {
   const [result] = await pool.query(
-    'INSERT INTO match_bet_info (user_id, match_id, prediction, bet, payout) VALUES (?,?,?,?,?)',
+    'INSERT INTO match_bet(user_id, match_id, prediction, bet, payout) VALUES (?,?,?,?,?)',
     [
       options.user_id,
       options.match_id,
@@ -66,4 +58,4 @@ async function createUserBetInfo(options: MatchBetOptions) {
   );
   return result;
 }
-export default {createUserBetInfo, updatePoints, getInfoByUuid};
+export default {createUserBet, getInfoByUuid};

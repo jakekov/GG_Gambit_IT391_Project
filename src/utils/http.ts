@@ -19,3 +19,6 @@ export function internalServerError(res: Response, msg?: string) {
 export function badRequest(res: Response, msg?: string) {
   res.status(HTTP_STATUS.BAD_REQUEST).json({error: msg || 'Bad Request'});
 }
+export function notAuthenticated(res: Response, msg?: string) {
+  res.status(HTTP_STATUS.UNAUTHENTICATED).json({error: msg || 'Not Signed in'});
+}

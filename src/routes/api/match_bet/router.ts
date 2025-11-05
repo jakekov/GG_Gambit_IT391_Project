@@ -7,19 +7,71 @@ import match_model, {
 } from '@/models/matches.js';
 import {randomInt} from 'crypto';
 import {VlrMatch, VlrMatches} from './controllers/matchUpdates.js';
-import {HTTP_STATUS} from '@/utils/http.js';
+import {
+  badRequest,
+  HTTP_STATUS,
+  internalServerError,
+  notAuthenticated,
+} from '@/utils/http.js';
 import {findTeamId} from './controllers/static_team.js';
+import {placeUserMatchBet} from './controllers/matchBetting.js';
+import {BadRequestError, UserNotFoundError} from '@/utils/errors.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
 router.get('/info', getMatchesInfo);
+router.post('/bet', postMatchBet);
+/**
+ * User submited post for making a bet on a match
+ * @param req needs match_id, team_winning, wager. in req.body all numbers/ids
+ * @param res
+ * @returns
+ */
+async function postMatchBet(
+  req: Request<{}, {}, UserMatchBetParams>,
+  res: Response
+) {
+  const {match_id, team_winning, wager} = req.body;
 
-async function postMatchBet(req: Request, res: Response) {}
+  if (
+    match_id === undefined ||
+    team_winning === undefined ||
+    wager === undefined
+  ) {
+    console.log(req.body);
+    return badRequest(res, 'NOT DEFINED ' + match_id + team_winning + wager);
+  }
+  var uuid = req.session.user?.id_buf;
 
-interface CombinedMatches {
-  data: Match;
-  strings: VlrMatch;
+  if (!uuid) {
+    return notAuthenticated(res);
+  }
+
+  //thhe request session is getting parsed into json
+  //move this to session middleware
+  if (!(uuid instanceof Buffer)) {
+    uuid = Buffer.from(uuid);
+  }
+  try {
+    await placeUserMatchBet(match_id, team_winning, wager, uuid);
+  } catch (err) {
+    if (err instanceof BadRequestError) {
+      return badRequest(res, err.message);
+    } else if (err instanceof UserNotFoundError) {
+      return notAuthenticated(res);
+    } else {
+      console.log(err);
+      return internalServerError(res);
+    }
+  }
+  res.status(200).json({data: 'ok'});
 }
+interface UserMatchBetParams {
+  match_id?: number;
+  team_winning?: number;
+  wager?: number;
+}
+
 /**
  * Route for getting our betting odds and id values for a potential bet
  * Only gets matches that are in the vlr upcoming or live and both teams are known
@@ -82,7 +134,7 @@ async function getMatchesInfo(req: Request, res: Response) {
           team_b: b_id.id,
           odds: randomInt(-1024, 1024),
           status: match.status as MatchStatus,
-          match_start: new Date(match.timestamp),
+          match_start: new Date(match.timestamp * 1000), //this needs to be in miliseconds and i think timestamp is in seconds
         } as Match;
         console.log(`created match ${match.id}, ${match.event}`);
         await match_model.createMatchRow(new_match);

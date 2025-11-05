@@ -50,10 +50,20 @@ async function getLeaderboard(limit: number) {
   return rows;
 }
 //get info by uuid then update from the primary key id, i think id should be indexed
-async function updatePoints(points: number, id: number) {
+async function updatePoints(add_points: number, id: number) {
   const [rows] = await pool.query(
-    'UPDATE user_bet_info SET points = ? WHERE id = ?',
-    [points, id]
+    'UPDATE user_bet_info SET points = ? + points WHERE id = ?',
+    [add_points, id]
+  );
+  return rows;
+}
+async function removebalance(balance: number, id: number) {
+  if (balance < 0) {
+    throw new Error('REmovign negative numbre');
+  }
+  const [rows] = await pool.query(
+    'UPDATE user_bet_info SET balance = balance - ?  WHERE id = ?',
+    [balance, id]
   );
   return rows;
 }
@@ -64,4 +74,11 @@ async function createUserBetInfo(uuid: Buffer) {
   );
   return result;
 }
-export default {createUserBetInfo, updatePoints, getInfoByUuid, getLeaderboard};
+
+export default {
+  createUserBetInfo,
+  updatePoints,
+  getInfoByUuid,
+  getLeaderboard,
+  removebalance,
+};
