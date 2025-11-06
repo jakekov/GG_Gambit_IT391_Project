@@ -140,8 +140,10 @@ async function scrapeSearchVlrTeam(
   $('.wf-card').each((_, el) => {
     const link = $(el).find('a.wf-module-item.search-item').attr('href');
     if (link?.startsWith('/team/')) {
-      let formatted_team = team.replace(/[^0-9A-Za-z\s.-]/g, '').toLowerCase();
-      formatted_team = formatted_team.trim().replace(/[.\s]+/g, '-');
+      const removed_chars = team.replace(/[']/g, '').toLowerCase();
+      //this is awful theres a team named ^-^ and its string name is "" you cant even search for the team on vlr
+      const only_ascii = team.replace(/[^0-9a-z']/g, ' ');
+      const formatted_team = only_ascii.trim().replace(/\s+/g, '-'); //combine consecutive dashes into one
       let end_idx = link.indexOf(formatted_team, 5);
       if (end_idx < 7) {
         console.log(data);
