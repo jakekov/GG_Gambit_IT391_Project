@@ -16,11 +16,12 @@ import {
 import {findTeamId} from './controllers/static_team.js';
 import {placeUserMatchBet} from './controllers/matchBetting.js';
 import {BadRequestError, UserNotFoundError} from '@/utils/errors.js';
+import {requireAuth} from '@/middleware/session.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
 router.get('/info', getMatchesInfo);
-router.post('/bet', postMatchBet);
+router.post('/bet', requireAuth, postMatchBet);
 /**
  * User submited post for making a bet on a match
  * @param req needs match_id, team_winning, wager. in req.body all numbers/ids
@@ -41,17 +42,18 @@ async function postMatchBet(
     console.log(req.body);
     return badRequest(res, 'NOT DEFINED ' + match_id + team_winning + wager);
   }
-  var uuid = req.session.user?.id_buf;
-
-  if (!uuid) {
+  if (!req.auth_user) {
     return notAuthenticated(res);
   }
+  var uuid = req.auth_user.uuid;
+
+  // if (!uuid) {
+  //   return notAuthenticated(res);
+  // }
 
   //thhe request session is getting parsed into json
   //move this to session middleware
-  if (!(uuid instanceof Buffer)) {
-    uuid = Buffer.from(uuid);
-  }
+
   try {
     await placeUserMatchBet(match_id, team_winning, wager, uuid);
   } catch (err) {

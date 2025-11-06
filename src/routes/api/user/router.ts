@@ -12,13 +12,14 @@ import bet_info from '@/models/userBetInfo.js';
 import user_model, {User} from '@/models/user.js';
 import {HTTP_STATUS} from '@/utils/http.js';
 import BetInfo from '@/models/userBetInfo.js';
+import {requireAuth} from '@/middleware/session.js';
 const router = express.Router();
 
 router.get('/', getUser);
 router.get('/get/:slug', getUser);
 router.get('/leaderboard', getLeaderboard);
-router.get('/balance', getUserBalance); //only session user can get
-router.patch('/', patchUser);
+router.get('/balance', requireAuth, getUserBalance); //only session user can get
+router.patch('/', requireAuth, patchUser);
 async function getUser(
   req: Request<{slug: string | undefined}>,
   res: Response
@@ -78,7 +79,7 @@ export interface PatchUserForm {
 //add express.json and urlencoded extended true to app.use
 async function patchUser(req: Request<{}, {}, PatchUserForm>, res: Response) {
   const user_form = req.body;
-  let user_id = req.session.user?.id_buf;
+  let user_id = req.auth_user?.uuid;
   if (!user_id)
     return res
       .status(HTTP_STATUS.UNAUTHENTICATED)
@@ -93,7 +94,7 @@ async function patchUser(req: Request<{}, {}, PatchUserForm>, res: Response) {
   }
 }
 async function getUserBalance(req: Request, res: Response) {
-  let user_id = req.session.user?.id_buf;
+  let user_id = req.auth_user?.uuid;
   if (!user_id)
     return res
       .status(HTTP_STATUS.UNAUTHENTICATED)
