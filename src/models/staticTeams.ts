@@ -48,6 +48,13 @@ async function getTeamById(id: number) {
   return rows;
 }
 
+async function updateTeamName(name: string, country: string, id: number) {
+  const [rows] = await pool.query(
+    'UPDATE static_teams SET name = ?, country = ? WHERE id = ?',
+    [name, country, id]
+  );
+  return rows;
+}
 //want more info go through the scraper to get players
 async function createStaticTeam(options: StaticTeamOptions) {
   const [result] = await pool.query(
@@ -56,4 +63,9 @@ async function createStaticTeam(options: StaticTeamOptions) {
   );
   return result;
 }
-export default {getTeamByUniqueName, getTeamById, createStaticTeam};
+export default {
+  getTeamByUniqueName,
+  getTeamById,
+  createStaticTeam,
+  updateTeamName,
+};

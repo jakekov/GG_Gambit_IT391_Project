@@ -32,7 +32,15 @@ export async function findTeamId(
       country: country,
       img: img,
     };
-    await team_model.createStaticTeam(static_team);
+    let id_in_use = await team_model.getTeamById(id);
+    if (id_in_use.length !== 0) {
+      //the team changed their name?
+      //so update the name instaed of replacing it
+      await team_model.updateTeamName(name, country, id);
+    } else {
+      await team_model.createStaticTeam(static_team);
+    }
+
     let teams = await team_model.getTeamByUniqueName(name, country);
     if (teams.length == 0) {
       console.log(`team does not exist ${name}, ${country}`);
@@ -142,7 +150,7 @@ async function scrapeSearchVlrTeam(
     if (link?.startsWith('/team/')) {
       const removed_chars = team.replace(/[']/g, '').toLowerCase();
       //this is awful theres a team named ^-^ and its string name is "" you cant even search for the team on vlr
-      const only_ascii = team.replace(/[^0-9a-z']/g, ' ');
+      const only_ascii = removed_chars.replace(/[^0-9a-z']/g, ' ');
       const formatted_team = only_ascii.trim().replace(/\s+/g, '-'); //combine consecutive dashes into one
       let end_idx = link.indexOf(formatted_team, 5);
       if (end_idx < 7) {
