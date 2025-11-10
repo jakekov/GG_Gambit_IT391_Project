@@ -78,19 +78,23 @@ export async function placeUserMatchBet(
   //this needs to be a transaction so an error later doesnt cause the use rto lose balance
   await removeUserBalance(wager, uuid);
   //odds is -1024 a to win 1024 b to win
-  const percent = odds / 1026;
+  const percent = Math.max(Math.min(odds, 1024), -1024) / 1026;
   //convert to 0-1
   const shift = percent * 0.5 + 0.5;
   var multiplier = 1;
   if (a_or_b === 'a') {
-    multiplier = 1 / (shift - 1); //a is negative so closer to 0 we want it to be less
+    //since percent cant be greater than 1 its fine to juts multiply by negative one since shift will always be less then 1 and greater than zero
+
+    multiplier = -1 / (shift - 1); //a is negative so closer to 0 we want it to be less
   } else if (a_or_b === 'b') {
     //b is positive so closer to 1 we want it to be less
     multiplier = 1 / shift;
   } else {
     throw new Error('NO A OR B');
   }
-  const payout = wager * multiplier;
+  if (multiplier < 0)
+    throw new Error(`Multipler is negative ${multiplier}, ${odds}`);
+  const payout = wager + wager * multiplier;
   const options: MatchBetOptions = {
     user_id: uuid,
     match_id: match_id,
