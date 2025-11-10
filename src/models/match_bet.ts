@@ -1,3 +1,4 @@
+import {PoolConnection} from 'mysql2/promise';
 import pool from '../databases/mysql.js';
 import {FieldPacket, RowDataPacket} from 'mysql2';
 
@@ -44,7 +45,20 @@ async function getInfoByUuid(uuid: Buffer) {
   );
   return rows;
 }
-
+async function getBetsByMatch(match_id: number) {
+  const [rows] = await pool.query<MatchBet[]>(
+    'SELECT * FROM match_bet WHERE user_id = ?',
+    [match_id]
+  );
+  return rows;
+}
+async function betConcluded(id: number, con?: PoolConnection) {
+  const [rows] = await pool.query<MatchBet[]>(
+    'UPDATE match_bet SET ended = 1, WHERE id = ?',
+    [id]
+  );
+  return rows;
+}
 async function createUserBet(options: MatchBetOptions) {
   const [result] = await pool.query(
     'INSERT INTO match_bet(user_id, match_id, prediction, bet, payout) VALUES (?,?,?,?,?)',
@@ -58,4 +72,5 @@ async function createUserBet(options: MatchBetOptions) {
   );
   return result;
 }
-export default {createUserBet, getInfoByUuid};
+
+export default {createUserBet, getInfoByUuid, getBetsByMatch, betConcluded};

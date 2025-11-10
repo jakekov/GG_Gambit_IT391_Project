@@ -10,7 +10,7 @@ export async function createUserBetInfoTable() {
   id int PRIMARY KEY AUTO_INCREMENT,
   user_id BINARY(16) NOT NULL,
   points int DEFAULT 0 NOT NULL,
-  balance int DEFAULT 0 NOT NULL,
+  balance FLOAT DEFAULT 20 NOT NULL,
   CONSTRAINT 
    fk_user_bet_info FOREIGN KEY (user_id) REFERENCES users(id)
    ON DELETE CASCADE
@@ -32,6 +32,7 @@ let dbUpdateFunction = function () {
 };
 
 import events from 'events';
+import {PoolConnection} from 'mysql2/promise';
 let update_bet_info = new events.EventEmitter();
 update_bet_info.on('update', dbUpdateFunction);
 
@@ -50,10 +51,26 @@ async function getLeaderboard(limit: number) {
   return rows;
 }
 //get info by uuid then update from the primary key id, i think id should be indexed
-async function updatePoints(add_points: number, id: number) {
-  const [rows] = await pool.query(
+async function updatePoints(
+  add_points: number,
+  id: number,
+  con?: PoolConnection
+) {
+  const db = con ?? pool;
+  const [rows] = await db.query(
     'UPDATE user_bet_info SET points = ? + points WHERE id = ?',
     [add_points, id]
+  );
+  return rows;
+}
+async function addbalance(balance: number, id: number, con?: PoolConnection) {
+  const db = con ?? pool;
+  if (balance < 0) {
+    throw new Error('adding negative numbre');
+  }
+  const [rows] = await db.query(
+    'UPDATE user_bet_info SET balance = balance + ?  WHERE id = ?',
+    [balance, id]
   );
   return rows;
 }
@@ -81,4 +98,5 @@ export default {
   getInfoByUuid,
   getLeaderboard,
   removebalance,
+  addbalance,
 };

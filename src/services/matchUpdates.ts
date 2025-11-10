@@ -3,6 +3,8 @@
 
 import match_model, {MatchStatus} from '@/models/matches.js';
 import results_model, {ResultOptions} from '@/models/match_results.js';
+import bet_model from '@/models/match_bet.js';
+import info_model from '@/models/userBetInfo.js';
 import pool from '@/databases/mysql.js';
 import schedule from 'node-schedule';
 export interface VlrMatches {
@@ -80,15 +82,17 @@ async function checkConclusions() {
   //number is only like 40 long so just do array although in javascript im not sure how well that would translate
 
   //make the promise here so the web fetch can start aswell
-  const live_matches_promise = match_model.getMatchesByStatus(MatchStatus.live);
 
+  const live_matches_promise = match_model.getMatchesByStatus(MatchStatus.live);
+  const live_matches = await live_matches_promise;
+  if (live_matches.length == 0) return;
+  console.log('checking for ended matches');
   const response = await fetch('http://10.111.21.84:5000/api/v1/results')
     .then((res) => res.json())
     .then((res) => {
       return res as VlrMatches;
     });
-  const live_matches = await live_matches_promise;
-  if (live_matches.length == 0) return;
+
   for (const match of live_matches) {
     //vlr results should only have finished matches
     for (const vlr_result of response.data) {
@@ -104,31 +108,62 @@ async function checkConclusions() {
         continue;
       }
       //use a transaction so we dont lose any match data if anything fails
+      let options: ResultOptions = {
+        score_a: parseInt(a),
+        score_b: parseInt(b),
+        event: vlr_result.event,
+        tournament: vlr_result.tournament,
+        img: vlr_result.img,
+      };
       const con = await pool.getConnection();
-      pool.beginTransaction;
       await con.beginTransaction();
       try {
         await match_model.removeMatch(match.id, con);
-
-        let options: ResultOptions = {
-          score_a: parseInt(a),
-          score_b: parseInt(b),
-          event: vlr_result.event,
-          tournament: vlr_result.tournament,
-          img: vlr_result.img,
-        };
 
         await results_model.createResultRow(match, options, con);
         await con.commit();
       } catch (err) {
         console.log('rollback');
         console.log(err);
-        con.rollback();
+        await con.rollback();
       } finally {
         con.release();
       }
       //todo emit an event for updating peoples bets
+      //or just do it here since this is being run async in schedule
+      endMatchBetUpdates(
+        match.id,
+        options.score_a > options.score_b ? 'a' : 'b'
+      );
       break;
+    }
+  }
+}
+async function endMatchBetUpdates(match_id: number, winner: string) {
+  const bets_on_match = await bet_model.getBetsByMatch(match_id);
+  for (const bet of bets_on_match) {
+    if (bet.ended) continue; //this shoudlnt happen unless this is called multiple times for a single match which shouldnt happen
+    let info = await info_model.getInfoByUuid(bet.user_id);
+    const con = await pool.getConnection();
+    await con.beginTransaction();
+
+    try {
+      var points = bet.payout;
+
+      if (bet.prediction === winner) {
+        points *= 2.5;
+        await info_model.addbalance(bet.payout, info[0].id, con);
+      }
+      //move this to the end so if any errors applying the points or balance it doesnt set the bet to ended
+      await info_model.updatePoints(Math.round(points), info[0].id, con);
+      await bet_model.betConcluded(bet.id, con);
+      await con.commit();
+    } catch (err) {
+      console.log('rollback');
+      console.log(err);
+      await con.rollback();
+    } finally {
+      con.release();
     }
   }
 }

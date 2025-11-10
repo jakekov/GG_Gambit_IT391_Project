@@ -121,15 +121,15 @@ async function getMatchesInfo(req: Request, res: Response) {
 
         data_response.push(existing_matches[0]);
       } else {
+        if (!match.timestamp) {
+          console.log('NO TIMESTAMP');
+          continue;
+        }
         let a_id = await findTeamId(team_a.name, team_a.country);
         let b_id = await findTeamId(team_b.name, team_b.country);
 
         if (!a_id || !b_id) {
           console.log(`COULD NOT FIND TEAM ID ${team_a.name}`);
-          continue;
-        }
-        if (!match.timestamp) {
-          console.log('NO TIMESTAMP');
           continue;
         }
 
