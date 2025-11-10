@@ -5,6 +5,7 @@
 //will need to do async task to go through upcoming / live and check if they are finished / add new upcoming matches
 //this probably wont be very big table and would proabayl juts be redis
 
+import {PoolConnection} from 'mysql2/promise';
 import pool from '../databases/mysql.js';
 import {FieldPacket, RowDataPacket} from 'mysql2';
 //i could maybe just store matches that people placed bets on
@@ -101,6 +102,13 @@ async function getMatchWithTeams(id: number) {
   );
   return rows;
 }
+async function getMatchesByStatus(status: MatchStatus) {
+  const [rows] = await pool.query<Match[]>(
+    'SELECT * FROM matches WHERE status = ? ',
+    [status]
+  );
+  return rows;
+}
 async function updateMatchStatus(id: number, status: MatchStatus) {
   const [rows] = await pool.query<Match[]>(
     'UPDATE matches SET status = ? WHERE id = ?',
@@ -124,8 +132,9 @@ async function createMatchRow(options: Match) {
   );
   return result;
 }
-async function removeMatch(id: number) {
-  const [result] = await pool.query('DELETE FROM matches WHERE id = ?', [id]);
+async function removeMatch(id: number, con: PoolConnection) {
+  const db = con ?? pool;
+  const [result] = await db.query('DELETE FROM matches WHERE id = ?', [id]);
   return result;
 }
 export default {
@@ -134,4 +143,5 @@ export default {
   updateMatchStatus,
   removeMatch,
   getMatchWithTeams,
+  getMatchesByStatus,
 };

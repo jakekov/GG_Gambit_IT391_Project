@@ -6,7 +6,7 @@ import match_model, {
   MatchWithTeams,
 } from '@/models/matches.js';
 import {randomInt} from 'crypto';
-import {VlrMatch, VlrMatches} from './controllers/matchUpdates.js';
+import {VlrMatches} from '@/services/matchUpdates.js';
 import {
   badRequest,
   HTTP_STATUS,
@@ -17,6 +17,8 @@ import {findTeamId} from './controllers/static_team.js';
 import {placeUserMatchBet} from './controllers/matchBetting.js';
 import {BadRequestError, UserNotFoundError} from '@/utils/errors.js';
 import {requireAuth} from '@/middleware/session.js';
+import schedule from 'node-schedule';
+import {startUpcomingMatchSchedule} from '@/services/matchUpdates.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
@@ -106,7 +108,8 @@ async function getMatchesInfo(req: Request, res: Response) {
         //test if the status is the same
         if (existing_matches[0].status == MatchStatus.upcoming) {
           //the response matches shouldnt have completed
-          if (match.status == MatchStatus.live) {
+          //it doesnt hurt to update things here so might as well while i have the request data
+          if ((match.status as MatchStatus) == MatchStatus.live) {
             //update the match to live
             existing_matches[0].status = MatchStatus.live;
             await match_model.updateMatchStatus(
@@ -144,6 +147,12 @@ async function getMatchesInfo(req: Request, res: Response) {
         if (te.length == 0) {
           console.log('INSERTION ERROR');
           continue;
+        }
+        if (te[0].status === MatchStatus.upcoming) {
+          let executionTime = new Date(
+            new_match.match_start.getTime() + 20000 // plus 20 seconds so its more likely that we dont have to check again
+          );
+          startUpcomingMatchSchedule(new_match.id, executionTime);
         }
 
         data_response.push(te[0]);

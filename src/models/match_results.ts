@@ -1,6 +1,7 @@
 import pool from '../databases/mysql.js';
 import {FieldPacket, RowDataPacket} from 'mysql2';
 import {Match} from './matches.js';
+import {PoolConnection} from 'mysql2/promise';
 //i could maybe just store matches that people placed bets on
 // and then only store results from that
 //cause the path will be make bet fetches matches you can bet on from the vlr.gg
@@ -59,8 +60,13 @@ async function getResultById(id: number) {
 }
 
 //want more info go through the scraper to get players
-async function createResultRow(options: Match, add: ResultOptions) {
-  const [result] = await pool.query(
+async function createResultRow(
+  options: Match,
+  add: ResultOptions,
+  con?: PoolConnection
+) {
+  const db = con ?? pool;
+  const [result] = await db.query(
     'INSERT INTO match_results (id, team_a, team_b, score_a, score_b, odds, event, tournament, img) VALUES (?,?,?,?,?,?)',
     [
       options.id,
@@ -76,4 +82,5 @@ async function createResultRow(options: Match, add: ResultOptions) {
   );
   return result;
 }
+
 export default {getResultById, createResultRow};
