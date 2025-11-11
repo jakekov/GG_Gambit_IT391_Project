@@ -10,13 +10,14 @@ import {createMatchesTable} from '@/models/matches.js';
 import {createStaticTeamsTable} from '@/models/staticTeams.js';
 import {createMatcheResultsTable} from '@/models/match_results.js';
 import {createMatchBetTable} from '@/models/match_bet.js';
+console.log(`HELP ME (${db.DB_USER}),(${db.DB_PASS})`);
 const pool = mysql.createPool({
   host: db.DB_HOST,
   user: db.DB_USER,
   password: db.DB_PASS,
   database: db.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 5,
+  connectionLimit: 10,
   queueLimit: 0,
 });
 pool
