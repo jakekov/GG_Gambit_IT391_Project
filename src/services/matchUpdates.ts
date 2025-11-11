@@ -30,9 +30,13 @@ export interface VlrTeam {
   won?: boolean; //result specific
 }
 export async function startupMatchSchedules() {
-  await checkConclusions();
-  await rebuildUpcomingMatchSchedules(); //this will scheduele any upcoming matches to check if the match has started
-  schedule.scheduleJob('*/5 * * * *', checkConclusions); //check for ended matches every 5 minutes
+  try {
+    await checkConclusions();
+    await rebuildUpcomingMatchSchedules(); //this will scheduele any upcoming matches to check if the match has started
+    schedule.scheduleJob('*/5 * * * *', checkConclusions); //check for ended matches every 5 minutes
+  } catch (err) {
+    console.log(err);
+  }
 }
 //run this after checking for upcoming matches to live matches
 async function rebuildUpcomingMatchSchedules() {
