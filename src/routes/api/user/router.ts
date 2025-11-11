@@ -19,6 +19,7 @@ router.get('/', getUser);
 router.get('/get/:slug', getUser);
 router.get('/leaderboard', getLeaderboard);
 router.get('/balance', requireAuth, getUserBalance); //only session user can get
+router.post('/balance', requireAuth, addUserBalance);
 router.patch('/', requireAuth, patchUser);
 async function getUser(
   req: Request<{slug: string | undefined}>,
@@ -113,20 +114,29 @@ async function getUserBalance(req: Request, res: Response) {
     return res.status(500).json({error: 'Internal server error'});
   }
 }
-async function addUserBalance(req: Request, res: Response) {
-  let user_id = req.session.user?.id_buf;
+export interface PostBalanceForm {
+  balance: number;
+}
+async function addUserBalance(
+  req: Request<{}, {}, PostBalanceForm>,
+  res: Response
+) {
+  let user_id = req.auth_user?.uuid;
   if (!user_id)
     return res
       .status(HTTP_STATUS.UNAUTHENTICATED)
       .json({error: 'Not authenticated'});
 
   try {
+    let balance = req.body;
     const info = await BetInfo.getInfoByUuid(user_id);
     if (info.length == 0)
       return res.status(500).json({error: 'Info does not exist'});
+    const _info = await BetInfo.addbalance(info[0].id, balance.balance);
+
     const data = {
       points: info[0].points,
-      balance: info[0].balance,
+      balance: info[0].balance + balance.balance,
     };
     return res.status(HTTP_STATUS.OK).json(data);
   } catch (err) {

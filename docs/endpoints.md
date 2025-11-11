@@ -15,6 +15,7 @@ Dev URL: `http://localhost:3000/api` <br />
 | GET   | [`/user/get/{username}`](/src/routes/api/user/router.ts#L16) |
 | GET   | [`/user/leaderboard`](/src/routes/api/user/router.ts#L16)    |
 | GET   | [`/user/balance`](/src/routes/api/user/router.ts#L16)        |
+| POST  | [`/user/balance`](/src/routes/api/user/router.ts#L16)        |
 | PATCH | [`/user`](/src/routes/api/user/router.ts#L16)                |
 
 ### Match Betting Endpoints
