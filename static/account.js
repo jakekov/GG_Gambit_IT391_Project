@@ -6,6 +6,7 @@ const usernamePreview = document.getElementById('usernamePreview');
 const resetButton = document.getElementById('resetProfile');
 const form = document.getElementById('profileForm');
 const creditDisplay = document.getElementById('userCredit');
+const modalCreditDisplay = document.getElementById('modalUserCredit');
 const addCreditButton = document.getElementById('addCredit');
 const withdrawButton = document.getElementById('withdrawFunds');
 const saveAvatarBtn = document.getElementById('saveAvatarBtn');
@@ -25,6 +26,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedUsername = localStorage.getItem('username');
   const savedAvatar = localStorage.getItem('avatar');
   const savedCredit = localStorage.getItem('credit');
+  const savedEmail = localStorage.getItem('email');
 
   // Credits
   if (savedCredit) {
@@ -50,6 +52,7 @@ usernameInput.addEventListener('input', () => {
   const value = usernameInput.value.trim();
   usernamePreview.textContent = value || "No Username";
   localStorage.setItem('username', value);
+  localStorage.setItem('email', userEmail);
 });
 
 // --- Profile form submit ---
@@ -58,41 +61,73 @@ form.addEventListener('submit', e => {
   alert("Profile saved successfully!");
 });
 
-// --- Reset profile ---
-resetButton.addEventListener('click', () => {
-  if (confirm("Are you sure you want to reset your profile?")) {
-    localStorage.clear();
-    usernameInput.value = "";
-    usernamePreview.textContent = "No Username";
-    avatarPreview.innerHTML = `<img src="${defaultAvatar}" alt="Default Avatar">`;
-    avatarInputs.forEach(input => input.checked = false);
-    creditDisplay.textContent = "0";
-    userCredit = 0;
-    tempSelectedAvatar = defaultAvatar;
-  }
+
+// Show the confirmation modal only
+document.getElementById("resetProfile").addEventListener("click", function() {
+  const deleteModal = new bootstrap.Modal(document.getElementById("deleteAccountModal"));
+  deleteModal.show();
 });
 
-// --- Credits management ---
+// When the user confirms deletion
+document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
+  localStorage.clear();
+  usernameInput.value = "";
+  usernamePreview.textContent = "No Username";
+  avatarPreview.innerHTML = `<img src="${defaultAvatar}" alt="Default Avatar">`;
+  avatarInputs.forEach(input => input.checked = false);
+  creditDisplay.textContent = "0";
+  userCredit = 0;
+  tempSelectedAvatar = defaultAvatar;
+
+  // Close the modal after cleanup
+  const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteAccountModal"));
+  deleteModal.hide();
+
+  alert("Account deleted successfully.");
+});
+
+
+
+// --- Add Funds Modal Logic ---
+const addFundsModalEl = document.getElementById('addFundsModal');
+const addFundsModal = new bootstrap.Modal(addFundsModalEl);
+
 addCreditButton.addEventListener('click', () => {
-  const amount = prompt("Enter amount to add:");
-  if (amount && !isNaN(amount)) {
-    userCredit += parseInt(amount);
-    localStorage.setItem('credit', userCredit);
-    creditDisplay.textContent = userCredit;
-  }
+  addFundsModal.show();
 });
 
-withdrawButton.addEventListener('click', () => {
-  const amount = prompt("Enter amount to withdraw:");
-  if (amount && !isNaN(amount)) {
-    const val = parseInt(amount);
-    if (val <= userCredit) {
-      userCredit -= val;
-      localStorage.setItem('credit', userCredit);
-      creditDisplay.textContent = userCredit;
-    } else {
-      alert("Insufficient balance!");
-    }
+addFundsModalEl.addEventListener('click', (e) => {
+  if (e.target.matches('button[data-amount]')) {
+    const amount = parseInt(e.target.getAttribute('data-amount'));
+    const start = userCredit;
+    const end = userCredit + amount;
+    const duration = Math.min(2000, 400 + (end - start) * 10);
+    const frameRate = 30; // smoother animation without lag
+
+    let current = start;
+    const increment = (end - start) / (duration / (1000 / frameRate));
+
+    // Animate credit increase
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= end) {
+        current = end;
+        clearInterval(interval);
+      }
+      creditDisplay.textContent = Math.floor(current);
+      modalCreditDisplay.textContent = Math.floor(current);
+    }, 1000 / frameRate);
+
+    // Save + feedback
+    userCredit = end;
+    localStorage.setItem('credit', userCredit);
+    creditDisplay.classList.add('credit-animate');
+    modalCreditDisplay.classList.add('credit-animate');
+
+    setTimeout(() => {
+      creditDisplay.classList.remove('credit-animate');
+      addFundsModal.hide();
+    }, duration + 200);
   }
 });
 

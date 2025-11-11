@@ -34,9 +34,14 @@ body {
   background: rgba(0,0,0,0.6);
   padding: 15px 25px;
   border-radius: 10px;
-  text-align: right;
+  text-align: center;
   box-shadow: 0 0 15px rgba(0,188,212,0.4);
   z-index: 1000;       /* make sure it's above other content */
+  color: white;
+}
+
+.gambit {
+  color: rgba(0,188,212,0.4);
 }
 
 
@@ -100,6 +105,34 @@ body {
   border-color: #00bcd4;
 }
 
+#addFundsModal .modal-content {
+  background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+#addFundsModal h5 {
+  color: #212529;
+  font-weight: 600;
+}
+
+#addFundsModal button {
+  min-width: 120px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: transform 0.1s ease-in-out;
+}
+
+#addFundsModal button:hover {
+  transform: scale(1.1);
+}
+
+.credit-animate {
+  color: #28a745 !important;
+  font-weight: 700;
+  transition: color 0.5s ease;
+}
+
 /* --- Buttons --- */
 .btn-custom, .button, .buttonLogin {
   background-color: #212529;
@@ -126,6 +159,55 @@ body {
   border-color: #212529;
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* --- Delete Account Modal --- */
+#deleteAccountModal .modal-content {
+  background: linear-gradient(to bottom right, #fff5f5, #ffecec);
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+#deleteAccountModal h5 {
+  color: #dc3545; /* Bootstrap’s red tone */
+  font-weight: 600;
+}
+
+#deleteAccountModal p {
+  color: #212529;
+  margin-bottom: 20px;
+}
+
+#deleteAccountModal button {
+  min-width: 120px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Primary (cancel) button style */
+#deleteAccountModal .btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  color: white;
+}
+
+#deleteAccountModal .btn-secondary:hover {
+  background-color: #5a6268;
+  transform: scale(1.05);
+}
+
+/* Delete button */
+#deleteAccountModal .btn-danger {
+  background-color: #dc3545;
+  border: none;
+  color: white;
+}
+
+#deleteAccountModal .btn-danger:hover {
+  background-color: #c82333;
+  transform: scale(1.1);
 }
 
 /* --- Footer --- */

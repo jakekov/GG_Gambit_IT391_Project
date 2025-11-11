@@ -32,10 +32,24 @@
 
   <!-- Credit Manager -->
   <div class="credit-container">
-    <h5>Your Balance: <span id="userCredit">0</span> gamBITS</h5>
+    <h5>Your Balance: <span class="gambit"><span id="userCredit">0</span> gamBITS</span></h5>
     <div class="credit-buttons">
-      <button class="btn btn-success btn-sm" id="add gamBIT">Add Funds</button>
+      <button class="btn btn-success btn-sm" id="addCredit">Add Funds</button>
     </div>
+  </div>
+
+  <div class="modal fade" id="addFundsModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-3">
+      <h5 class="mb-3">Select Amount to Add</h5>
+      <h5>Your Balance: <span class="gambit"><span id="modalUserCredit">0</span> gamBITS</span></h5>
+      <div>
+        <button class="btn btn-success m-2" data-amount="10">10 gamBITS</button>
+        <button class="btn btn-success m-2" data-amount="50">50 gamBITS</button>
+        <button class="btn btn-success m-2" data-amount="100">100 gamBITS</button>
+      </div>
+    </div>
+  </div>
   </div>
 
   <!-- Account Form -->
@@ -65,9 +79,24 @@
 
       <!-- Save and Reset -->
       <button type="submit" class="btn-custom">Save Profile</button>
-      <button type="button" id="resetProfile" class="btn-custom">Reset Profile</button>
+      <button type="button" id="resetProfile" class="btn-custom">Delete Profile</button>
     </form>
   </div>
+
+  <!-- Delete Account Modal -->
+  <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center p-4">
+        <h5 id="deleteAccountModalLabel">Delete Account</h5>
+        <p>Are you sure you want to permanently delete your account? This action cannot be undone.</p>
+        <div class="d-flex justify-content-center gap-3 mt-3">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Avatar Selection Modal -->
   <div class="modal fade" id="avatarModal" tabindex="-1" aria-labelledby="avatarModalLabel" aria-hidden="true">
