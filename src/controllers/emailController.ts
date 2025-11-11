@@ -2,16 +2,16 @@
 //or just use jwt
 //generate JWT token
 //
-import jwt from "jsonwebtoken";
-import config from "../config/config";
+import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
 import email_model, {
   EmailConformationString,
   TokenOptions,
-} from "../models/email_tokens";
-import user_model from "../models/user";
-import email_tokens from "../models/email_tokens";
-import crypto from "crypto";
-import { DatabaseError } from "../errors";
+} from '../models/email_tokens.js';
+import user_model from '../models/user.js';
+import email_tokens from '../models/email_tokens.js';
+import crypto from 'crypto';
+import {DatabaseError} from '../utils/errors.js';
 //im pretty sure email should be unique for users
 //this would probably be better as a helper file
 interface EmailJWTPayload {
@@ -31,7 +31,7 @@ async function generateEmailVerificationToken(
 ): Promise<string | null> {
   //i thkn the jwt just needs a email
   let token = jwt.sign(
-    { email: email, conformation_type: conformation_type },
+    {email: email, conformation_type: conformation_type},
     config.jwt_secret
   );
 
@@ -41,7 +41,7 @@ async function generateEmailVerificationToken(
       return null;
     }
     let user = users[0];
-    let hash = crypto.createHash("sha256");
+    let hash = crypto.createHash('sha256');
     hash.update(token);
 
     let token_options: TokenOptions = {
@@ -54,7 +54,7 @@ async function generateEmailVerificationToken(
     await email_tokens.createEmailToken(token_options);
   } catch (err) {
     console.log(err);
-    throw new DatabaseError("Database error");
+    throw new DatabaseError('Database error');
   }
   return token;
 }
@@ -74,17 +74,17 @@ async function verifyEmailVerificationToken(token: string): Promise<boolean> {
 
   console.log(email_entry);
   if (email_entry.length == 0) {
-    console.log("token does not exist or was revoked");
+    console.log('token does not exist or was revoked');
     return false;
   }
 
   let row = email_entry[0];
   //check hash //cause this could be an old token sent to the same email
-  let hash = crypto.createHash("sha256");
+  let hash = crypto.createHash('sha256');
   hash.update(token);
   let token_hash = hash.digest();
   if (token_hash.toString() !== row.token_hash) {
-    console.log("old email token used");
+    console.log('old email token used');
     return false;
   }
   //if an old token was used dont remove the new one
@@ -95,7 +95,7 @@ async function verifyEmailVerificationToken(token: string): Promise<boolean> {
   let date = new Date(row.created);
   //if the verify request creation time + timeout exceeds date now the email dont accept the verification
   if (Date.now() >= date.getTime() + config.verification_timeout) {
-    console.log("expired token");
+    console.log('expired token');
     return false;
   }
 
@@ -103,4 +103,4 @@ async function verifyEmailVerificationToken(token: string): Promise<boolean> {
   return true;
 }
 
-export default { generateEmailVerificationToken, verifyEmailVerificationToken };
+export default {generateEmailVerificationToken, verifyEmailVerificationToken};

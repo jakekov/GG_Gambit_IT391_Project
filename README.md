@@ -2,6 +2,12 @@
 
 We are making an app to bet on live Esport Valorant games. This is our project for our IT 391 course at Illinois State University.
 
+### Overview
+
+[`Project Structure`](/docs/overview.md)
+
+[`Api Endpoints`](/docs/endpoints.md)
+
 ### Run
 
 -clone git repo

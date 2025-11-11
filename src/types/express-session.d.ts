@@ -1,7 +1,8 @@
-import "express-session";
+import 'express-session';
 
-declare module "express-session" {
+declare module 'express-session' {
   interface SessionData {
-    user?: { id: string; username: string, id_buf: Buffer };
+    user?: {id: string; username: string; id_buf: Buffer};
+    state?: string;
   }
 }

@@ -1,7 +1,7 @@
 import team_model, {
   StaticTeam,
   StaticTeamOptions,
-} from "@/models/staticTeams";
+} from '@/models/staticTeams.js';
 
 //the all doesnt work so just manually check each region
 
@@ -25,14 +25,22 @@ export async function findTeamId(
       console.log(`team does not exist ${name}, ${country}`);
       return null;
     }
-    if (img === null) console.log("warn team insert image is null");
+    if (img === null) console.log('warn team insert image is null');
     let static_team: StaticTeamOptions = {
       id: id,
       name: name,
       country: country,
       img: img,
     };
-    await team_model.createStaticTeam(static_team);
+    let id_in_use = await team_model.getTeamById(id);
+    if (id_in_use.length !== 0) {
+      //the team changed their name?
+      //so update the name instaed of replacing it
+      await team_model.updateTeamName(name, country, id);
+    } else {
+      await team_model.createStaticTeam(static_team);
+    }
+
     let teams = await team_model.getTeamByUniqueName(name, country);
     if (teams.length == 0) {
       console.log(`team does not exist ${name}, ${country}`);
@@ -58,20 +66,20 @@ interface Pagination {
 const team_search_cooldown_us: number = 600000;
 var last_search_time: number = 0;
 const regionAvailable = [
-  "na",
-  "eu",
-  "br",
-  "ap",
-  "asia",
-  "pacific",
-  "kr",
-  "ch",
-  "jp",
-  "la-s",
-  "la-n",
-  "oce",
-  "mena",
-  "gc",
+  'na',
+  'eu',
+  'br',
+  'ap',
+  'asia',
+  'pacific',
+  'kr',
+  'ch',
+  'jp',
+  'la-s',
+  'la-n',
+  'oce',
+  'mena',
+  'gc',
 ];
 /**
  * Goes through the vlresports teams api
@@ -85,7 +93,7 @@ async function populateStaticTeams() {
     return;
   }
   last_search_time = Date.now();
-  console.log("searching teams");
+  console.log('searching teams');
   for (const region of regionAvailable) {
     console.log(region);
     let counter = 1;
@@ -113,7 +121,7 @@ async function populateStaticTeams() {
     }
   }
 }
-import * as cheerio from "cheerio";
+import * as cheerio from 'cheerio';
 /**
  * Searches vlr.gg and scrapes for the team that matches team param
  * vlr condenses names to a-z removing characters outside and - for space
@@ -125,9 +133,11 @@ async function scrapeSearchVlrTeam(
   team: string
 ): Promise<[number, string | null]> {
   //console.log(`https://vlr.gg/search/?q=${team}&type=teams`);
-  const data = await fetch(`https://vlr.gg/search/?q=${team}&type=teams`);
+  const data = await fetch(
+    `https://vlr.gg/search/?q=${encodeURIComponent(team)}&type=teams`
+  );
   if (data.status != 200) {
-    console.log("Scrape error");
+    console.log('Scrape error');
     console.log(data);
     return [-1, null];
   }
@@ -135,23 +145,28 @@ async function scrapeSearchVlrTeam(
   var img = null;
   let html = await data.text();
   const $ = cheerio.load(html);
-  $(".wf-card").each((_, el) => {
-    const link = $(el).find("a.wf-module-item.search-item").attr("href");
-    if (link?.startsWith("/team/")) {
-      var spaceReg = new RegExp("/\s+/", "g");
-      var andReg = new RegExp("&", "g");
-      let formatted_team = team.replace(/[^0-9A-Za-z\s]/g, "").toLowerCase();
-      formatted_team = formatted_team.trim().replace(/\s+/g, "-");
+  $('.wf-card').each((_, el) => {
+    const link = $(el).find('a.wf-module-item.search-item').attr('href');
+    if (link?.startsWith('/team/')) {
+      const removed_chars = team.replace(/[']/g, '').toLowerCase();
+      //this is awful theres a team named ^-^ and its string name is "" you cant even search for the team on vlr
+      const only_ascii = removed_chars.replace(/[^0-9a-z']/g, ' ');
+      const formatted_team = only_ascii.trim().replace(/\s+/g, '-'); //combine consecutive dashes into one
       let end_idx = link.indexOf(formatted_team, 5);
-      if (end_idx < 7) return true; //continue next iter
+      if (end_idx < 7) {
+        console.log(data);
+        console.log(formatted_team);
+        console.log(link);
+        return true;
+      } //continue next iter
 
       let id = link.substring(6, end_idx - 1);
       found_id = parseInt(id);
 
-      img = $(el).find("img").attr("src");
-      if (img && img.startsWith("//")) {
+      img = $(el).find('img').attr('src');
+      if (img && img.startsWith('//')) {
         // Make it a full URL
-        img = "https:" + img;
+        img = 'https:' + img;
       }
       return false;
     }

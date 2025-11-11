@@ -1,6 +1,6 @@
-import nodemailer from "nodemailer";
-import {google} from "googleapis";
-import {email} from "../config/config"
+import nodemailer from 'nodemailer';
+import {google} from 'googleapis';
+import {email} from '../config/config.js';
 // const REDIRECT_URI = 'http://localhost';
 // const oAuth2Client = new google.auth.OAuth2(
 //   process.env.GOOGLE_CLIENT_ID,
@@ -15,8 +15,6 @@ import {email} from "../config/config"
 // import process from 'node:process';
 // import {authenticate} from '@google-cloud/local-auth';
 // //import {google} from 'googleapis';
-
-
 
 // // The scope for reading Gmail labels.
 // const SCOPES = ['https://mail.google.com/',
@@ -35,7 +33,7 @@ import {email} from "../config/config"
 //   const auth = await authenticate({
 //     scopes: SCOPES,
 //     keyfilePath: CREDENTIALS_PATH,
-    
+
 //   });
 //   if (!auth) {
 //     console.log("auth null");
@@ -86,16 +84,16 @@ export const sendMail = async (
   from: string,
   to: string,
   subject: string,
-  text: string,
+  text: string
 ) => {
-   //const access_token = await oAuth2Client.getAccessToken();
-//    let token = access_token.token;
-//    if (!token) {
-//     console.log("Token is null or undefined")
-//     return;
-//    }
-    //await listLabels();
-    //return;
+  //const access_token = await oAuth2Client.getAccessToken();
+  //    let token = access_token.token;
+  //    if (!token) {
+  //     console.log("Token is null or undefined")
+  //     return;
+  //    }
+  //await listLabels();
+  //return;
   try {
     let mailOptions = {
       from,
@@ -107,14 +105,13 @@ export const sendMail = async (
     //service: to determine which email platform to use
     //auth contains the senders email and password which are all saved in the .env
     //it says this will get a access token by itself
-      
+
     const Transporter = nodemailer.createTransport({
-        service: "gmail",
-  auth: {
-    user: email.email_user,
-    pass: email.app_password
-   
-  },
+      service: 'gmail',
+      auth: {
+        user: email.email_user,
+        pass: email.app_password,
+      },
     });
 
     //return the Transporter variable which has the sendMail method to send the mail

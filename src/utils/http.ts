@@ -1,4 +1,4 @@
-import { Response } from "express";
+import {Response} from 'express';
 export const HTTP_STATUS = {
   OK: 200,
   BAD_REQUEST: 400,
@@ -14,8 +14,11 @@ export const HTTP_STATUS = {
 export function internalServerError(res: Response, msg?: string) {
   res
     .status(HTTP_STATUS.SERVER_ERROR)
-    .json({ error: msg || "Internal Server Error" });
+    .json({error: msg || 'Internal Server Error'});
 }
 export function badRequest(res: Response, msg?: string) {
-  res.status(HTTP_STATUS.BAD_REQUEST).json({ error: msg || "Bad Request" });
+  res.status(HTTP_STATUS.BAD_REQUEST).json({error: msg || 'Bad Request'});
+}
+export function notAuthenticated(res: Response, msg?: string) {
+  res.status(HTTP_STATUS.UNAUTHENTICATED).json({error: msg || 'Not Signed in'});
 }
