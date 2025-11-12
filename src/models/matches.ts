@@ -102,6 +102,10 @@ async function getMatchWithTeams(id: number) {
   );
   return rows;
 }
+async function getAllMatches() {
+  const [rows] = await pool.query<Match[]>('SELECT * FROM matches', []);
+  return rows;
+}
 async function getMatchesByStatus(status: MatchStatus) {
   const [rows] = await pool.query<Match[]>(
     'SELECT * FROM matches WHERE status = ? ',
@@ -144,4 +148,5 @@ export default {
   removeMatch,
   getMatchWithTeams,
   getMatchesByStatus,
+  getAllMatches,
 };

@@ -19,6 +19,7 @@ import {BadRequestError, UserNotFoundError} from '@/utils/errors.js';
 import {requireAuth} from '@/middleware/session.js';
 import schedule from 'node-schedule';
 import {startUpcomingMatchSchedule} from '@/services/matchUpdates.js';
+import config from '@/config/config.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
@@ -87,7 +88,7 @@ interface UserMatchBetParams {
  */
 async function getMatchesInfo(req: Request, res: Response) {
   try {
-    const response = await fetch('http://10.111.21.84:5000/api/v1/matches')
+    const response = await fetch(`${config.scraper_url}/api/v1/matches`)
       .then((res1) => res1.json())
       .then((res1) => {
         return res1 as VlrMatches;

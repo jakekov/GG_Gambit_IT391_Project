@@ -67,7 +67,7 @@ async function createResultRow(
 ) {
   const db = con ?? pool;
   const [result] = await db.query(
-    'INSERT INTO match_results (id, team_a, team_b, score_a, score_b, odds, event, tournament, img) VALUES (?,?,?,?,?,?)',
+    'INSERT INTO match_results (id, team_a, team_b, score_a, score_b, odds, event, tournament, img) VALUES (?,?,?,?,?,?,?,?,?)',
     [
       options.id,
       options.team_a,

@@ -7,6 +7,7 @@ interface Config {
   email_verification: boolean;
   jwt_secret: string;
   http: string;
+  scraper_url: string;
 }
 interface DB {
   DB_HOST: string;
@@ -30,6 +31,7 @@ const config: Config = {
   email_verification: getEnvVar('REQUIRE_EMAIL_VERIFICATION') === 'true',
   jwt_secret: getEnvVar('JWT_SECRET'),
   http: getEnvVarOr('HTTP_TYPE', 'http'), //until or if we use a certificate
+  scraper_url: getEnvVarOr('SCRAPER_URL', 'http://10.111.21.84:5000'),
 };
 export const email: Email = {
   email_user: getEnvVar('EMAIL_USER'),

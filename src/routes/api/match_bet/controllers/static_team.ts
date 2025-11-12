@@ -1,3 +1,4 @@
+import config from '@/config/config.js';
 import team_model, {
   StaticTeam,
   StaticTeamOptions,
@@ -99,7 +100,7 @@ async function populateStaticTeams() {
     let counter = 1;
     while (true) {
       let res = await fetch(
-        `http://10.111.21.84:5000/api/v1/teams?limit=50&page=${counter}&region=${region}`
+        `${config.scraper_url}/api/v1/teams?limit=50&page=${counter}&region=${region}`
       )
         .then((res1) => res1.json())
         .then((res1) => {

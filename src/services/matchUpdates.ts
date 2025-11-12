@@ -7,6 +7,7 @@ import bet_model from '@/models/match_bet.js';
 import info_model from '@/models/userBetInfo.js';
 import pool from '@/databases/mysql.js';
 import schedule from 'node-schedule';
+import config from '@/config/config.js';
 export interface VlrMatches {
   status: string;
   size: number;
@@ -47,7 +48,7 @@ async function rebuildUpcomingMatchSchedules() {
   let our_upcoming_promise = match_model.getMatchesByStatus(
     MatchStatus.upcoming
   );
-  const response = await fetch('http://10.111.21.84:5000/api/v1/matches')
+  const response = await fetch(`${config.scraper_url}/api/v1/matches`)
     .then((res1) => res1.json())
     .then((res1) => {
       return res1 as VlrMatches;
@@ -87,11 +88,11 @@ async function checkConclusions() {
 
   //make the promise here so the web fetch can start aswell
 
-  const live_matches_promise = match_model.getMatchesByStatus(MatchStatus.live);
+  const live_matches_promise = match_model.getAllMatches();
   const live_matches = await live_matches_promise;
   if (live_matches.length == 0) return;
   console.log('checking for ended matches');
-  const response = await fetch('http://10.111.21.84:5000/api/v1/results')
+  const response = await fetch(`${config.scraper_url}/api/v1/results`)
     .then((res) => res.json())
     .then((res) => {
       return res as VlrMatches;
@@ -217,7 +218,7 @@ async function checkUpcoming(for_match_id: number, failed_attempts: number) {
   //this should also just use a single match api but it would need to be made
   //but i dont care enough to make it so just scedule this whenever a new upcoming match entry is made
   console.log(`running update check ${for_match_id}`);
-  const response = await fetch('http://10.111.21.84:5000/api/v1/matches')
+  const response = await fetch(`${config.scraper_url}/api/v1/matches`)
     .then((res1) => res1.json())
     .then((res1) => {
       return res1 as VlrMatches;
