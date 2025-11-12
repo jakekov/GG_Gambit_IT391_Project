@@ -26,15 +26,14 @@ const router = express.Router();
  * Makes sure the server can handle sending oauth links
  * this probably needs to change because it requires the serve to have all oauth providers set up
  */
-router.use('/', check_sign_in_enabled);
 
-router.get('/redirect/:provider', oauth_redirect);
+router.get('/redirect/:provider', check_sign_in_enabled, oauth_redirect);
 /**
  * When the user is done authenticating with the Oauth provider it sends the browser to this route
  * this route takes the provider and creates a profile from the helper for each auth provider
  * it then logs in the user to the existing account or creates a new account
  */
-router.get('/callback/:provider/', oauth_callback);
+router.get('/callback/:provider/', check_sign_in_enabled, oauth_callback);
 router.post('/login', auth_login);
 router.post('/signup', auth_signup);
 router.get('/logout', auth_logout);
