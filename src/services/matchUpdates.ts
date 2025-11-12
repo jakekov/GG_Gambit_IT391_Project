@@ -3,7 +3,7 @@
 
 import match_model, {MatchStatus} from '@/models/matches.js';
 import results_model, {ResultOptions} from '@/models/match_results.js';
-import bet_model from '@/models/match_bet.js';
+import bet_model, {MatchBet} from '@/models/match_bet.js';
 import info_model from '@/models/userBetInfo.js';
 import pool from '@/databases/mysql.js';
 import schedule from 'node-schedule';
@@ -32,9 +32,12 @@ export interface VlrTeam {
 }
 export async function startupMatchSchedules() {
   try {
+    console.log(`CONFIG WHYYY ${config.scraper_url}`);
+    console.log(config);
     await checkConclusions();
     await rebuildUpcomingMatchSchedules(); //this will scheduele any upcoming matches to check if the match has started
-    schedule.scheduleJob('*/5 * * * *', checkConclusions); //check for ended matches every 5 minutes
+    await updateAllMatchBets();
+    schedule.scheduleJob('*/5 * * * *', async () => await checkConclusions()); //check for ended matches every 5 minutes
   } catch (err) {
     console.log(err);
   }
@@ -136,7 +139,7 @@ async function checkConclusions() {
       }
       //todo emit an event for updating peoples bets
       //or just do it here since this is being run async in schedule
-      endMatchBetUpdates(
+      await endMatchBetUpdates(
         match.id,
         options.score_a > options.score_b ? 'a' : 'b'
       );
@@ -144,32 +147,61 @@ async function checkConclusions() {
     }
   }
 }
+async function updateAllMatchBets() {
+  console.log('updating all active bets');
+  const bets = await bet_model.allActiveBets();
+  for (const bet of bets) {
+    const result = await results_model.getResultById(bet.match_id);
+    if (result.length == 0) {
+      const existing_match = await match_model.getMatchById(bet.match_id);
+      if (existing_match.length == 0) {
+        console.log(
+          `bet ${bet.id} does not have a finished match do something about it`
+        );
+      }
+
+      continue;
+    }
+    const match = result[0];
+    await updateUserBet(bet, match.score_a > match.score_b ? 'a' : 'b');
+  }
+}
 async function endMatchBetUpdates(match_id: number, winner: string) {
   const bets_on_match = await bet_model.getBetsByMatch(match_id);
   for (const bet of bets_on_match) {
-    if (bet.ended) continue; //this shoudlnt happen unless this is called multiple times for a single match which shouldnt happen
-    let info = await info_model.getInfoByUuid(bet.user_id);
-    const con = await pool.getConnection();
-    await con.beginTransaction();
+    await updateUserBet(bet, winner);
+  }
+}
+/**
+ * This needs to only be run by one task
+ * @param bet
+ * @param winner
+ * @returns
+ */
+async function updateUserBet(bet: MatchBet, winner: string) {
+  if (bet.ended) return; //this shoudlnt happen unless this is called multiple times for a single match which shouldnt happen
+  let info = await info_model.getInfoByUuid(bet.user_id);
+  const con = await pool.getConnection();
+  await con.beginTransaction();
 
-    try {
-      var points = bet.payout;
-
-      if (bet.prediction === winner) {
-        points *= 2.5;
-        await info_model.addbalance(bet.payout, info[0].id, con);
-      }
-      //move this to the end so if any errors applying the points or balance it doesnt set the bet to ended
-      await info_model.updatePoints(Math.round(points), info[0].id, con);
-      await bet_model.betConcluded(bet.id, con);
-      await con.commit();
-    } catch (err) {
-      console.log('rollback');
-      console.log(err);
-      await con.rollback();
-    } finally {
-      con.release();
+  try {
+    var points = bet.payout;
+    const bet_won = bet.prediction === winner ? true : false;
+    if (bet_won) {
+      points *= 2.5;
+      await info_model.addbalance(bet.payout, info[0].id, con);
     }
+    //move this to the end so if any errors applying the points or balance it doesnt set the bet to ended
+    await info_model.updatePoints(Math.round(points), info[0].id, con);
+    await bet_model.betConcluded(bet.id, bet_won, points, con);
+    await con.commit();
+    console.log(`updated bet ${bet.bet}`);
+  } catch (err) {
+    console.log('rollback');
+    console.log(err);
+    await con.rollback();
+  } finally {
+    con.release();
   }
 }
 /**
@@ -191,7 +223,10 @@ export function startUpcomingMatchSchedule(
     execution_time.setTime(Date.now() + 5000);
   }
   console.log(`scheduled live check for ${execution_time} id ${for_match_id}`);
-  schedule.scheduleJob(execution_time, () => checkUpcoming(for_match_id, 0));
+  schedule.scheduleJob(
+    execution_time,
+    async () => await checkUpcoming(for_match_id, 0)
+  );
 }
 /**
  * Checks all of our database upcoming matches and checks vlr to see if they started
@@ -262,8 +297,9 @@ async function checkUpcoming(for_match_id: number, failed_attempts: number) {
       return;
     }
     let execution_time = new Date(Date.now() + 60000); // add a minute and try again
-    schedule.scheduleJob(execution_time, () =>
-      checkUpcoming(for_match_id, failed_attempts + 1)
+    schedule.scheduleJob(
+      execution_time,
+      async () => await checkUpcoming(for_match_id, failed_attempts + 1)
     );
   }
 }
