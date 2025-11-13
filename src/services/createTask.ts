@@ -17,7 +17,6 @@ export async function createTask(
   const queue = task_queue.queue;
   const location = task_queue.location;
 
-  // Construct the fully qualified queue name.
   const parent = client.queuePath(project, location, queue);
   const time = Math.ceil(date.getSeconds() / 30) * 30;
   const task = {
@@ -25,20 +24,21 @@ export async function createTask(
       headers: {
         'Content-Type': 'text/plain', // Set content type to ensure compatibility your application's request parsing
       },
-      httpMethod: 'POST',
+      httpMethod: protos.google.cloud.tasks.v2.HttpMethod.POST,
       url: task_queue.task_run_url + relative_uri,
-      body: null,
+      body: payload ? Buffer.from(payload).toString('base64') : null,
       name: relative_uri + time.toString(),
     },
-  } as protos.google.cloud.tasks.v2.ITask;
-
-  if (payload && task.httpRequest) {
-    task.httpRequest.body = Buffer.from(payload).toString('base64');
-  }
-
-  task.scheduleTime = {
-    seconds: time,
+    scheduleTime: {seconds: time},
   };
+
+  // if (payload && task.httpRequest) {
+  //   task.httpRequest.body = Buffer.from(payload).toString('base64');
+  // }
+
+  // task.scheduleTime = {
+  //   seconds: time,
+  // };
 
   console.log('Sending task:');
   console.log(task);

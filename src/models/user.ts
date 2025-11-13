@@ -10,7 +10,7 @@ export async function createUserTable() {
   email VARCHAR(64) NOT NULL,
   username VARCHAR(32) UNIQUE NOT NULL,
   display_name VARCHAR(32),
-  avatar VARCHAR(32),
+  avatar VARCHAR(128),
   email_verified BOOLEAN NOT NULL DEFAULT FALSE,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

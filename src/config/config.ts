@@ -75,7 +75,7 @@ export const task_queue = load_task_queue();
 function load_task_queue(): TaskQueue | null {
   try {
     const task_queue: TaskQueue = {
-      project: getEnvVar('TASK_PROJECT_NAME'),
+      project: getEnvVar('GCLOUD_PROJECT'),
       queue: getEnvVar('TASK_QUEUE'),
       location: getEnvVar('TASK_LOCATION'),
       service_account: getEnvVar('TASK_SERVICE_ACCOUNT'),
