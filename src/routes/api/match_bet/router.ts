@@ -20,6 +20,7 @@ import {requireAuth} from '@/middleware/session.js';
 import schedule from 'node-schedule';
 import {startUpcomingMatchSchedule} from '@/services/matchUpdates.js';
 import config from '@/config/config.js';
+import {scheduele_live_check} from '@/services/taskInterface.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
@@ -151,9 +152,9 @@ async function getMatchesInfo(req: Request, res: Response) {
         }
         if (te[0].status === MatchStatus.upcoming) {
           let executionTime = new Date(
-            new_match.match_start.getTime() + 20000 // plus 20 seconds so its more likely that we dont have to check again
+            new_match.match_start.getTime() + 30000 // plus 30 seconds so its more likely that we dont have to check again
           );
-          startUpcomingMatchSchedule(new_match.id, executionTime);
+          await scheduele_live_check(new_match.id, executionTime);
         }
 
         data_response.push(te[0]);

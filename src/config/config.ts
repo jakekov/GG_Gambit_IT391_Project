@@ -63,6 +63,29 @@ function load_google_sign_in(): GoogleSignIn {
   }
   return output;
 }
+interface TaskQueue {
+  project: string;
+  queue: string;
+  location: string;
+
+  service_account: string;
+  task_run_url: string;
+}
+export const task_queue = load_task_queue();
+function load_task_queue(): TaskQueue | null {
+  try {
+    const task_queue: TaskQueue = {
+      project: getEnvVar('TASK_PROJECT_NAME'),
+      queue: getEnvVar('TASK_QUEUE'),
+      location: getEnvVar('TASK_LOCATION'),
+      service_account: getEnvVar('TASK_SERVICE_ACCOUNT'),
+      task_run_url: getEnvVar('TASK_RUN_URL'),
+    };
+    return task_queue;
+  } catch (err) {
+    return null;
+  }
+}
 function getEnvVarOr(key: string, or: string): string {
   const value = process.env[key];
   if (!value) {

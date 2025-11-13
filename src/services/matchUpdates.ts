@@ -71,7 +71,7 @@ async function rebuildUpcomingMatchSchedules() {
       let executionTime = new Date(
         upcoming_matches[idx].match_start.getTime() + 2000 // plus 20 seconds so its more likely that we dont have to check again
       );
-      startUpcomingMatchSchedule(id, executionTime);
+      await startUpcomingMatchSchedule(id, executionTime);
     }
   }
 }
@@ -210,7 +210,7 @@ async function updateUserBet(bet: MatchBet, winner: string) {
  * @param for_match_id valid match id for the match we want to check live status of
  * @param execution_time any valid date object This checks for already passed times and schedules it to run in 5 seconds
  */
-export function startUpcomingMatchSchedule(
+export async function startUpcomingMatchSchedule(
   for_match_id: number,
   execution_time: Date
 ) {
@@ -228,12 +228,12 @@ export function startUpcomingMatchSchedule(
     async () => await checkUpcoming(for_match_id, 0)
   );
 }
-/**
- * Checks all of our database upcoming matches and checks vlr to see if they started
- */
-export async function checkAllUpcomingMatches() {
-  await checkUpcoming(-1, 0);
-}
+// /**
+//  * Checks all of our database upcoming matches and checks vlr to see if they started
+//  */
+// export async function checkAllUpcomingMatches() {
+//   await checkUpcoming(-1, 0);
+// }
 /**
  * Used inside a schedule
  * Goes through vlr_matches and updates any in our database that are upcoming but should be live

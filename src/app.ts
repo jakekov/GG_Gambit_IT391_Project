@@ -63,9 +63,12 @@ app.get('/dashboard', (req, res) => {
 
 import {create_if_not_exists} from './databases/mysql.js';
 import {startupMatchSchedules} from './services/matchUpdates.js';
+import {task_queue} from './config/config.js';
 (async () => {
   await create_if_not_exists();
-  await startupMatchSchedules();
+  if (!task_queue) {
+    await startupMatchSchedules();
+  }
 })();
 
 //if i wanted an auth check for a directory of sites i just add a middleware function for each request in a specific path
