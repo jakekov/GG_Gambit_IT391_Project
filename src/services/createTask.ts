@@ -28,7 +28,7 @@ export async function createTask(
       url: task_queue.task_run_url + relative_uri,
       body: payload ? Buffer.from(payload).toString('base64') : null,
     },
-    name: relative_uri + time_seconds.toString(),
+    name: relative_uri.replace(/^[\w]/g, '-') + time_seconds.toString(),
     scheduleTime: {seconds: time_seconds},
   };
 
