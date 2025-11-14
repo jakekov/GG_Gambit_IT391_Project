@@ -90,7 +90,13 @@ interface UserMatchBetParams {
 async function getMatchesInfo(req: Request, res: Response) {
   try {
     const response = await fetch(`${config.scraper_url}/api/v1/matches`)
-      .then((res1) => res1.json())
+      .then((res1) => {
+        if (!res1.ok) {
+          console.log(res1);
+          throw new Error('Failed to fetch scraper api matches');
+        }
+        return res1.json();
+      })
       .then((res1) => {
         return res1 as VlrMatches;
       });
@@ -154,7 +160,13 @@ async function getMatchesInfo(req: Request, res: Response) {
           let executionTime = new Date(
             new_match.match_start.getTime() + 30000 // plus 30 seconds so its more likely that we dont have to check again
           );
-          await scheduele_live_check(new_match.id, executionTime);
+          try {
+            await scheduele_live_check(new_match.id, executionTime);
+          } catch (err) {
+            //if this fails once it will most likely fail every time
+            console.log(err);
+            return internalServerError(res);
+          }
         }
 
         data_response.push(te[0]);

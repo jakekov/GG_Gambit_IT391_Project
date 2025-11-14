@@ -52,7 +52,13 @@ async function rebuildUpcomingMatchSchedules() {
     MatchStatus.upcoming
   );
   const response = await fetch(`${config.scraper_url}/api/v1/matches`)
-    .then((res1) => res1.json())
+    .then((res1) => {
+      if (!res1.ok) {
+        console.log(res1);
+        throw new Error('Failed to fetch scraper api matches');
+      }
+      return res1.json();
+    })
     .then((res1) => {
       return res1 as VlrMatches;
     });
@@ -96,7 +102,13 @@ async function checkConclusions() {
   if (live_matches.length == 0) return;
   console.log('checking for ended matches');
   const response = await fetch(`${config.scraper_url}/api/v1/results`)
-    .then((res) => res.json())
+    .then((res1) => {
+      if (!res1.ok) {
+        console.log(res1);
+        throw new Error('Failed to fetch scraper api results');
+      }
+      return res1.json();
+    })
     .then((res) => {
       return res as VlrMatches;
     });
@@ -254,7 +266,13 @@ async function checkUpcoming(for_match_id: number, failed_attempts: number) {
   //but i dont care enough to make it so just scedule this whenever a new upcoming match entry is made
   console.log(`running update check ${for_match_id}`);
   const response = await fetch(`${config.scraper_url}/api/v1/matches`)
-    .then((res1) => res1.json())
+    .then((res1) => {
+      if (!res1.ok) {
+        console.log(res1);
+        throw new Error('Failed to fetch scraper api matches');
+      }
+      return res1.json();
+    })
     .then((res1) => {
       return res1 as VlrMatches;
     });

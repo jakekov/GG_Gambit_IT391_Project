@@ -113,6 +113,7 @@ async function server_verify_google_id(code: string): Promise<TokenPayload> {
   try {
     tokens = (await response.json()) as GoogleTokenResponse;
   } catch (err) {
+    console.log(err);
     throw new Error('invalid token');
   }
 
