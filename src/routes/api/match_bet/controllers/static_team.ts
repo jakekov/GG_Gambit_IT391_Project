@@ -23,7 +23,7 @@ export async function findTeamId(
   if (teams.length == 0) {
     let [id, img] = await scrapeSearchVlrTeam(name);
     if (id === -1) {
-      console.log(`team does not exist ${name}, ${country}`);
+      console.log(`team not found by scrape ${name}, ${country}`);
       return null;
     }
     if (img === null) console.log('warn team insert image is null');
@@ -146,31 +146,49 @@ async function scrapeSearchVlrTeam(
   var img = null;
   let html = await data.text();
   const $ = cheerio.load(html);
-  $('.wf-card').each((_, el) => {
-    const link = $(el).find('a.wf-module-item.search-item').attr('href');
-    if (link?.startsWith('/team/')) {
-      const removed_chars = team.replace(/[']/g, '').toLowerCase();
-      //this is awful theres a team named ^-^ and its string name is "" you cant even search for the team on vlr
-      const only_ascii = removed_chars.replace(/[^0-9a-z']/g, ' ');
-      const formatted_team = only_ascii.trim().replace(/\s+/g, '-'); //combine consecutive dashes into one
-      let end_idx = link.indexOf(formatted_team, 5);
-      if (end_idx < 7) {
-        console.log(data);
-        console.log(formatted_team);
-        console.log(link);
-        return true;
-      } //continue next iter
-
-      let id = link.substring(6, end_idx - 1);
-      found_id = parseInt(id);
-
+  $('.wf-card .search-item').each((_, el) => {
+    const title = $(el).find('.search-item-title').text().trim();
+    if (title == team) {
       img = $(el).find('img').attr('src');
       if (img && img.startsWith('//')) {
         // Make it a full URL
         img = 'https:' + img;
       }
-      return false;
+      const link = $(el).attr('href') || '';
+      if (link) {
+        const id = link.match(/\/team\/(\d+)/);
+        if (id && id.length > 1) {
+          found_id = parseInt(id[1]);
+          return false;
+        }
+      }
     }
+    return true;
+
+    // if (link?.startsWith('/team/')) {
+    //   const removed_chars = team.replace(/[']/g, '').toLowerCase();
+    //   //this is awful theres a team named ^-^ and its string name is "" you cant even search for the team on vlr
+    //   const only_ascii = removed_chars.replace(/[^0-9a-z']/g, ' ');
+    //   const formatted_team = only_ascii.trim().replace(/\s+/g, '-'); //combine consecutive dashes into one
+    //   console.log(formatted_team);
+    //   let end_idx = link.indexOf(formatted_team, 5);
+    //   if (end_idx < 7) {
+    //     console.log(data);
+    //     console.log(formatted_team);
+    //     console.log(link);
+    //     return true;
+    //   } //continue next iter
+
+    //   let id = link.substring(6, end_idx - 1);
+    //   found_id = parseInt(id);
+
+    //   img = $(el).find('img').attr('src');
+    //   if (img && img.startsWith('//')) {
+    //     // Make it a full URL
+    //     img = 'https:' + img;
+    //   }
+    //   return false;
+    // }
   });
   return [found_id, img];
 }
