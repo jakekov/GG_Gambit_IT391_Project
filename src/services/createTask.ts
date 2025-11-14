@@ -19,6 +19,10 @@ export async function createTask(
 
   const parent = client.queuePath(project, location, queue);
   const time_seconds = Math.ceil(date.getTime() / 30000) * 30;
+  const formated_id =
+    relative_uri.replace(/^[\w]/g, '-') + time_seconds.toString();
+  const formated_name = `projects/${project}/locations/${location}/queues/${queue}/tasks/${formated_id}`;
+  console.log(formated_name);
   const task = {
     httpRequest: {
       headers: {
@@ -28,7 +32,7 @@ export async function createTask(
       url: task_queue.task_run_url + relative_uri,
       body: payload ? Buffer.from(payload).toString('base64') : null,
     },
-    name: relative_uri.replace(/^[\w]/g, '-') + time_seconds.toString(),
+    name: formated_name,
     scheduleTime: {seconds: time_seconds},
   };
 
