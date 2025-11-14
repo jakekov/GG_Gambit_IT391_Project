@@ -20,7 +20,8 @@ export async function createTask(
   const parent = client.queuePath(project, location, queue);
   const time_seconds = Math.ceil(date.getTime() / 30000) * 30;
   const formated_id =
-    relative_uri.replace(/^[\w]/g, '-') + time_seconds.toString();
+    relative_uri.replace(/[^\w]/g, '-') + time_seconds.toString();
+  console.log(formated_id);
   const formated_name = `projects/${project}/locations/${location}/queues/${queue}/tasks/${formated_id}`;
   console.log(formated_name);
   const task = {
