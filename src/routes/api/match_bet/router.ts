@@ -19,13 +19,15 @@ import {BadRequestError, UserNotFoundError} from '@/utils/errors.js';
 import {requireAuth} from '@/middleware/session.js';
 import schedule from 'node-schedule';
 import {startUpcomingMatchSchedule} from '@/services/matchUpdates.js';
-import config from '@/config/config.js';
+import config, {task_queue} from '@/config/config.js';
 import {scheduele_live_check} from '@/services/taskInterface.js';
+import {createTask} from '@/services/createTask.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
 router.get('/info', getMatchesInfo);
 router.post('/bet', requireAuth, postMatchBet);
+router.get('/debug', debugService);
 /**
  * User submited post for making a bet on a match
  * @param req needs match_id, team_winning, wager. in req.body all numbers/ids
@@ -181,5 +183,17 @@ async function getMatchesInfo(req: Request, res: Response) {
     console.log(err);
     return res.status(HTTP_STATUS.SERVER_ERROR).json({error: 'ERROR'});
   }
+}
+async function debugService(req: Request, res: Response) {
+  if (!task_queue) {
+    return res.send('Task service not initialized');
+  }
+  await createTask(
+    new Date(Date.now() + 300000),
+    '/log_payload',
+    JSON.stringify({data: 50, someString: 'HELP ME'})
+  );
+  console.log('debug task');
+  return res.send('ok');
 }
 export default router;
