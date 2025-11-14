@@ -168,9 +168,8 @@ async function getMatchesInfo(req: Request, res: Response) {
           try {
             await schedule_live_check(new_match.id, executionTime);
           } catch (err) {
-            //if this fails once it will most likely fail every time
+            //if this fails once it might happen everytime or it might fail because theres already a check scheduled
             console.log(err);
-            return internalServerError(res);
           }
         } else if (te[0].status === MatchStatus.live) {
           //created a new live match need to schedule a conclusion
@@ -182,8 +181,12 @@ async function getMatchesInfo(req: Request, res: Response) {
           try {
             schedule_conclusion_check(new_match.id, executionTime);
           } catch (err) {
+            //if this fails once it might happen everytime or it might fail because theres already a check scheduled
             console.log(err);
-            return internalServerError(res);
+            // i need to remove the match because i dont have a way to recover schedules
+            // the only way this can happen is if i delete a match without removeing the queue
+            //i think instead of timestamp for name it should be match_id
+            //but that would require redoing the scraper to only lookup indiviudal matches and i dont care enought to do that
           }
         }
 
