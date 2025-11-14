@@ -20,7 +20,10 @@ import {requireAuth} from '@/middleware/session.js';
 import schedule from 'node-schedule';
 import {startUpcomingMatchSchedule} from '@/services/matchUpdates.js';
 import config, {task_queue} from '@/config/config.js';
-import {scheduele_live_check} from '@/services/taskInterface.js';
+import {
+  schedule_conclusion_check,
+  schedule_live_check,
+} from '@/services/taskInterface.js';
 import {createTask} from '@/services/createTask.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
@@ -163,9 +166,22 @@ async function getMatchesInfo(req: Request, res: Response) {
             new_match.match_start.getTime() + 30000 // plus 30 seconds so its more likely that we dont have to check again
           );
           try {
-            await scheduele_live_check(new_match.id, executionTime);
+            await schedule_live_check(new_match.id, executionTime);
           } catch (err) {
             //if this fails once it will most likely fail every time
+            console.log(err);
+            return internalServerError(res);
+          }
+        } else if (te[0].status === MatchStatus.live) {
+          //created a new live match need to schedule a conclusion
+          // if its creating the live match no one could bet on it anyway so just do an hour
+          //this doesnt have to be good cause if we were making it good we would have a better api and wouldnt have to scrape everything
+          let executionTime = new Date(
+            new_match.match_start.getTime() + 3600000 // wait an hour and check
+          );
+          try {
+            schedule_conclusion_check(new_match.id, executionTime);
+          } catch (err) {
             console.log(err);
             return internalServerError(res);
           }
