@@ -20,9 +20,8 @@
         <img src="images/whiteLogo.svg" class="img-fluid logoNav" alt="Main Logo"> Gambit
       </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-              data-bs-target="#navbarNav" aria-controls="navbarNav" 
-              aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -45,159 +44,151 @@
     </div>
   </nav>
 
-  <div class="dash-section bg-dark text-white py-5">
-  <div class="container">
-    <div class="row g-4 align-items-start">
-      
-      <!-- Left  -->
-      <div class="col-12 col-md-3">
-        <div class="card shadow-sm h-100">
-          <div class="card-header bg-success text-white text-center">
-            <h5 class="mb-0">Upcoming Esports Matches</h5>
-          </div>
-          <div class="card-body p-0" style="height: 400px;">
-            <iframe
-              src="https://www.esportsguide.com/widget/upcoming-matches"
-              width="100%"
-              height="100%"
-              frameborder="0"
-              allowfullscreen>
-            </iframe>
+  <div class="dash-section  text-white py-5">
+    <div class="container-fluid pt-5">
+      <div class="row align-items-start">
+
+        <!-- Left  -->
+        <div class="col-12 col-md-3">
+          <div class="card border-dark shadow-sm">
+            <div class="card-body p-0" style="height: 50em;">
+              <iframe src="https://valorant-feed-scroll.lovable.app" width="100%" height="100%" frameborder="0"
+                allowfullscreen>
+              </iframe>
+            </div>
           </div>
         </div>
+
+
+        <!-- Middle Column -->
+        <div class="col-12 col-md-6">
+          <div class="card shadow-sm bg-dark text-white h-100">
+            <div class="card-header text-white text-center">
+              <h5 class="mb-0">Selected Bets</h5>
+            </div>
+
+            <!-- Container -->
+            <div class="card-body p-3" id="selectedBetsContainer" style="max-height: 400px; overflow-y: auto;">
+
+              <!-- Example Bet Row -->
+              <div
+                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+                <div class="team-info d-flex align-items-center">
+                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+                  <div>
+                    <span class="fw-bold">Team A</span>
+                    <span class="text-secondary">vs</span>
+                    <span class="fw-bold">Team B</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="odds text-success fw-bold me-2">+150</span>
+                </div>
+              </div>
+              <div
+                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+                <div class="team-info d-flex align-items-center">
+                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+                  <div>
+                    <span class="fw-bold">Team A</span>
+                    <span class="text-secondary">vs</span>
+                    <span class="fw-bold">Team B</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="odds text-success fw-bold me-2">+150</span>
+                </div>
+              </div>
+              <div
+                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+                <div class="team-info d-flex align-items-center">
+                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+                  <div>
+                    <span class="fw-bold">Team A</span>
+                    <span class="text-secondary">vs</span>
+                    <span class="fw-bold">Team B</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="odds text-success fw-bold me-2">+150</span>
+                </div>
+              </div>
+              <div
+                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+                <div class="team-info d-flex align-items-center">
+                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+                  <div>
+                    <span class="fw-bold">Team A</span>
+                    <span class="text-secondary">vs</span>
+                    <span class="fw-bold">Team B</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="odds text-success fw-bold me-2">+150</span>
+                </div>
+              </div>
+              <div
+                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+                <div class="team-info d-flex align-items-center">
+                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
+                  <div>
+                    <span class="fw-bold">Team A</span>
+                    <span class="text-secondary">vs</span>
+                    <span class="fw-bold">Team B</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="odds text-success fw-bold me-2">+150</span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="card-footer text-center bg-dark border-top border-secondary">
+              <button class="btn text-white bg-success w-100 fw-bold">Place Bets</button>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Right -->
+        <div class="col-12 col-md-3">
+          <div class="card border-dark shadow-sm h-100">
+            <div class="card-header bg-dark text-white text-center">
+              <h5 class="mb-0">Leaderboard</h5>
+            </div>
+            <ul class="leaderList list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>🥇 <strong id="fpName">Alice</strong></div>
+                <span class="badge bg-success rounded-pill" id="fpPoints">1500</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>🥈 <strong id="spName">Bob</strong></div>
+                <span class="badge bg-info rounded-pill" id="spPoints">1200</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>🥉 <strong id="tpName">Charlie</strong></div>
+                <span class="badge bg-warning text-dark rounded-pill" id="tpPoints">1000</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span id="fourthpName">Diana</span>
+                <span class="badge bg-secondary text-light rounded-pill" id="fourthpPoints">950</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span id="fifthpName">Evan</span>
+                <span class="badge bg-secondary text-light rounded-pill" id="fifthpPoints">800</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
       </div>
-
-<!-- Middle Column -->
-<div class="col-12 col-md-6">
-  <div class="card shadow-sm bg-dark text-white h-100">
-    <div class="card-header bg-success text-white text-center">
-      <h5 class="mb-0">Selected Bets</h5>
-    </div>
-
-    <!-- Container -->
-    <div class="card-body p-3" id="selectedBetsContainer" style="max-height: 400px; overflow-y: auto;">
-      
-      <!-- Example Bet Row -->
-      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-        <div class="team-info d-flex align-items-center">
-          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-          <div>
-            <span class="fw-bold">Team A</span> 
-            <span class="text-secondary">vs</span> 
-            <span class="fw-bold">Team B</span>
-          </div>
-        </div>
-        <div class="d-flex align-items-center">
-          <span class="odds text-success fw-bold me-2">+150</span>
-          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
-        </div>
-      </div>
-      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-        <div class="team-info d-flex align-items-center">
-          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-          <div>
-            <span class="fw-bold">Team A</span> 
-            <span class="text-secondary">vs</span> 
-            <span class="fw-bold">Team B</span>
-          </div>
-        </div>
-        <div class="d-flex align-items-center">
-          <span class="odds text-success fw-bold me-2">+150</span>
-          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
-        </div>
-      </div>
-      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-        <div class="team-info d-flex align-items-center">
-          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-          <div>
-            <span class="fw-bold">Team A</span> 
-            <span class="text-secondary">vs</span> 
-            <span class="fw-bold">Team B</span>
-          </div>
-        </div>
-        <div class="d-flex align-items-center">
-          <span class="odds text-success fw-bold me-2">+150</span>
-          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
-        </div>
-      </div>
-      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-        <div class="team-info d-flex align-items-center">
-          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-          <div>
-            <span class="fw-bold">Team A</span> 
-            <span class="text-secondary">vs</span> 
-            <span class="fw-bold">Team B</span>
-          </div>
-        </div>
-        <div class="d-flex align-items-center">
-          <span class="odds text-success fw-bold me-2">+150</span>
-          <button class="btn btn-sm btn-outline-danger py-0 px-2">✕</button>
-        </div>
-      </div>
-      <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-        <div class="team-info d-flex align-items-center">
-          <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-          <div>
-            <span class="fw-bold">Team A</span> 
-            <span class="text-secondary">vs</span> 
-            <span class="fw-bold">Team B</span>
-          </div>
-        </div>
-        <div class="d-flex align-items-center">
-          <span class="odds text-success fw-bold me-2">+150</span>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="card-footer text-center bg-dark border-top border-secondary">
-      <button class="btn btn-success w-100 fw-bold">Place Bets</button>
-    </div>
-  </div>
-</div>
-
-
-
-      <!-- Right -->
-      <div class="col-12 col-md-3">
-        <div class="card shadow-sm h-100">
-          <div class="card-header bg-dark text-white text-center">
-            <h5 class="mb-0">Leaderboard</h5>
-          </div>
-          <ul class="leaderList list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div>🥇 <strong id="fpName">Alice</strong></div>
-              <span class="badge bg-success rounded-pill" id="fpPoints">1500</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div>🥈 <strong id="spName">Bob</strong></div>
-              <span class="badge bg-info rounded-pill" id="spPoints">1200</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div>🥉 <strong id="tpName">Charlie</strong></div>
-              <span class="badge bg-warning text-dark rounded-pill" id="tpPoints">1000</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span id="fourthpName">Diana</span>
-              <span class="badge bg-secondary text-light rounded-pill" id="fourthpPoints">950</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span id="fifthpName">Evan</span>
-              <span class="badge bg-secondary text-light rounded-pill" id="fifthpPoints">800</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-
     </div>
   </div>
-</div>
 
 
-    </div>
-  </div>
-  </div>
-  
+
   <!-- Footer -->
   <footer class="bg-dark text-white text-center py-3 mt-4">
     <div class="container">
