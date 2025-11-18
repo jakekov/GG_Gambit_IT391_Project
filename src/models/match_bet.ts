@@ -11,6 +11,8 @@ export async function createMatchBetTable() {
   bet FLOAT NOT NULL,
   payout FLOAT NOT NULL,
   ended boolean NOT NULL DEFAULT 0,
+  bet_won boolean Default NULL,
+  points_earned int NOT NULL DEFAULT 0,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )`;
   await pool.query(query);
@@ -28,6 +30,8 @@ export interface MatchBet extends RowDataPacket {
   bet: number;
   payout: number;
   ended: boolean; //tells if it should look in match results
+  bet_won: boolean | null; // null if the bet hasnt ended
+  points_earned: number;
   created: string;
 }
 export interface MatchBetOptions {
@@ -45,6 +49,13 @@ async function getInfoByUuid(uuid: Buffer) {
   );
   return rows;
 }
+async function allActiveBets() {
+  const [rows] = await pool.query<MatchBet[]>(
+    'SELECT * FROM match_bet WHERE ended = 0',
+    []
+  );
+  return rows;
+}
 async function getBetsByMatch(match_id: number) {
   const [rows] = await pool.query<MatchBet[]>(
     'SELECT * FROM match_bet WHERE user_id = ?',
@@ -52,10 +63,15 @@ async function getBetsByMatch(match_id: number) {
   );
   return rows;
 }
-async function betConcluded(id: number, con?: PoolConnection) {
+async function betConcluded(
+  id: number,
+  bet_won: boolean,
+  points_earned: number,
+  con?: PoolConnection
+) {
   const [rows] = await pool.query<MatchBet[]>(
-    'UPDATE match_bet SET ended = 1, WHERE id = ?',
-    [id]
+    'UPDATE match_bet SET ended = 1, bet_won = ?, points_earned = ? WHERE id = ?',
+    [bet_won, points_earned, id]
   );
   return rows;
 }
@@ -73,4 +89,10 @@ async function createUserBet(options: MatchBetOptions) {
   return result;
 }
 
-export default {createUserBet, getInfoByUuid, getBetsByMatch, betConcluded};
+export default {
+  createUserBet,
+  getInfoByUuid,
+  getBetsByMatch,
+  betConcluded,
+  allActiveBets,
+};

@@ -7,6 +7,7 @@ interface Config {
   email_verification: boolean;
   jwt_secret: string;
   http: string;
+  scraper_url: string;
 }
 interface DB {
   DB_HOST: string;
@@ -30,6 +31,7 @@ const config: Config = {
   email_verification: getEnvVar('REQUIRE_EMAIL_VERIFICATION') === 'true',
   jwt_secret: getEnvVar('JWT_SECRET'),
   http: getEnvVarOr('HTTP_TYPE', 'http'), //until or if we use a certificate
+  scraper_url: getEnvVarOr('SCRAPER_URL', 'http://10.111.21.84:5000'),
 };
 export const email: Email = {
   email_user: getEnvVar('EMAIL_USER'),
@@ -60,6 +62,29 @@ function load_google_sign_in(): GoogleSignIn {
     };
   }
   return output;
+}
+interface TaskQueue {
+  project: string;
+  queue: string;
+  location: string;
+
+  service_account: string;
+  task_run_url: string;
+}
+export const task_queue = load_task_queue();
+function load_task_queue(): TaskQueue | null {
+  try {
+    const task_queue: TaskQueue = {
+      project: getEnvVar('GCLOUD_PROJECT'),
+      queue: getEnvVar('TASK_QUEUE'),
+      location: getEnvVar('TASK_LOCATION'),
+      service_account: getEnvVar('TASK_SERVICE_ACCOUNT'),
+      task_run_url: getEnvVar('TASK_RUN_URL'),
+    };
+    return task_queue;
+  } catch (err) {
+    return null;
+  }
 }
 function getEnvVarOr(key: string, or: string): string {
   const value = process.env[key];

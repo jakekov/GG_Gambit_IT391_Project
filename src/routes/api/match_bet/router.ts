@@ -19,11 +19,18 @@ import {BadRequestError, UserNotFoundError} from '@/utils/errors.js';
 import {requireAuth} from '@/middleware/session.js';
 import schedule from 'node-schedule';
 import {startUpcomingMatchSchedule} from '@/services/matchUpdates.js';
+import config, {task_queue} from '@/config/config.js';
+import {
+  schedule_conclusion_check,
+  schedule_live_check,
+} from '@/services/taskInterface.js';
+import {createTask} from '@/services/createTask.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
 router.get('/info', getMatchesInfo);
 router.post('/bet', requireAuth, postMatchBet);
+router.get('/debug', debugService);
 /**
  * User submited post for making a bet on a match
  * @param req needs match_id, team_winning, wager. in req.body all numbers/ids
@@ -87,8 +94,14 @@ interface UserMatchBetParams {
  */
 async function getMatchesInfo(req: Request, res: Response) {
   try {
-    const response = await fetch('http://10.111.21.84:5000/api/v1/matches')
-      .then((res1) => res1.json())
+    const response = await fetch(`${config.scraper_url}/api/v1/matches`)
+      .then((res1) => {
+        if (!res1.ok) {
+          console.log(res1);
+          throw new Error('Failed to fetch scraper api matches');
+        }
+        return res1.json();
+      })
       .then((res1) => {
         return res1 as VlrMatches;
       });
@@ -150,9 +163,31 @@ async function getMatchesInfo(req: Request, res: Response) {
         }
         if (te[0].status === MatchStatus.upcoming) {
           let executionTime = new Date(
-            new_match.match_start.getTime() + 20000 // plus 20 seconds so its more likely that we dont have to check again
+            new_match.match_start.getTime() + 30000 // plus 30 seconds so its more likely that we dont have to check again
           );
-          startUpcomingMatchSchedule(new_match.id, executionTime);
+          try {
+            await schedule_live_check(new_match.id, executionTime);
+          } catch (err) {
+            //if this fails once it might happen everytime or it might fail because theres already a check scheduled
+            console.log(err);
+          }
+        } else if (te[0].status === MatchStatus.live) {
+          //created a new live match need to schedule a conclusion
+          // if its creating the live match no one could bet on it anyway so just do an hour
+          //this doesnt have to be good cause if we were making it good we would have a better api and wouldnt have to scrape everything
+          let executionTime = new Date(
+            new_match.match_start.getTime() + 3600000 // wait an hour and check
+          );
+          try {
+            schedule_conclusion_check(new_match.id, executionTime);
+          } catch (err) {
+            //if this fails once it might happen everytime or it might fail because theres already a check scheduled
+            console.log(err);
+            // i need to remove the match because i dont have a way to recover schedules
+            // the only way this can happen is if i delete a match without removeing the queue
+            //i think instead of timestamp for name it should be match_id
+            //but that would require redoing the scraper to only lookup indiviudal matches and i dont care enought to do that
+          }
         }
 
         data_response.push(te[0]);
@@ -167,5 +202,17 @@ async function getMatchesInfo(req: Request, res: Response) {
     console.log(err);
     return res.status(HTTP_STATUS.SERVER_ERROR).json({error: 'ERROR'});
   }
+}
+async function debugService(req: Request, res: Response) {
+  if (!task_queue) {
+    return res.send('Task service not initialized');
+  }
+  await createTask(
+    new Date(Date.now() + 300000),
+    '/log_payload',
+    JSON.stringify({data: 50, someString: 'HELP ME'})
+  );
+  console.log('debug task');
+  return res.send('ok');
 }
 export default router;
