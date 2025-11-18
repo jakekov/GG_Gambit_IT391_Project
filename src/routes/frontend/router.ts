@@ -22,4 +22,35 @@ router.get('/login', (req: Request, res: Response) => {
   }
   res.sendFile(path.join(staticPath, 'login.html'));
 });
+//make logon route for nav bar (copy format) and update navbar routes on all pages!!!
+//change href to /signup or like the name
+// needs to be updated on frontendpoints be sure to this first!!!
+router.get('/dashboard', (req: Request, res: Response) => {
+  if (req.session.user == null) {
+    //user is not logged in go to default ie dashboard account home whatever it is
+    return res.redirect('/home');
+  }
+  res.sendFile(path.join(staticPath, 'dashboard.html'));
+});
+router.get('/homelogon', (req: Request, res: Response) => {
+  if (req.session.user == null) {
+    //user is not logged in go to default ie dashboard account home whatever it is
+    return res.redirect('/home');
+  }
+  res.sendFile(path.join(staticPath, 'homelogon.html'));
+});
+router.get('/account', (req: Request, res: Response) => {
+  if (req.session.user == null) {
+    //user is not logged in go to default ie dashboard account home whatever it is
+    return res.redirect('/home');
+  }
+  res.sendFile(path.join(staticPath, 'account.html'));
+});
+router.get('/home', (req: Request, res: Response) => {
+  if (req.session.user != null) {
+    //user is not logged in go to default ie dashboard account home whatever it is
+    return res.redirect('/homelogon');
+  }
+  res.sendFile(path.join(staticPath, 'home.html'));
+});
 export default router;
