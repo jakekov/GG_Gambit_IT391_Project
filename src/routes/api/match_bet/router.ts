@@ -154,7 +154,9 @@ async function getMatchesInfo(req: Request, res: Response) {
           status: match.status as MatchStatus,
           match_start: new Date(match.timestamp * 1000), //this needs to be in miliseconds and i think timestamp is in seconds
         } as Match;
-        console.log(`created match ${match.id}, ${match.event}`);
+        console.log(
+          `created match ${match.id}, ${match.event}, timestamp ${new_match.match_start}, ${match.timestamp}`
+        );
         await match_model.createMatchRow(new_match);
         let te = await match_model.getMatchWithTeams(new_match.id);
         if (te.length == 0) {
