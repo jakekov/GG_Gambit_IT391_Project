@@ -122,7 +122,7 @@ async function getMatchesInfo(req: Request, res: Response) {
         if (existing_matches[0].status == MatchStatus.upcoming) {
           //the response matches shouldnt have completed
           //it doesnt hurt to update things here so might as well while i have the request data
-          if ((match.status as MatchStatus) == MatchStatus.live) {
+          if ((match.status.toLowerCase() as MatchStatus) == MatchStatus.live) {
             //update the match to live
             existing_matches[0].status = MatchStatus.live;
             await match_model.updateMatchStatus(
@@ -151,7 +151,7 @@ async function getMatchesInfo(req: Request, res: Response) {
           team_a: a_id.id,
           team_b: b_id.id,
           odds: randomInt(-1024, 1024),
-          status: match.status as MatchStatus,
+          status: match.status.toLowerCase() as MatchStatus,
           match_start: new Date(match.timestamp * 1000), //this needs to be in miliseconds and i think timestamp is in seconds
         } as Match;
         console.log(

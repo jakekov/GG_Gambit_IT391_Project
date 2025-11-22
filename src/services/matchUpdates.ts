@@ -280,17 +280,17 @@ async function updateMatch(for_match_id: number, failed_attempts: number) {
   let now = new Date(Date.now());
 
   const match_date = new Date(response.data.utcDate);
-  let year = now.getFullYear();
-  if (now.getMonth() < match_date.getMonth()) {
+  let year = now.getUTCFullYear();
+  if (now.getUTCMonth() < match_date.getUTCMonth()) {
     //if current month is less than match_date
     //it means its in the previous year
     //
     year -= 1;
-  } else if (now.getMonth() > match_date.getMonth()) {
+  } else if (now.getUTCMonth() > match_date.getUTCMonth()) {
     year += 1;
     //if the current month is greater than the match date than its in the next year now december match in january
   }
-  match_date.setFullYear(year);
+  match_date.setUTCFullYear(year);
   const [match] = await match_p; //juts get first element
   if (!match) {
     console.log(`match was not found canceling update ${for_match_id}`);
@@ -311,14 +311,16 @@ async function updateMatch(for_match_id: number, failed_attempts: number) {
     //but we need to make sure we stop propogating schedule checks
     return;
   }
-  if ((response.status as MatchStatus) === MatchStatus.live) {
+  if (
+    (response.data.status.toLowerCase() as MatchStatus) === MatchStatus.live
+  ) {
     await match_model.updateMatchStatus(match.id, MatchStatus.live);
     console.log(`updating match status to live ${match.id}`);
     //schedule a check for when we think the match would end
     //i think most matches are best of 3 so like hour and a half maybe
     schedule_conclusion_check(
       for_match_id,
-      new Date(Math.max(match_date.getTime(), Date.now()) + 324000000)
+      new Date(Math.max(match_date.getTime(), Date.now()) + 5400000)
     );
     return;
   }
@@ -338,7 +340,7 @@ async function updateMatch(for_match_id: number, failed_attempts: number) {
   //this is needed if its rescheduled
   //if the match still hasnt starter and now has passes use now
   let execution_time = new Date(
-    base_time + 60000 + Math.pow(2, Math.min(failed_attempts, 5) * 10000) //6 minute updates after 5 attempts
+    base_time + 60000 + Math.pow(2, Math.min(failed_attempts, 5)) * 10000 //6 minute updates after 5 attempts
   ); // add a minute and try again
   schedule_live_check(for_match_id, execution_time, failed_attempts + 1);
 }
