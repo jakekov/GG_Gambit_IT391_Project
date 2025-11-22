@@ -45,8 +45,8 @@ export async function createTask(
   //   seconds: time,
   // };
 
-  console.log('Sending task:');
-  console.log(task);
+  // console.log('Sending task:');
+  // console.log(task);
 
   // Send create task request.
   const request = {parent: parent, task: task};
@@ -82,8 +82,8 @@ export async function createAnonymousTask(
     },
     scheduleTime: {seconds: time_seconds},
   };
-  console.log('Sending anon task:');
-  console.log(task);
+  // console.log('Sending anon task:');
+  // console.log(task);
 
   // Send create task request.
   const request = {parent: parent, task: task};
