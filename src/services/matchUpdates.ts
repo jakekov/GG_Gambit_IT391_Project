@@ -28,6 +28,10 @@ export interface VlrMatch {
   in?: string; //match specific
   timestamp?: number; //match specific
 }
+export interface DirectResponse {
+  status: string;
+  data: DirectVlrMatch;
+}
 export interface DirectVlrMatch {
   teams: VlrTeam[];
   status: string;
@@ -268,16 +272,33 @@ async function updateMatch(for_match_id: number, failed_attempts: number) {
       return res1.json();
     })
     .then((res1) => {
-      return res1 as DirectVlrMatch;
+      return res1 as DirectResponse;
     });
 
   //match date should now always be when the match should start so base reschedules off of it
   //unless Date.now is greater than match_start
-  const match_date = new Date(response.utcDate);
+  let now = new Date(Date.now());
+
+  const match_date = new Date(response.data.utcDate);
+  let year = now.getFullYear();
+  if (now.getMonth() < match_date.getMonth()) {
+    //if current month is less than match_date
+    //it means its in the previous year
+    //
+    year -= 1;
+  } else if (now.getMonth() > match_date.getMonth()) {
+    year += 1;
+    //if the current month is greater than the match date than its in the next year now december match in january
+  }
+  match_date.setFullYear(year);
   const [match] = await match_p; //juts get first element
+  if (!match) {
+    console.log(`match was not found canceling update ${for_match_id}`);
+    return;
+  }
   if (match.match_start.getTime() !== match_date.getTime()) {
     console.log(
-      `match_start for match ${match.id} changed to ${match_date.toDateString()}`
+      `match_start for match ${match.id} changed to ${match_date.toISOString()}`
     );
     failed_attempts = 0; //reset failed attempts if the time changes
     await match_model.updateMatchStart(match.id, match_date);
@@ -302,7 +323,7 @@ async function updateMatch(for_match_id: number, failed_attempts: number) {
     return;
   }
   //if match status is not live yet reschedule to run again
-  if (for_match_id < 0) {
+  if (for_match_id < 0 || failed_attempts < 0) {
     return; //call was intended to run once and immedietly
   }
   if (failed_attempts > 20) {
