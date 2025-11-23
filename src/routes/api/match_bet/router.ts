@@ -117,6 +117,7 @@ async function getMatchesInfo(req: Request, res: Response) {
       let existing_matches = await match_model.getMatchWithTeams(
         parseInt(match.id)
       );
+      //this should also check if the time has changed
       if (existing_matches.length != 0) {
         //test if the status is the same
         if (existing_matches[0].status == MatchStatus.upcoming) {
@@ -129,6 +130,15 @@ async function getMatchesInfo(req: Request, res: Response) {
               existing_matches[0].id,
               MatchStatus.live
             );
+            let executionTime = new Date(
+              existing_matches[0].match_start.getTime() + 3600000 // wait an hour and check
+            );
+            try {
+              schedule_conclusion_check(existing_matches[0].id, executionTime);
+            } catch (err) {
+              //if this fails once it might happen everytime or it might fail because theres already a check scheduled
+              console.log(err);
+            }
           }
         }
 
@@ -163,7 +173,8 @@ async function getMatchesInfo(req: Request, res: Response) {
           console.log('INSERTION ERROR');
           continue;
         }
-        if (te[0].status === MatchStatus.upcoming) {
+        console.log(te[0].status);
+        if (te[0].status == MatchStatus.upcoming) {
           let executionTime = new Date(
             new_match.match_start.getTime() + 30000 // plus 30 seconds so its more likely that we dont have to check again
           );
@@ -173,7 +184,7 @@ async function getMatchesInfo(req: Request, res: Response) {
             //if this fails once it might happen everytime or it might fail because theres already a check scheduled
             console.log(err);
           }
-        } else if (te[0].status === MatchStatus.live) {
+        } else if (te[0].status == MatchStatus.live) {
           //created a new live match need to schedule a conclusion
           // if its creating the live match no one could bet on it anyway so just do an hour
           //this doesnt have to be good cause if we were making it good we would have a better api and wouldnt have to scrape everything
@@ -190,6 +201,11 @@ async function getMatchesInfo(req: Request, res: Response) {
             //i think instead of timestamp for name it should be match_id
             //but that would require redoing the scraper to only lookup indiviudal matches and i dont care enought to do that
           }
+        } else {
+          console.log(
+            'Match started but no task or schedule was created for it'
+          );
+          console.log(new_match);
         }
 
         data_response.push(te[0]);

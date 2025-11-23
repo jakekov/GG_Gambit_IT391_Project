@@ -46,10 +46,6 @@ export interface ResultOptions {
   tournament: string;
   img: string;
 }
-export enum MatchStatus {
-  live = 'Live',
-  upcoming = 'Upcoming',
-}
 
 async function getResultById(id: number) {
   const [rows] = await pool.query<Result[]>(
