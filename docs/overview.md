@@ -112,6 +112,20 @@ Session management and token validation helpers live in `/controllers`.
 
 ---
 
+## App Functions
+1. **Match Scraping**
+   - Uses a fork of Vlresports scraper for vlr.gg for retrieving upcoming matches and ending matches when users go to /api/matches/info
+   - populates our database with matches and the odds we calculate for the match
+   
+2. **Match Tracking**
+   - When a match is created in our database a task is sceduled to run when the match is supposed to start
+        - If the task doesnt succed it is retried using an exponential backoff or rescheduling if the time changed
+   - The same happens for live matches that need to be updated when it ends
+   - The monolithic server uses node-scheduler to run tasks which check for match updates (Match started or Match ended)
+        - Cloud version uses Cloud Tasks and a microservice in Cloud Run to update our matches and update database
+   - When matches end the async service updates any bets associated with the matches and gives out points and balance to accounts
+
+---
 ## 🧩 Development Commands
 
 | Command       | Description                                      |
@@ -139,4 +153,5 @@ APP_PASSWORD=
 REQUIRE_EMAIL_VERIFICATION=false
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
+SCRAPER_URL=https://vlr.orlandomm.net
 ```
