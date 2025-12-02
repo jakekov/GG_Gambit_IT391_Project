@@ -1,9 +1,13 @@
 import {task_queue} from '@/config/config.js';
-import {createTask} from './createTask.js';
+import {createAnonymousTask, createTask} from './createTask.js';
 import {startUpcomingMatchSchedule} from './matchUpdates.js';
 
 interface ScheduleLiveCheck {
-  (for_match_id: number, execution_date: Date): Promise<void>;
+  (
+    for_match_id: number,
+    execution_date: Date,
+    failed_attempts?: number
+  ): Promise<void>;
 }
 interface ScheduleConclusionCheck {
   (for_match_id: number, execution_date: Date): Promise<void>;
@@ -16,13 +20,17 @@ export const schedule_live_check = Create_Live_Check();
 function Create_Live_Check(): ScheduleLiveCheck {
   if (task_queue) {
     console.log('Using Google CLoud Tasks');
-    return (for_match_id: number, execution_date: Date): Promise<void> => {
-      return createTask(
+    return (
+      for_match_id: number,
+      execution_date: Date,
+      failed_attempts?: number
+    ): Promise<void> => {
+      return createAnonymousTask(
         execution_date,
         '/check_upcoming_to_live',
         JSON.stringify({
           for_match_id: for_match_id,
-          failed_attempts: 0,
+          failed_attempts: failed_attempts || 0,
         } as PayloadBody)
       );
     };

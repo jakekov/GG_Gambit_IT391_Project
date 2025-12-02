@@ -86,3 +86,40 @@ async function verifyLogin() {
     console.error("There was a problem with the login fetch operation:", error);
   }
 }
+
+function renderSelectedBets(betsArray) {
+  const container = document.getElementById("selectedBetsContainer");
+
+  if (!container) {
+    console.error("Container #selectedBetsContainer not found.");
+    return;
+  }
+
+  container.innerHTML = betsArray.map(bet => `
+    <div class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
+      <div class="team-info d-flex align-items-center">
+        <img src="${bet.img}" alt="${bet.teamA}" width="40" 
+             class="me-2 rounded-circle border border-success">
+        <div>
+          <span class="fw-bold">${bet.teamA}</span>
+          <span class="text-secondary">vs</span>
+          <span class="fw-bold">${bet.teamB}</span>
+        </div>
+      </div>
+      <div class="d-flex align-items-center">
+        <span class="odds text-success fw-bold me-2">${bet.odds}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+//get info from api for user selected teams
+const bets = [
+  { teamA: "Team test", teamB: "Team B", odds: "+150", img: "images/team1.png" },
+  { teamA: "Team C", teamB: "Team D", odds: "-110", img: "images/team1.png" },
+  { teamA: "Team X", teamB: "Team Y", odds: "+200", img: "images/team1.png" },
+  { teamA: "Team X", teamB: "Team Y", odds: "+200", img: "images/team1.png" },
+  { teamA: "Team X", teamB: "Team Y", odds: "+200", img: "images/team1.png" }
+];
+
+renderSelectedBets(bets);

@@ -17,17 +17,17 @@ export async function createTask(
   const queue = task_queue.queue;
   const location = task_queue.location;
 
+  // Construct the fully qualified queue name.
   const parent = client.queuePath(project, location, queue);
   const time_seconds = Math.ceil(date.getTime() / 30000) * 30;
   const formated_id =
     relative_uri.replace(/[^\w]/g, '-') + time_seconds.toString();
-  console.log(formated_id);
   const formated_name = `projects/${project}/locations/${location}/queues/${queue}/tasks/${formated_id}`;
   console.log(formated_name);
   const task = {
     httpRequest: {
       headers: {
-        'Content-Type': 'application/json', // Set content type to ensure compatibility your application/json's request parsing
+        'Content-Type': 'application/json', // Set content type to ensure compatibility your application's request parsing
       },
       httpMethod: protos.google.cloud.tasks.v2.HttpMethod.POST,
       url: task_queue.task_run_url + relative_uri,
@@ -45,12 +45,48 @@ export async function createTask(
   //   seconds: time,
   // };
 
-  console.log('Sending task:');
-  console.log(task);
+  // console.log('Sending task:');
+  // console.log(task);
 
   // Send create task request.
   const request = {parent: parent, task: task};
   const [response] = await client.createTask(request);
   const name = response.name;
   console.log(`Created task ${name}`);
+}
+export async function createAnonymousTask(
+  date: Date,
+  relative_uri: string,
+  payload?: string
+) {
+  // TODO(developer): Uncomment these lines and replace with your values.
+  if (!task_queue) {
+    console.log('yOUSHOULDNT BE CALLING THIS');
+    return;
+  }
+  const project = task_queue.project;
+  const queue = task_queue.queue;
+  const location = task_queue.location;
+
+  // Construct the fully qualified queue name.
+  const parent = client.queuePath(project, location, queue);
+  const time_seconds = Math.ceil(date.getTime() / 1000);
+  const task = {
+    httpRequest: {
+      headers: {
+        'Content-Type': 'application/json', // Set content type to ensure compatibility your application's request parsing
+      },
+      httpMethod: protos.google.cloud.tasks.v2.HttpMethod.POST,
+      url: task_queue.task_run_url + relative_uri,
+      body: payload ? Buffer.from(payload).toString('base64') : null,
+    },
+    scheduleTime: {seconds: time_seconds},
+  };
+  // console.log('Sending anon task:');
+  // console.log(task);
+
+  // Send create task request.
+  const request = {parent: parent, task: task};
+  const [response] = await client.createTask(request);
+  console.log(`Created  unamed task for ${relative_uri}`);
 }

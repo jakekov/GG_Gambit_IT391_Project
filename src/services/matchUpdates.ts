@@ -1,13 +1,17 @@
 //in charge of keeping track when the server is updating matches / match status
 // routes can use this to schedule when a match should update
 
-import match_model, {MatchStatus} from '@/models/matches.js';
+import match_model, {Match, MatchStatus} from '@/models/matches.js';
 import results_model, {ResultOptions} from '@/models/match_results.js';
 import bet_model, {MatchBet} from '@/models/match_bet.js';
 import info_model from '@/models/userBetInfo.js';
 import pool from '@/databases/mysql.js';
 import schedule from 'node-schedule';
 import config from '@/config/config.js';
+import {
+  schedule_conclusion_check,
+  schedule_live_check,
+} from './taskInterface.js';
 export interface VlrMatches {
   status: string;
   size: number;
@@ -23,6 +27,19 @@ export interface VlrMatch {
   ago?: string; //Result specific
   in?: string; //match specific
   timestamp?: number; //match specific
+}
+export interface DirectResponse {
+  status: string;
+  data: DirectVlrMatch;
+}
+export interface DirectVlrMatch {
+  teams: VlrTeam[];
+  status: string;
+  event: string;
+  tournament: string;
+  img: string;
+  utcDate: string; //match specific
+  won?: boolean;
 }
 export interface VlrTeam {
   name: string;
@@ -100,7 +117,6 @@ async function checkConclusions() {
   const live_matches_promise = match_model.getAllMatches();
   const live_matches = await live_matches_promise;
   if (live_matches.length == 0) return;
-  console.log('checking for ended matches');
   const response = await fetch(`${config.scraper_url}/api/v1/results`)
     .then((res1) => {
       if (!res1.ok) {
@@ -146,11 +162,13 @@ async function checkConclusions() {
         console.log('rollback');
         console.log(err);
         await con.rollback();
+        continue;
       } finally {
         con.release();
       }
       //todo emit an event for updating peoples bets
       //or just do it here since this is being run async in schedule
+      console.log(`ended match ${match.id}`);
       await endMatchBetUpdates(
         match.id,
         options.score_a > options.score_b ? 'a' : 'b'
@@ -237,35 +255,15 @@ export async function startUpcomingMatchSchedule(
   console.log(`scheduled live check for ${execution_time} id ${for_match_id}`);
   schedule.scheduleJob(
     execution_time,
-    async () => await checkUpcoming(for_match_id, 0)
+    async () => await updateMatch(for_match_id, 0)
   );
 }
-// /**
-//  * Checks all of our database upcoming matches and checks vlr to see if they started
-//  */
-// export async function checkAllUpcomingMatches() {
-//   await checkUpcoming(-1, 0);
-// }
-/**
- * Used inside a schedule
- * Goes through vlr_matches and updates any in our database that are upcoming but should be live
- * this should just check vlr.gg for the specific match id but wed need to build a scraper for that
- * so for now it juts checks every match
- * @param for_match_id  Match id its inteded to search for. -1  for a search that doesnt propogate
- * @param failed_attempts
- * @returns
- */
-async function checkUpcoming(for_match_id: number, failed_attempts: number) {
-  //funciton used for checking if a match is not live
-  //should be run in background task scheduled at the timestart of the match + a minute
-  //this can also be used in a route incase someone wants to refreshs to get better updates
-  //this should check vlr matches and move a match into live status
-  //i dont need to worry about double writes in case a con job and route try to do the same thing
 
-  //this should also just use a single match api but it would need to be made
-  //but i dont care enough to make it so just scedule this whenever a new upcoming match entry is made
-  console.log(`running update check ${for_match_id}`);
-  const response = await fetch(`${config.scraper_url}/api/v1/matches`)
+async function updateMatch(for_match_id: number, failed_attempts: number) {
+  const match_p = match_model.getMatchById(for_match_id);
+  const response = await fetch(
+    `${config.scraper_url}/api/v1/matches/${for_match_id}`
+  )
     .then((res1) => {
       if (!res1.ok) {
         console.log(res1);
@@ -274,50 +272,75 @@ async function checkUpcoming(for_match_id: number, failed_attempts: number) {
       return res1.json();
     })
     .then((res1) => {
-      return res1 as VlrMatches;
+      return res1 as DirectResponse;
     });
-  let match_updated = false;
-  for (const match of response.data) {
-    const team_a = match.teams[0];
-    const team_b = match.teams[1];
-    if (team_a.name === 'TBD' || team_b.name === 'TBD') continue; //some of them after still have names
-    //find match in database from vlr id
-    if ((match.status as MatchStatus) != MatchStatus.live) continue;
-    //only do checks if its  alive match
-    const id = parseInt(match.id);
-    const existing_matches = await match_model.getMatchWithTeams(id);
-    if (existing_matches.length != 0) {
-      if (existing_matches[0].status === MatchStatus.live) {
-        //the match is already live continue to next
-        //but we need to make sure we stop propogating schedule checks
-        if (existing_matches[0].match_id === for_match_id) {
-          match_updated = true;
-        }
-        continue;
-      }
 
-      await match_model.updateMatchStatus(
-        existing_matches[0].id,
-        MatchStatus.live
-      );
-      if (id === for_match_id) match_updated = true;
-    }
+  //match date should now always be when the match should start so base reschedules off of it
+  //unless Date.now is greater than match_start
+  let now = new Date(Date.now());
+
+  const match_date = new Date(response.data.utcDate);
+  let year = now.getUTCFullYear();
+  if (now.getUTCMonth() < match_date.getUTCMonth()) {
+    //if current month is less than match_date
+    //it means its in the previous year
+    //
+    year -= 1;
+  } else if (now.getUTCMonth() > match_date.getUTCMonth()) {
+    year += 1;
+    //if the current month is greater than the match date than its in the next year now december match in january
   }
-  //if the match didnt go live at the expected time retry in a minute
-  if (!match_updated) {
-    if (for_match_id == -1) {
-      return; //call was intended to run once and immedietly
-    }
-    if (failed_attempts > 20) {
-      console.log(
-        `Match ${for_match_id} Failed to update to live do somethign about it`
-      );
-      return;
-    }
-    let execution_time = new Date(Date.now() + 60000); // add a minute and try again
-    schedule.scheduleJob(
-      execution_time,
-      async () => await checkUpcoming(for_match_id, failed_attempts + 1)
+  match_date.setUTCFullYear(year);
+  const [match] = await match_p; //juts get first element
+  if (!match) {
+    console.log(`match was not found canceling update ${for_match_id}`);
+    return;
+  }
+  if (match.match_start.getTime() !== match_date.getTime()) {
+    console.log(
+      `match_start for match ${match.id} changed to ${match_date.toISOString()}`
     );
+    failed_attempts = 0; //reset failed attempts if the time changes
+    await match_model.updateMatchStart(match.id, match_date);
+    //this needs to reschedule for a different time potentially
+    //match.match_start.setTime(match_date.getTime()); // this match object doesnt persist so changing it is okay
+    //
   }
+  if (match.status === MatchStatus.live) {
+    //the match is already live continue to next
+    //but we need to make sure we stop propogating schedule checks
+    return;
+  }
+  if (
+    (response.data.status.toLowerCase() as MatchStatus) === MatchStatus.live
+  ) {
+    await match_model.updateMatchStatus(match.id, MatchStatus.live);
+    console.log(`updating match status to live ${match.id}`);
+    //schedule a check for when we think the match would end
+    //i think most matches are best of 3 so like hour and a half maybe
+    schedule_conclusion_check(
+      for_match_id,
+      new Date(Math.max(match_date.getTime(), Date.now()) + 5400000)
+    );
+    return;
+  }
+  //if match status is not live yet reschedule to run again
+  if (for_match_id < 0 || failed_attempts < 0) {
+    return; //call was intended to run once and immedietly
+  }
+  if (failed_attempts > 20) {
+    console.log(
+      `Match ${for_match_id} Failed to update to live do somethign about it`
+    );
+    return;
+  }
+  //check if the match_start changed
+  const base_time =
+    match_date.getTime() < Date.now() ? Date.now() : match_date.getTime();
+  //this is needed if its rescheduled
+  //if the match still hasnt starter and now has passes use now
+  let execution_time = new Date(
+    base_time + 60000 + Math.pow(2, Math.min(failed_attempts, 5)) * 10000 //6 minute updates after 5 attempts
+  ); // add a minute and try again
+  schedule_live_check(for_match_id, execution_time, failed_attempts + 1);
 }

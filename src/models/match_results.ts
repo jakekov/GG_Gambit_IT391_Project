@@ -1,6 +1,6 @@
 import pool from '../databases/mysql.js';
 import {FieldPacket, RowDataPacket} from 'mysql2';
-import {Match} from './matches.js';
+import {Match, MatchWithTeams} from './matches.js';
 import {PoolConnection} from 'mysql2/promise';
 //i could maybe just store matches that people placed bets on
 // and then only store results from that
@@ -46,14 +46,41 @@ export interface ResultOptions {
   tournament: string;
   img: string;
 }
-export enum MatchStatus {
-  live = 'Live',
-  upcoming = 'Upcoming',
+export interface ResultWithTeams extends RowDataPacket {
+  match_id: number;
+  a_id: number;
+  a_name: string;
+  a_img: string;
+  b_id: number;
+  b_name: string;
+  b_img: string;
+  odds: number;
+  match_end: Date;
 }
-
 async function getResultById(id: number) {
   const [rows] = await pool.query<Result[]>(
     'SELECT * FROM match_results WHERE id = ?',
+    [id]
+  );
+  return rows;
+}
+async function getResultWithTeams(id: number) {
+  const [rows] = await pool.query<ResultWithTeams[]>(
+    `SELECT 
+      m.id as match_id,
+      ta.id as a_id,
+      ta.name as a_name,
+      ta.img as a_img,
+      tb.id as b_id,
+      tb.name as b_name,
+      tb.img as b_img,
+      m.odds,
+      m.match_end
+      FROM match_results m
+      join static_teams ta on m.team_a = ta.id
+      join static_teams tb on m.team_b = tb.id
+      WHERE m.id = ?
+    `,
     [id]
   );
   return rows;
@@ -83,4 +110,4 @@ async function createResultRow(
   return result;
 }
 
-export default {getResultById, createResultRow};
+export default {getResultById, getResultWithTeams, createResultRow};
