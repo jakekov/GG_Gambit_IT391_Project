@@ -61,94 +61,43 @@
 
 
         <!-- Middle Column -->
-        <div class="col-12 col-md-6">
-          <div class="card shadow-sm bg-dark text-white h-100">
-            <div class="card-header text-white text-center">
-              <h5 class="mb-0">Selected Bets</h5>
-            </div>
+<div class="col-12 col-md-6">
 
-            <!-- Container -->
-            <div class="card-body p-3" id="selectedBetsContainer" style="max-height: 400px; overflow-y: auto;">
+  <!-- Selected Bets Card -->
+  <div class="card shadow-sm bg-dark text-white h-100 mb-3">
+    <div class="card-header text-white text-center">
+      <h5 class="mb-0">Upcoming Bets</h5>
+    </div>
 
-              <!-- Example Bet Row -->
-              <div
-                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-                <div class="team-info d-flex align-items-center">
-                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-                  <div>
-                    <span class="fw-bold">Team A</span>
-                    <span class="text-secondary">vs</span>
-                    <span class="fw-bold">Team B</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="odds text-success fw-bold me-2">+150</span>
-                </div>
-              </div>
-              <div
-                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-                <div class="team-info d-flex align-items-center">
-                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-                  <div>
-                    <span class="fw-bold">Team A</span>
-                    <span class="text-secondary">vs</span>
-                    <span class="fw-bold">Team B</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="odds text-success fw-bold me-2">+150</span>
-                </div>
-              </div>
-              <div
-                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-                <div class="team-info d-flex align-items-center">
-                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-                  <div>
-                    <span class="fw-bold">Team A</span>
-                    <span class="text-secondary">vs</span>
-                    <span class="fw-bold">Team B</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="odds text-success fw-bold me-2">+150</span>
-                </div>
-              </div>
-              <div
-                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-                <div class="team-info d-flex align-items-center">
-                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-                  <div>
-                    <span class="fw-bold">Team A</span>
-                    <span class="text-secondary">vs</span>
-                    <span class="fw-bold">Team B</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="odds text-success fw-bold me-2">+150</span>
-                </div>
-              </div>
-              <div
-                class="bet-row d-flex justify-content-between align-items-center border-bottom border-secondary py-2 px-2 rounded">
-                <div class="team-info d-flex align-items-center">
-                  <img src="images/team1.png" alt="Team A" width="40" class="me-2 rounded-circle border border-success">
-                  <div>
-                    <span class="fw-bold">Team A</span>
-                    <span class="text-secondary">vs</span>
-                    <span class="fw-bold">Team B</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="odds text-success fw-bold me-2">+150</span>
-                </div>
-              </div>
+    <!-- Container -->
+    <div class="card-body p-3" id="selectedBetsContainer" style="max-height: 400px; overflow-y: auto;">
+      <div id="noSelectedBetsMessage" class="text-center text-secondary fw-bold py-3">
+        No upcoming bets placed.
+      </div>
+    </div>
+  </div>
+  
+  <!-- Past Bets Card -->
+  <div class="card shadow-sm bg-dark text-white h-100">
+    <div class="card-header text-white text-center">
+      <h5 class="mb-0">Past Bets</h5>
+    </div>
 
-            </div>
+    <!-- Container -->
+    <div class="card-body p-3" id="pastBetsContainer" style="max-height: 400px; overflow-y: auto;">
+      <div id="noPastBetsMessage" class="text-center text-secondary fw-bold py-3">
+        No past bets placed.
+      </div>
+    </div>
 
-            <div class="card-footer text-center bg-dark border-top border-secondary">
-              <button class="btn text-white bg-success w-100 fw-bold">Place Bets</button>
-            </div>
-          </div>
-        </div>
+    <div class="card-footer text-center bg-dark">
+      <!-- Optional footer for Past Bets -->
+    </div>
+  </div>
+
+</div>
+
+
 
 
 

@@ -87,7 +87,7 @@ async function verifyLogin() {
   }
 }
 
-function renderSelectedBets(betsArray) {
+/*function renderSelectedBets(betsArray) {
   const container = document.getElementById("selectedBetsContainer");
 
   if (!container) {
@@ -114,12 +114,119 @@ function renderSelectedBets(betsArray) {
 }
 
 //get info from api for user selected teams
+
 const bets = [
   { teamA: "Team test", teamB: "Team B", odds: "+150", img: "images/team1.png" },
   { teamA: "Team C", teamB: "Team D", odds: "-110", img: "images/team1.png" },
   { teamA: "Team X", teamB: "Team Y", odds: "+200", img: "images/team1.png" },
-  { teamA: "Team X", teamB: "Team Y", odds: "+200", img: "images/team1.png" },
-  { teamA: "Team X", teamB: "Team Y", odds: "+200", img: "images/team1.png" }
+
 ];
 
 renderSelectedBets(bets);
+*/
+
+async function loadBets() {
+  try {
+    const res = await fetch("/api/matches/get");
+    const json = await res.json();
+
+    if (!json.data) return;
+
+    const container = document.getElementById("selectedBetsContainer");
+
+    json.data.forEach(bet => {
+      const id = bet.match_id;
+
+      // If the row doesn’t exist yet → create it
+      if (!document.getElementById(`bet-${id}`)) {
+        container.insertAdjacentHTML(
+          "beforeend",
+          `
+          <div class="bet-row border-bottom border-secondary py-3 px-2 rounded" id="bet-${id}">
+            <div class="d-flex justify-content-between">
+            
+              <!-- TEAMS SIDE -->
+              <div class="teams d-flex align-items-center gap-3">
+                <div class="team d-flex align-items-center">
+                  <img id="bet-${id}-team-a-img" src="" width="45" class="rounded-circle border border-success me-2">
+                  <span id="bet-${id}-team-a-name" class="fw-bold"></span>
+                </div>
+
+                <span class="fw-bold text-secondary mx-2">VS</span>
+
+                <div class="team d-flex align-items-center">
+                  <img id="bet-${id}-team-b-img" src="" width="45" class="rounded-circle border border-danger me-2">
+                  <span id="bet-${id}-team-b-name" class="fw-bold"></span>
+                </div>
+              </div>
+
+              <!-- BET DATA SIDE -->
+              <div class="bet-data text-end">
+                <div>
+                  <span class="text-info fw-bold">Chosen:</span>
+                  <span id="bet-${id}-chosen" class="fw-bold"></span>
+                </div>
+
+                <div>
+                  <span class="text-warning fw-bold">Amount:</span>
+                  <span id="bet-${id}-amount" class="fw-bold"></span>
+                </div>
+
+                <div>
+                  <span class="text-success fw-bold">Payout:</span>
+                  <span id="bet-${id}-payout" class="fw-bold"></span>
+                </div>
+
+                <div>
+                  <span class="text-secondary fw-bold">Ended:</span>
+                  <span id="bet-${id}-ended" class="ended-status fw-bold"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          `
+        );
+      }
+
+      // Update DOM values
+      document.getElementById(`bet-${id}-team-a-name`).textContent = bet.team_a;
+      document.getElementById(`bet-${id}-team-a-img`).src = bet.img_a;
+
+      document.getElementById(`bet-${id}-team-b-name`).textContent = bet.team_b;
+      document.getElementById(`bet-${id}-team-b-img`).src = bet.img_b;
+
+      // Convert prediction (a/b) into team name
+      const chosenTeam =
+        bet.prediction === "a" ? bet.team_a :
+        bet.prediction === "b" ? bet.team_b :
+        "Unknown";
+
+      document.getElementById(`bet-${id}-chosen`).textContent = chosenTeam;
+
+      // Money formatting
+      document.getElementById(`bet-${id}-amount`).textContent = `$${bet.bet_amount}`;
+      document.getElementById(`bet-${id}-payout`).textContent = `$${bet.payout.toFixed(2)}`;
+
+      // Ended status
+      const endedEl = document.getElementById(`bet-${id}-ended`);
+      if (bet.ended === 1) {
+        endedEl.textContent = "Yes";
+        endedEl.classList.remove("text-success");
+        endedEl.classList.add("text-danger");
+      } else {
+        endedEl.textContent = "No";
+        endedEl.classList.remove("text-danger");
+        endedEl.classList.add("text-success");
+      }
+
+    });
+
+  } catch (err) {
+    console.error("Failed to load bets:", err);
+  }
+}
+
+loadBets();
+setInterval(loadBets, 5000); // refresh every 5 seconds
+
