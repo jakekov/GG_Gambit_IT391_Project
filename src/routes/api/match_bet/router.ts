@@ -38,9 +38,11 @@ router.get('/debug', debugService);
  * @returns
  */
 async function postMatchBet(
+  //cntrl click for params on usrmatchbet
   req: Request<{}, {}, UserMatchBetParams>,
   res: Response
 ) {
+  //
   const {match_id, team_winning, wager} = req.body;
 
   if (
@@ -77,11 +79,13 @@ async function postMatchBet(
   }
   res.status(200).json({data: 'ok'});
 }
+
 interface UserMatchBetParams {
   match_id?: number;
   team_winning?: number;
   wager?: number;
 }
+//ex call 
 
 /**
  * Route for getting our betting odds and id values for a potential bet
