@@ -25,12 +25,67 @@ import {
   schedule_live_check,
 } from '@/services/taskInterface.js';
 import {createTask} from '@/services/createTask.js';
+import match_bet from '@/models/match_bet.js';
+import results_model from '@/models/match_results.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
 
 router.get('/info', getMatchesInfo);
 router.post('/bet', requireAuth, postMatchBet);
+router.get('/get', requireAuth, getMatchBets);
 router.get('/debug', debugService);
+interface UserBets {
+  all_bets: UserBet[];
+}
+interface UserBet {
+  match_id: number;
+  team_a: string;
+  img_a: string;
+  team_b: string;
+  img_b: string;
+  prediction: string;
+  bet_amount: number;
+  payout: number;
+  ended: boolean;
+  bet_won: boolean | null;
+}
+async function getMatchBets(req: Request, res: Response) {
+  if (!req.auth_user) {
+    return notAuthenticated(res);
+  }
+  var uuid = req.auth_user.uuid;
+  let user_bets = await match_bet.getPopulatedBetsByUuid(uuid);
+  let all_bets = [];
+  for (const bet of user_bets) {
+    var match;
+    if (!bet.ended) {
+      let matches = await match_model.getMatchWithTeams(bet.match_id);
+      if (matches.length == 0) {
+        continue;
+      }
+      match = matches[0];
+    } else {
+      let matches = await results_model.getResultWithTeams(bet.match_id);
+      if (matches.length == 0) {
+        continue;
+      }
+      match = matches[0];
+    }
+    all_bets.push({
+      match_id: bet.match_id,
+      team_a: match.a_name,
+      img_a: match.a_img,
+      team_b: match.b_name,
+      img_b: match.b_img,
+      prediction: bet.prediction,
+      bet_amount: bet.bet,
+      payout: bet.payout,
+      ended: bet.ended,
+      bet_won: bet.bet_won,
+    } as UserBet);
+  }
+  return res.status(200).json({data: all_bets});
+}
 /**
  * User submited post for making a bet on a match
  * @param req needs match_id, team_winning, wager. in req.body all numbers/ids

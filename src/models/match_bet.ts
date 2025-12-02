@@ -49,6 +49,13 @@ async function getInfoByUuid(uuid: Buffer) {
   );
   return rows;
 }
+async function getPopulatedBetsByUuid(uuid: Buffer) {
+  const [rows] = await pool.query<MatchBet[]>(
+    'SELECT * FROM match_bet WHERE user_id = ?',
+    [uuid]
+  );
+  return rows;
+}
 async function allActiveBets() {
   const [rows] = await pool.query<MatchBet[]>(
     'SELECT * FROM match_bet WHERE ended = 0',
@@ -93,6 +100,7 @@ export default {
   createUserBet,
   getInfoByUuid,
   getBetsByMatch,
+  getPopulatedBetsByUuid,
   betConcluded,
   allActiveBets,
 };

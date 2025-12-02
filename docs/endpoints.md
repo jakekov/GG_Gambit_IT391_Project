@@ -24,6 +24,7 @@ Dev URL: `http://localhost:3000/api` <br />
 | :--- | :--------------------------------------------------------- |
 | GET  | [`/matches/info`](/src/routes/api/match_bet/router.ts#L16) |
 | POST | [`/matches/bet`](/src/routes/api/match_bet/router.ts#L16)  |
+| POST | [`/matches/get`](/src/routes/api/match_bet/router.ts#L16)  |
 
 ### Auth Endpoints
 
