@@ -132,8 +132,8 @@ async function addUserBalance(
     const info = await BetInfo.getInfoByUuid(user_id);
     if (info.length == 0)
       return res.status(500).json({error: 'Info does not exist'});
-    const _info = await BetInfo.addbalance(info[0].id, balance.balance);
-
+    const _info = await BetInfo.addbalance(balance.balance, info[0].id);
+    console.log(_info);
     const data = {
       points: info[0].points,
       balance: info[0].balance + balance.balance,
