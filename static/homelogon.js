@@ -157,6 +157,10 @@ async function updateMatches(matchArray,teamStuff) {
     const team1Btn = matchElement.querySelector(".team1");
     const team2Btn = matchElement.querySelector(".team2");
 
+    //making bet odds
+      const team1OddsEl = matchElement.querySelector(".team1-odds");
+      const team2OddsEl = matchElement.querySelector(".team2-odds");
+
     // --- UPDATE TEAM NAMES ---
     if (team1Span) team1Span.textContent = matchData.teams[0].name;
     if (team2Span) team2Span.textContent = matchData.teams[1].name;
@@ -187,6 +191,11 @@ async function updateMatches(matchArray,teamStuff) {
       team2Btn.dataset.matchId = matchData.id;
       
     }
+    //update betting odds
+    team1OddsEl.textContent = teamdata.BetOdds
+    t2odds = Number(teamdata.BetOdds);
+    t2odds = t2odds *-1;
+    team2OddsEl.textContent = t2odds;
     REALindex++;
     console.log(REALindex);
   }
