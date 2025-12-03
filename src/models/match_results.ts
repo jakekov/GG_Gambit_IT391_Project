@@ -51,9 +51,11 @@ export interface ResultWithTeams extends RowDataPacket {
   a_id: number;
   a_name: string;
   a_img: string;
+  a_score: number;
   b_id: number;
   b_name: string;
   b_img: string;
+  b_score: number;
   odds: number;
   match_end: Date;
 }
@@ -75,7 +77,9 @@ async function getResultWithTeams(id: number) {
       tb.name as b_name,
       tb.img as b_img,
       m.odds,
-      m.match_end
+      m.match_end,
+      m.score_a as a_score,
+      m.score_b as b_score
       FROM match_results m
       join static_teams ta on m.team_a = ta.id
       join static_teams tb on m.team_b = tb.id

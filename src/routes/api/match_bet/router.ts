@@ -25,7 +25,7 @@ import {
   schedule_live_check,
 } from '@/services/taskInterface.js';
 import {createTask} from '@/services/createTask.js';
-import match_bet from '@/models/match_bet.js';
+import match_bet, {MatchBet} from '@/models/match_bet.js';
 import results_model from '@/models/match_results.js';
 const router = express.Router();
 //needs csrf and authentication for the user session
@@ -41,37 +41,26 @@ interface UserBet {
   match_id: number;
   team_a: string;
   img_a: string;
+  score_a: number | null;
   team_b: string;
   img_b: string;
+  score_b: number | null;
   prediction: string;
   bet_amount: number;
   payout: number;
   ended: boolean;
   bet_won: boolean | null;
+  match_status: string;
+  timestamp: Date;
 }
-async function getMatchBets(req: Request, res: Response) {
-  if (!req.auth_user) {
-    return notAuthenticated(res);
-  }
-  var uuid = req.auth_user.uuid;
-  let user_bets = await match_bet.getPopulatedBetsByUuid(uuid);
-  let all_bets = [];
-  for (const bet of user_bets) {
-    var match;
-    if (!bet.ended) {
-      let matches = await match_model.getMatchWithTeams(bet.match_id);
-      if (matches.length == 0) {
-        continue;
-      }
-      match = matches[0];
-    } else {
-      let matches = await results_model.getResultWithTeams(bet.match_id);
-      if (matches.length == 0) {
-        continue;
-      }
-      match = matches[0];
+async function fetchMatch(bet: MatchBet) {
+  if (!bet.ended) {
+    let matches = await match_model.getMatchWithTeams(bet.match_id);
+    if (matches.length == 0) {
+      return null;
     }
-    all_bets.push({
+    const match = matches[0];
+    return {
       match_id: bet.match_id,
       team_a: match.a_name,
       img_a: match.a_img,
@@ -82,9 +71,55 @@ async function getMatchBets(req: Request, res: Response) {
       payout: bet.payout,
       ended: bet.ended,
       bet_won: bet.bet_won,
-    } as UserBet);
+      score_a: null,
+      score_b: null,
+      match_status: match.status,
+      timestamp: match.match_start,
+    } as UserBet;
+  } else {
+    let matches = await results_model.getResultWithTeams(bet.match_id);
+    if (matches.length == 0) {
+      return null;
+    }
+    const match = matches[0];
+    return {
+      match_id: bet.match_id,
+      team_a: match.a_name,
+      img_a: match.a_img,
+      team_b: match.b_name,
+      img_b: match.b_img,
+      prediction: bet.prediction,
+      bet_amount: bet.bet,
+      payout: bet.payout,
+      ended: bet.ended,
+      bet_won: bet.bet_won,
+      score_a: match.a_score,
+      score_b: match.b_score,
+      match_status: 'final',
+      timestamp: match.match_end,
+    } as UserBet;
   }
-  return res.status(200).json({data: all_bets});
+}
+async function getMatchBets(req: Request, res: Response) {
+  if (!req.auth_user) {
+    return notAuthenticated(res);
+  }
+  var uuid = req.auth_user.uuid;
+  let user_bets = await match_bet.getPopulatedBetsByUuid(uuid);
+  let all_bets = [];
+  for (const bet of user_bets) {
+    all_bets.push(fetchMatch(bet));
+  }
+  const data = await Promise.all(all_bets);
+  const output = [];
+  for (const match of data) {
+    if (match == null) {
+      continue;
+    }
+    output.push(match);
+  }
+  output.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  return res.status(200).json({data: output});
 }
 /**
  * User submited post for making a bet on a match
@@ -140,7 +175,7 @@ interface UserMatchBetParams {
   team_winning?: number;
   wager?: number;
 }
-//ex call 
+//ex call
 
 /**
  * Route for getting our betting odds and id values for a potential bet
