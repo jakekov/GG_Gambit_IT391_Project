@@ -27,7 +27,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
            <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/homelogon">Home</a>
+            <a class="nav-link active" aria-current="page" href="/homelogon">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/login">Login</a>
@@ -36,7 +36,7 @@
             <a class="nav-link" href="/account">Account</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="/dashboard">Dashboard</a>
+            <a class="nav-link" href="/dashboard">Dashboard</a>
           </li>
         </ul>
       </div>
@@ -47,7 +47,12 @@
   <div class="hero-section d-flex align-items-center justify-content-center text-white bg-dark">
   <div class="text-center">
    
-    <p class="lead"> Place your bets! </p>
+    <div class="bet-banner">
+  <img src="images/whiteLogo.svg" alt="GG Gambit Logo" class="bet-banner-logo">
+  <p class="lead mb-0">Place Your Bets!</p>
+</div>
+
+
 
 <div id="datacontainer">
         <div class="matches-container">
@@ -66,6 +71,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
     </div>
     <span class="vs">vs</span>
     <div class="match-team">
@@ -80,6 +88,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
     </div>
     <div class="tournament" id="tournamentname">LCS Spring</div>
   </div>
@@ -97,6 +108,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
     </div>
     <span class="vs">vs</span>
     <div class="match-team">
@@ -111,6 +125,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
     </div>
     <div class="tournament" id="tournamentname">LCS Spring</div>
   </div>
@@ -128,6 +145,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
     </div>
     <span class="vs">vs</span>
     <div class="match-team">
@@ -142,6 +162,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
     </div>
     <div class="tournament" id="tournamentname">LCS Spring</div>
   </div>
@@ -159,6 +182,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
     </div>
     <span class="vs">vs</span>
     <div class="match-team">
@@ -173,6 +199,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
     </div>
     <div class="tournament" id="tournamentname">LCS Spring</div>
   </div>
@@ -190,6 +219,9 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
     </div>
     <span class="vs">vs</span>
     <div class="match-team">
@@ -204,9 +236,194 @@
   data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
   Bet
 </button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
     </div>
     <div class="tournament" id="tournamentname">LCS Spring</div>
 </div>
+ <div class="match" id="match6">
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team A">
+      <span id = "team1">Team A</span>
+      <button 
+  class="bet-btn btn btn-primary team1"
+  data-team="team1"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
+    </div>
+    <span class="vs">vs</span>
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team B">
+      <span id = "team2">Team B</span>
+      <button 
+  class="bet-btn btn btn-primary team2"
+  data-team="team2"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
+    </div>
+    <div class="tournament" id="tournamentname">LCS Spring</div>
+  </div>
+
+ <div class="match" id="match7">
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team A">
+      <span id = "team1">Team A</span>
+      <button 
+  class="bet-btn btn btn-primary team1"
+  data-team="team1"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
+    </div>
+    <span class="vs">vs</span>
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team B">
+      <span id = "team2">Team B</span>
+      <button 
+  class="bet-btn btn btn-primary team2"
+  data-team="team2"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
+    </div>
+    <div class="tournament" id="tournamentname">LCS Spring</div>
+  </div>
+   <div class="match" id="match8">
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team A">
+      <span id = "team1">Team A</span>
+      <button 
+  class="bet-btn btn btn-primary team1"
+  data-team="team1"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
+    </div>
+    <span class="vs">vs</span>
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team B">
+      <span id = "team2">Team B</span>
+      <button 
+  class="bet-btn btn btn-primary team2"
+  data-team="team2"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
+    </div>
+    <div class="tournament" id="tournamentname">LCS Spring</div>
+  </div>
+   <div class="match" id="match9">
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team A">
+      <span id = "team1">Team A</span>
+      <button 
+  class="bet-btn btn btn-primary team1"
+  data-team="team1"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
+    </div>
+    <span class="vs">vs</span>
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team B">
+      <span id = "team2">Team B</span>
+      <button 
+  class="bet-btn btn btn-primary team2"
+  data-team="team2"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
+    </div>
+    <div class="tournament" id="tournamentname">LCS Spring</div>
+  </div>
+   <div class="match" id="match10">
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team A">
+      <span id = "team1">Team A</span>
+      <button 
+  class="bet-btn btn btn-primary team1"
+  data-team="team1"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team1-odds">Odds: --</span>
+  </div>
+    </div>
+    <span class="vs">vs</span>
+    <div class="match-team">
+      <img src="https://via.placeholder.com/32" alt="Team B">
+      <span id = "team2">Team B</span>
+      <button 
+  class="bet-btn btn btn-primary team2"
+  data-team="team2"
+  data-bs-toggle="popover" 
+  data-bs-placement="right"
+  title="Place Your Bet"
+  data-bs-content='<input type="number" class="form-control bet-input" placeholder="Enter amount"><button class="btn btn-success btn-sm mt-2">Confirm</button>'>
+  Bet
+</button>
+<div class="odds-container">
+    <span class="team2-odds">Odds: --</span>
+  </div>
+    </div>
+    <div class="tournament" id="tournamentname">LCS Spring</div>
+  </div>
+<!-- end of box divs -->
     </div>
 
     <div>

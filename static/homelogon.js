@@ -6,7 +6,7 @@ async function domLoaded(){
 console.log("hi");
 const matchArray =  await fetchTodos();
 const teamArray = await fetchTeamTodos()
-//console.log(teamArray);
+console.log(matchArray);
 updateMatches(matchArray, teamArray);
 
 
@@ -130,20 +130,23 @@ console.log(data);
 
 
 async function updateMatches(matchArray,teamStuff) {
+   console.log(matchArray);
   const matches = document.querySelectorAll(".match");
-  console.log(teamStuff);
-  
+  console.log(matches);
+  REALindex=0;
+   for(index = 0; REALindex < 10; index++ ){
 
-  matches.forEach((matchElement, index) => {
     const matchData = matchArray.data[index];
-    const teamdata = teamStuff.data[index]
+    const teamdata = teamStuff.data[index];
+    console.log(teamdata.CurrentStatus);
+    if(teamdata.CurrentStatus.toLowerCase() == "upcoming"){
+    const matchElement = matches[REALindex];
     console.log(teamdata);
     if (!matchData) return;
 
     // team name spans
     const team1Span = matchElement.querySelector('[id="team1"]');
     const team2Span = matchElement.querySelector('[id="team2"]');
-
     // team images (2 images inside .match-team)
     const imgElements = matchElement.querySelectorAll('.match-team img');
 
@@ -154,13 +157,17 @@ async function updateMatches(matchArray,teamStuff) {
     const team1Btn = matchElement.querySelector(".team1");
     const team2Btn = matchElement.querySelector(".team2");
 
+    //making bet odds
+      const team1OddsEl = matchElement.querySelector(".team1-odds");
+      const team2OddsEl = matchElement.querySelector(".team2-odds");
+
     // --- UPDATE TEAM NAMES ---
     if (team1Span) team1Span.textContent = matchData.teams[0].name;
     if (team2Span) team2Span.textContent = matchData.teams[1].name;
 
     // --- UPDATE TEAM IMAGES ---
-    if (imgElements[0]) imgElements[0].src = matchData.img;
-    if (imgElements[1]) imgElements[1].src = matchData.img;
+    if (imgElements[0]) imgElements[0].src = teamdata.Team1Img;
+    if (imgElements[1]) imgElements[1].src = teamdata.Team2Img;
 
     // --- TOURNAMENT TITLE ---
     if (tournamentElement) {
@@ -184,7 +191,15 @@ async function updateMatches(matchArray,teamStuff) {
       team2Btn.dataset.matchId = matchData.id;
       
     }
-  });
+    //update betting odds
+    team1OddsEl.textContent = teamdata.BetOdds
+    t2odds = Number(teamdata.BetOdds);
+    t2odds = t2odds *-1;
+    team2OddsEl.textContent = t2odds;
+    REALindex++;
+    console.log(REALindex);
+  }
+};
 }
 
 

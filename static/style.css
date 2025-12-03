@@ -11,18 +11,22 @@
     flex-shrink: 0;  /* prevent stretching */
 }
 .hero-section {
-  height: 100vh; /* full screen height */
   width: 100%;
+  min-height: 100vh; /* ensures full viewport height at least */
+  padding: 2rem 0; /* give top/bottom spacing */
   background: 
     linear-gradient(to bottom, 
-      rgba(33,37,41,1) 0%,        /* top fade color (#212529) */
-      rgba(0,0,0,0) 20%,          /* fade to transparent */
-      rgba(0,0,0,0) 80%,          /* keep center transparent */
-      rgba(33,37,41,1) 100%       /* bottom fade color */
+      rgba(33,37,41,1) 0%,        
+      rgba(0,0,0,0) 20%,          
+      rgba(0,0,0,0) 80%,          
+      rgba(33,37,41,1) 100%       
     ),
     url("images/heroImage.png") no-repeat center;
   background-size: cover;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .dash-section {
@@ -39,6 +43,8 @@
     url("images/dash1.webp") no-repeat center;
   background-size: cover;
   position: relative;
+  padding-bottom: 0; /* added to remove gap */
+  margin-bottom: 0;  /* added to remove gap */
 }
 
 .login-section {
@@ -66,7 +72,7 @@
       rgba(0,0,0,0) 80%,          /* keep center transparent */
       rgba(33,37,41,1) 100%       /* bottom fade color */
     ),
-    url("signupBackground.jpg") no-repeat center;
+    url("images/signup.jpg") no-repeat center;
   background-size: cover;
   position: relative;
 }
@@ -76,7 +82,7 @@
       margin: auto;
       margin-top: 10vh;
       padding: 2rem;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.85);
       border-radius: 10px;
       color: #fff;
     }
@@ -193,13 +199,51 @@
     }
 
     /* ccs for home logon */
-    .matches-container {
-    background-color: #1f1f23;
-    border-radius: 10px;
-    padding: 20px;
-    width: 600px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  }
+    /* Scrollable matches container with custom scrollbar like dashboard */
+.matches-container {
+  background-color: #1f1f23;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 400px; /* scrollable if more bets */
+  overflow-y: auto;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  margin: 1rem auto;
+  scroll-behavior: smooth; /* optional smooth scroll */
+}
+
+/* Webkit browsers (Chrome, Edge, Safari) */
+.matches-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.matches-container::-webkit-scrollbar-track {
+  background: #1e1e1e; 
+  border-radius: 8px;
+}
+
+.matches-container::-webkit-scrollbar-thumb {
+  background-color: #343a40; 
+  border-radius: 8px;
+  border: 2px solid #1e1e1e; 
+  transition: background 0.3s ease;
+}
+
+.matches-container::-webkit-scrollbar-thumb:hover {
+  background-color: #ffc107; 
+}
+
+/* Firefox */
+.matches-container {
+  scrollbar-width: thin;
+  scrollbar-color: #343a40 #1e1e1e;
+}
+
+.matches-container:hover {
+  scrollbar-color: #ffc107 #1e1e1e;
+}
+
 
   .match {
     display: flex;
@@ -289,37 +333,48 @@
 }
 
 .matches-container {
-    background-color: #1f1f23;
-    border-radius: 10px;
-    padding: 20px;
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  background-color: #1f1f23;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 600px; /* increased from 400px to 600px */
+  overflow-y: auto;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  margin: 1rem auto;
+  scroll-behavior: smooth;
 }
 
+/* Optionally, make it relative to viewport height for responsiveness */
+@media (min-width: 768px) {
+  .matches-container {
+    max-height: 70vh; /* 70% of viewport height */
+  }
+}
+
+
 .match {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid #2c2c2f;
-    flex-wrap: wrap; /* allows wrapping on small screens */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2c2c2f;
+  flex-wrap: wrap; 
 }
 
 .match:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .match-team {
-    display: flex;
-    flex-direction: column; /* stack image, name, button */
-    align-items: center;
-    justify-content: center;
-    width: 45%; /* fixed width for alignment */
-    min-width: 150px; /* prevent shrinking too much */
-    text-align: center;
-    gap: 8px;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center;
+  width: 45%;
+  min-width: 150px; 
+  text-align: center;
+  gap: 8px;
 }
 
 .match-team img {
@@ -330,11 +385,11 @@
 }
 
 .vs {
-    font-weight: bold;
-    color: #ffc107;
-    font-size: 1.2rem;
-    text-align: center;
-    width: 10%; /* fixed width for vs */
+  font-weight: bold;
+  color: #ffc107;
+  font-size: 1.2rem;
+  text-align: center;
+  width: 10%;
 }
 
 .bet-btn {
@@ -351,10 +406,89 @@
 }
 
 .tournament {
-    width: 100%;
-    font-size: 0.85rem;
-    color: #888;
-    text-align: center;
-    margin-top: 5px;
+  width: 100%;
+  font-size: 0.85rem;
+  color: #888;
+  text-align: center;
+  margin-top: 5px;
 }
+
+
+.bet-banner {
+  background-color: #212529; /* fully opaque dark background */
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3); /* subtle shadow */
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  margin: 2rem auto;
+  width: 90%;
+  max-width: 700px;
+  position: relative;
+}
+
+/* Logo styling */
+.bet-banner-logo {
+  width: 60px;      /* adjust size as needed */
+  height: auto;
+  margin-bottom: 1rem; /* spacing between logo and text */
+}
+
+/* Subtle text shadow */
+.bet-banner .lead {
+  text-shadow: 0 0 5px rgba(255,255,255,0.1);
+  font-size: inherit;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .bet-banner {
+    font-size: 1.6rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .bet-banner-logo {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bet-banner {
+    font-size: 1.3rem;
+    padding: 1.2rem 0.8rem;
+  }
+
+  .bet-banner-logo {
+    width: 40px;
+  }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+    background-color: #212529;
+  min-height: 100vh;
+}
+
+footer {
+  margin-top: 0;
+  background-color: #212529;
+}
+
+#signup-section {
+  height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(33,37,41,1) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 90%, rgba(33,37,41,1) 100%),
+    url("images/signup.jpg") no-repeat center;
+  background-size: cover;
+  position: relative;
+}
+
 
