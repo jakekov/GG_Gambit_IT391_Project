@@ -202,9 +202,16 @@ async function loadBets() {
                   <span class="text-secondary fw-bold">Status:</span>
                   <span id="bet-${id}-status" class="bet-status fw-bold"></span>
                 </div>
-              </div>
 
+                <div>
+                  <span class="text-primary fw-bold">Result:</span>
+                  <span id="bet-${id}-result" class="fw-bold"></span>
+                </div>
+              </div>
             </div>
+
+            <!-- WINNER & TIMESTAMP -->
+            <div class="d-flex justify-content-end mt-2 bottom-info" id="bet-${id}-bottom-info"></div>
           </div>
           `
         );
@@ -226,9 +233,32 @@ async function loadBets() {
 
       // Money
       document.getElementById(`bet-${id}-amount`).textContent = `$${bet.bet_amount}`;
-      document.getElementById(`bet-${id}-payout`).textContent = `$${bet.payout.toFixed(2)}`;
 
-      // ✓ Updated Status text (Upcoming / Ended)
+      // Determine winner
+      let winnerText = "TBD";
+      if (isEnded) {
+        if (bet.score_a > bet.score_b) winnerText = bet.team_a;
+        else if (bet.score_b > bet.score_a) winnerText = bet.team_b;
+        else winnerText = "Draw";
+      }
+
+      // Result & payout logic
+      let resultText = "Pending";
+      let payoutValue = bet.payout; // default
+
+      if (isEnded) {
+        if (winnerText === chosen) {
+          resultText = "Won!";
+        } else {
+          resultText = "Lost";
+          payoutValue = 0;
+        }
+      }
+
+      document.getElementById(`bet-${id}-payout`).textContent = `$${payoutValue.toFixed(2)}`;
+      document.getElementById(`bet-${id}-result`).textContent = resultText;
+
+      // Status text (Upcoming / Ended)
       const statusEl = document.getElementById(`bet-${id}-status`);
       if (isEnded) {
         statusEl.textContent = "Ended";
@@ -238,6 +268,14 @@ async function loadBets() {
         statusEl.textContent = "Upcoming";
         statusEl.classList.remove("text-danger");
         statusEl.classList.add("text-success");
+      }
+
+      // Timestamp & Winner
+      const date = new Date(bet.timestamp);
+      const formattedTime = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+      const bottomInfoEl = document.getElementById(`bet-${id}-bottom-info`);
+      if (bottomInfoEl) {
+        bottomInfoEl.textContent = `Winner: ${winnerText} | Time: ${formattedTime}`;
       }
 
     });
