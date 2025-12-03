@@ -134,7 +134,7 @@ async function updateMatches(matchArray,teamStuff) {
   const matches = document.querySelectorAll(".match");
   console.log(matches);
   REALindex=0;
-   for(index = 0; REALindex < 5; index++ ){
+   for(index = 0; REALindex < 10; index++ ){
 
     const matchData = matchArray.data[index];
     const teamdata = teamStuff.data[index];
@@ -147,7 +147,6 @@ async function updateMatches(matchArray,teamStuff) {
     // team name spans
     const team1Span = matchElement.querySelector('[id="team1"]');
     const team2Span = matchElement.querySelector('[id="team2"]');
-
     // team images (2 images inside .match-team)
     const imgElements = matchElement.querySelectorAll('.match-team img');
 
