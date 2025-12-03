@@ -43,6 +43,8 @@
     url("images/dash1.webp") no-repeat center;
   background-size: cover;
   position: relative;
+  padding-bottom: 0; /* added to remove gap */
+  margin-bottom: 0;  /* added to remove gap */
 }
 
 .login-section {
@@ -466,3 +468,17 @@
     width: 40px;
   }
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  min-height: 100vh;
+}
+
+footer {
+  margin-top: 0;
+  background-color: #212529;
+}
+
+
