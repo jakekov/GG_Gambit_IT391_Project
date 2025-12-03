@@ -26,32 +26,21 @@
 }
 
 .dash-section {
-  height: 100vh; /* full screen height */
+  /* Remove fixed height */
+  min-height: 100vh; /* ensures at least full viewport height */
   width: 100%;
   background: 
     linear-gradient(to bottom, 
-      rgba(33,37,41,1) 0%,        /* top fade color (#212529) */
-      rgba(0,0,0,0) 20%,          /* fade to transparent */
-      rgba(0,0,0,0) 80%,          /* keep center transparent */
-      rgba(33,37,41,1) 100%       /* bottom fade color */
+      rgba(33,37,41,1) 0%,
+      rgba(0,0,0,0) 20%,
+      rgba(0,0,0,0) 80%,
+      rgba(33,37,41,1) 100%
     ),
     url("images/dash1.webp") no-repeat center;
   background-size: cover;
   position: relative;
 }
-.blank-section {
-  height: 100vh; /* full screen height */
-  width: 100%;
-  background: 
-    linear-gradient(to bottom, 
-      rgba(33,37,41,1) 0%,        /* top fade color (#212529) */
-      rgba(0,0,0,0) 20%,          /* fade to transparent */
-      rgba(112, 28, 28, 0) 80%,          /* keep center transparent */
-      rgba(33,37,41,1) 100%       /* bottom fade color */
-    );
-  background-size: cover;
-  position: relative;
-}
+
 .login-section {
   height: 100vh; /* full screen height */
   width: 100%;
@@ -246,3 +235,126 @@
     font-size: 0.9rem;
     color: #888;
   }
+
+  .team {
+  display: flex;
+  align-items: center;
+  width: 160px;     /* Adjust width as needed */
+  min-width: 160px;
+}
+
+.bets-container {
+  max-height: 400px; /* or any height you want */
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for bets containers */
+.bets-container {
+  max-height: 400px; /* keeps content scrollable */
+  overflow-y: auto;
+
+  /* Optional: smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+/* Webkit-based browsers (Chrome, Edge, Safari) */
+.bets-container::-webkit-scrollbar {
+  width: 10px; /* width of the scrollbar */
+}
+
+.bets-container::-webkit-scrollbar-track {
+  background: #1e1e1e; /* dark background for track */
+  border-radius: 8px;
+}
+
+.bets-container::-webkit-scrollbar-thumb {
+  background-color: #343a40; /* slightly lighter dark for thumb */
+  border-radius: 8px;
+  border: 2px solid #1e1e1e; /* gives padding effect */
+  transition: background 0.3s ease;
+}
+
+.bets-container::-webkit-scrollbar-thumb:hover {
+  background-color: #ffc107; /* gold accent on hover */
+}
+
+/* Firefox */
+.bets-container {
+  scrollbar-width: thin;
+  scrollbar-color: #343a40 #1e1e1e;
+}
+
+.bets-container:hover {
+  scrollbar-color: #ffc107 #1e1e1e;
+}
+
+.matches-container {
+    background-color: #1f1f23;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.match {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #2c2c2f;
+    flex-wrap: wrap; /* allows wrapping on small screens */
+}
+
+.match:last-child {
+    border-bottom: none;
+}
+
+.match-team {
+    display: flex;
+    flex-direction: column; /* stack image, name, button */
+    align-items: center;
+    justify-content: center;
+    width: 45%; /* fixed width for alignment */
+    min-width: 150px; /* prevent shrinking too much */
+    text-align: center;
+    gap: 8px;
+}
+
+.match-team img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.vs {
+    font-weight: bold;
+    color: #ffc107;
+    font-size: 1.2rem;
+    text-align: center;
+    width: 10%; /* fixed width for vs */
+}
+
+.bet-btn {
+    background-color: #28a745;
+    border: none;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.9rem;
+}
+
+.bet-btn:hover {
+    background-color: #218838;
+}
+
+.tournament {
+    width: 100%;
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+    margin-top: 5px;
+}
+
