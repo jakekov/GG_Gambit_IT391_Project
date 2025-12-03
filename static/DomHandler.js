@@ -129,38 +129,59 @@ async function loadBets() {
   try {
     const res = await fetch("/api/matches/get");
     const json = await res.json();
-
     if (!json.data) return;
 
-    const container = document.getElementById("selectedBetsContainer");
+    const upcomingContainer = document.getElementById("selectedBetsContainer");
+    const pastContainer = document.getElementById("pastBetsContainer");
+
+    const noUpcomingMsg = document.getElementById("noSelectedBetsMessage");
+    const noPastMsg = document.getElementById("noPastBetsMessage");
+
+    let hasUpcoming = false;
+    let hasPast = false;
 
     json.data.forEach(bet => {
       const id = bet.match_id;
+      const isEnded = bet.ended === 1;
+      const targetContainer = isEnded ? pastContainer : upcomingContainer;
 
-      // If the row doesn’t exist yet → create it
-      if (!document.getElementById(`bet-${id}`)) {
-        container.insertAdjacentHTML(
+      if (isEnded) hasPast = true;
+      else hasUpcoming = true;
+
+      let row = document.getElementById(`bet-${id}`);
+
+      // Move to correct container if needed
+      if (row && row.parentElement !== targetContainer) {
+        row.remove();
+        row = null;
+      }
+
+      // Create row if missing
+      if (!row) {
+        targetContainer.insertAdjacentHTML(
           "beforeend",
           `
           <div class="bet-row border-bottom border-secondary py-3 px-2 rounded" id="bet-${id}">
             <div class="d-flex justify-content-between">
-            
-              <!-- TEAMS SIDE -->
+
+              <!-- TEAMS -->
               <div class="teams d-flex align-items-center gap-3">
                 <div class="team d-flex align-items-center">
-                  <img id="bet-${id}-team-a-img" src="" width="45" class="rounded-circle border border-success me-2">
+                  <img id="bet-${id}-team-a-img" src="" width="45"
+                       class="rounded-circle me-2">
                   <span id="bet-${id}-team-a-name" class="fw-bold"></span>
                 </div>
 
                 <span class="fw-bold text-secondary mx-2">VS</span>
 
                 <div class="team d-flex align-items-center">
-                  <img id="bet-${id}-team-b-img" src="" width="45" class="rounded-circle border border-danger me-2">
+                  <img id="bet-${id}-team-b-img" src="" width="45"
+                       class="rounded-circle me-2">
                   <span id="bet-${id}-team-b-name" class="fw-bold"></span>
                 </div>
               </div>
 
-              <!-- BET DATA SIDE -->
+              <!-- BET DATA -->
               <div class="bet-data text-end">
                 <div>
                   <span class="text-info fw-bold">Chosen:</span>
@@ -178,8 +199,8 @@ async function loadBets() {
                 </div>
 
                 <div>
-                  <span class="text-secondary fw-bold">Ended:</span>
-                  <span id="bet-${id}-ended" class="ended-status fw-bold"></span>
+                  <span class="text-secondary fw-bold">Status:</span>
+                  <span id="bet-${id}-status" class="bet-status fw-bold"></span>
                 </div>
               </div>
 
@@ -189,38 +210,41 @@ async function loadBets() {
         );
       }
 
-      // Update DOM values
+      // Update team data
       document.getElementById(`bet-${id}-team-a-name`).textContent = bet.team_a;
       document.getElementById(`bet-${id}-team-a-img`).src = bet.img_a;
 
       document.getElementById(`bet-${id}-team-b-name`).textContent = bet.team_b;
       document.getElementById(`bet-${id}-team-b-img`).src = bet.img_b;
 
-      // Convert prediction (a/b) into team name
-      const chosenTeam =
+      // Chosen
+      const chosen =
         bet.prediction === "a" ? bet.team_a :
         bet.prediction === "b" ? bet.team_b :
         "Unknown";
+      document.getElementById(`bet-${id}-chosen`).textContent = chosen;
 
-      document.getElementById(`bet-${id}-chosen`).textContent = chosenTeam;
-
-      // Money formatting
+      // Money
       document.getElementById(`bet-${id}-amount`).textContent = `$${bet.bet_amount}`;
       document.getElementById(`bet-${id}-payout`).textContent = `$${bet.payout.toFixed(2)}`;
 
-      // Ended status
-      const endedEl = document.getElementById(`bet-${id}-ended`);
-      if (bet.ended === 1) {
-        endedEl.textContent = "Yes";
-        endedEl.classList.remove("text-success");
-        endedEl.classList.add("text-danger");
+      // ✓ Updated Status text (Upcoming / Ended)
+      const statusEl = document.getElementById(`bet-${id}-status`);
+      if (isEnded) {
+        statusEl.textContent = "Ended";
+        statusEl.classList.remove("text-success");
+        statusEl.classList.add("text-danger");
       } else {
-        endedEl.textContent = "No";
-        endedEl.classList.remove("text-danger");
-        endedEl.classList.add("text-success");
+        statusEl.textContent = "Upcoming";
+        statusEl.classList.remove("text-danger");
+        statusEl.classList.add("text-success");
       }
 
     });
+
+    // SHOW / HIDE message labels
+    noUpcomingMsg.style.display = hasUpcoming ? "none" : "block";
+    noPastMsg.style.display = hasPast ? "none" : "block";
 
   } catch (err) {
     console.error("Failed to load bets:", err);
@@ -228,5 +252,4 @@ async function loadBets() {
 }
 
 loadBets();
-setInterval(loadBets, 5000); // refresh every 5 seconds
-
+setInterval(loadBets, 5000);
