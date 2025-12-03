@@ -6,7 +6,7 @@ async function domLoaded(){
 console.log("hi");
 const matchArray =  await fetchTodos();
 const teamArray = await fetchTeamTodos()
-//console.log(teamArray);
+console.log(matchArray);
 updateMatches(matchArray, teamArray);
 
 
@@ -130,13 +130,17 @@ console.log(data);
 
 
 async function updateMatches(matchArray,teamStuff) {
+   console.log(matchArray);
   const matches = document.querySelectorAll(".match");
-  console.log(teamStuff);
-  
+  console.log(matches);
+  REALindex=0;
+   for(index = 0; REALindex < 5; index++ ){
 
-  matches.forEach((matchElement, index) => {
     const matchData = matchArray.data[index];
-    const teamdata = teamStuff.data[index]
+    const teamdata = teamStuff.data[index];
+    console.log(teamdata.CurrentStatus);
+    if(teamdata.CurrentStatus.toLowerCase() == "upcoming"){
+    const matchElement = matches[REALindex];
     console.log(teamdata);
     if (!matchData) return;
 
@@ -159,8 +163,8 @@ async function updateMatches(matchArray,teamStuff) {
     if (team2Span) team2Span.textContent = matchData.teams[1].name;
 
     // --- UPDATE TEAM IMAGES ---
-    if (imgElements[0]) imgElements[0].src = matchData.img;
-    if (imgElements[1]) imgElements[1].src = matchData.img;
+    if (imgElements[0]) imgElements[0].src = teamdata.Team1Img;
+    if (imgElements[1]) imgElements[1].src = teamdata.Team2Img;
 
     // --- TOURNAMENT TITLE ---
     if (tournamentElement) {
@@ -184,7 +188,10 @@ async function updateMatches(matchArray,teamStuff) {
       team2Btn.dataset.matchId = matchData.id;
       
     }
-  });
+    REALindex++;
+    console.log(REALindex);
+  }
+};
 }
 
 
