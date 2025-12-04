@@ -6,7 +6,7 @@ import match_model, {
   MatchWithTeams,
 } from '@/models/matches.js';
 import {randomInt} from 'crypto';
-import {VlrMatches} from '@/services/matchUpdates.js';
+import {VlrMatch, VlrMatches} from '@/services/matchUpdates.js';
 import {
   badRequest,
   HTTP_STATUS,
@@ -200,119 +200,125 @@ async function getMatchesInfo(req: Request, res: Response) {
         return res1 as VlrMatches;
       });
 
-    const data_response: MatchWithTeams[] = [];
-
+    let p = [];
     for (const match of response.data) {
-      let team_a = match.teams[0];
-      let team_b = match.teams[1];
-      if (team_a.name === 'TBD' || team_b.name === 'TBD') continue; //some of them after still have names
-      //find match in database from vlr id
-
-      let existing_matches = await match_model.getMatchWithTeams(
-        parseInt(match.id)
-      );
-      //this should also check if the time has changed
-      if (existing_matches.length != 0) {
-        //test if the status is the same
-        if (existing_matches[0].status == MatchStatus.upcoming) {
-          //the response matches shouldnt have completed
-          //it doesnt hurt to update things here so might as well while i have the request data
-          if ((match.status.toLowerCase() as MatchStatus) == MatchStatus.live) {
-            //update the match to live
-            existing_matches[0].status = MatchStatus.live;
-            await match_model.updateMatchStatus(
-              existing_matches[0].id,
-              MatchStatus.live
-            );
-            let executionTime = new Date(
-              existing_matches[0].match_start.getTime() + 3600000 // wait an hour and check
-            );
-            try {
-              schedule_conclusion_check(existing_matches[0].id, executionTime);
-            } catch (err) {
-              //if this fails once it might happen everytime or it might fail because theres already a check scheduled
-              console.log(err);
-            }
-          }
-        }
-
-        data_response.push(existing_matches[0]);
-      } else {
-        if (!match.timestamp) {
-          console.log('NO TIMESTAMP');
-          continue;
-        }
-        let a_id = await findTeamId(team_a.name, team_a.country);
-        let b_id = await findTeamId(team_b.name, team_b.country);
-
-        if (!a_id || !b_id) {
-          console.log(`COULD NOT FIND TEAM ID ${team_a.name}`);
-          continue;
-        }
-
-        let new_match: Match = {
-          id: parseInt(match.id),
-          team_a: a_id.id,
-          team_b: b_id.id,
-          odds: randomInt(-1024, 1024),
-          status: match.status.toLowerCase() as MatchStatus,
-          match_start: new Date(match.timestamp * 1000), //this needs to be in miliseconds and i think timestamp is in seconds
-        } as Match;
-        console.log(
-          `created match ${match.id}, ${match.event}, timestamp ${new_match.match_start}, ${match.timestamp}`
-        );
-        await match_model.createMatchRow(new_match);
-        let te = await match_model.getMatchWithTeams(new_match.id);
-        if (te.length == 0) {
-          console.log('INSERTION ERROR');
-          continue;
-        }
-        console.log(te[0].status);
-        if (te[0].status == MatchStatus.upcoming) {
-          let executionTime = new Date(
-            new_match.match_start.getTime() + 30000 // plus 30 seconds so its more likely that we dont have to check again
-          );
-          try {
-            await schedule_live_check(new_match.id, executionTime);
-          } catch (err) {
-            //if this fails once it might happen everytime or it might fail because theres already a check scheduled
-            console.log(err);
-          }
-        } else if (te[0].status == MatchStatus.live) {
-          //created a new live match need to schedule a conclusion
-          // if its creating the live match no one could bet on it anyway so just do an hour
-          //this doesnt have to be good cause if we were making it good we would have a better api and wouldnt have to scrape everything
-          let executionTime = new Date(
-            new_match.match_start.getTime() + 3600000 // wait an hour and check
-          );
-          try {
-            schedule_conclusion_check(new_match.id, executionTime);
-          } catch (err) {
-            //if this fails once it might happen everytime or it might fail because theres already a check scheduled
-            console.log(err);
-            // i need to remove the match because i dont have a way to recover schedules
-            // the only way this can happen is if i delete a match without removeing the queue
-            //i think instead of timestamp for name it should be match_id
-            //but that would require redoing the scraper to only lookup indiviudal matches and i dont care enought to do that
-          }
-        } else {
-          console.log(
-            'Match started but no task or schedule was created for it'
-          );
-          console.log(new_match);
-        }
-
-        data_response.push(te[0]);
-        //find the team ids
-        //calculate odds for the team
-        //put entry in database
-        //add object to return response
-      }
+      p.push(singleMatchInfo(match));
+    }
+    const data_response: MatchWithTeams[] = [];
+    for (const d of p) {
+      let val = await d;
+      if (!val) continue;
+      data_response.push(val);
     }
     return res.status(200).json({data: data_response});
   } catch (err) {
     console.log(err);
     return res.status(HTTP_STATUS.SERVER_ERROR).json({error: 'ERROR'});
+  }
+}
+async function singleMatchInfo(match: VlrMatch) {
+  let team_a = match.teams[0];
+  let team_b = match.teams[1];
+  if (team_a.name === 'TBD' || team_b.name === 'TBD') return; //some of them after still have names
+  //find match in database from vlr id
+
+  let existing_matches = await match_model.getMatchWithTeams(
+    parseInt(match.id)
+  );
+  //this should also check if the time has changed
+  if (existing_matches.length != 0) {
+    //test if the status is the same
+    if (existing_matches[0].status == MatchStatus.upcoming) {
+      //the response matches shouldnt have completed
+      //it doesnt hurt to update things here so might as well while i have the request data
+      if ((match.status.toLowerCase() as MatchStatus) == MatchStatus.live) {
+        //update the match to live
+        existing_matches[0].status = MatchStatus.live;
+        await match_model.updateMatchStatus(
+          existing_matches[0].id,
+          MatchStatus.live
+        );
+        let executionTime = new Date(
+          existing_matches[0].match_start.getTime() + 3600000 // wait an hour and check
+        );
+        try {
+          schedule_conclusion_check(existing_matches[0].id, executionTime);
+        } catch (err) {
+          //if this fails once it might happen everytime or it might fail because theres already a check scheduled
+          console.log(err);
+        }
+      }
+    }
+    return existing_matches[0];
+    //data_response.push(existing_matches[0]);
+  } else {
+    if (!match.timestamp) {
+      console.log('NO TIMESTAMP');
+      return;
+    }
+    let a_id = await findTeamId(team_a.name, team_a.country);
+    let b_id = await findTeamId(team_b.name, team_b.country);
+
+    if (!a_id || !b_id) {
+      console.log(`COULD NOT FIND TEAM ID ${team_a.name}`);
+      return;
+    }
+
+    let new_match: Match = {
+      id: parseInt(match.id),
+      team_a: a_id.id,
+      team_b: b_id.id,
+      odds: randomInt(-1024, 1024),
+      status: match.status.toLowerCase() as MatchStatus,
+      match_start: new Date(match.timestamp * 1000), //this needs to be in miliseconds and i think timestamp is in seconds
+    } as Match;
+    console.log(
+      `created match ${match.id}, ${match.event}, timestamp ${new_match.match_start}, ${match.timestamp}`
+    );
+    await match_model.createMatchRow(new_match);
+    let te = await match_model.getMatchWithTeams(new_match.id);
+    if (te.length == 0) {
+      console.log('INSERTION ERROR');
+      return;
+    }
+    console.log(te[0].status);
+    if (te[0].status == MatchStatus.upcoming) {
+      let executionTime = new Date(
+        new_match.match_start.getTime() + 30000 // plus 30 seconds so its more likely that we dont have to check again
+      );
+      try {
+        await schedule_live_check(new_match.id, executionTime);
+      } catch (err) {
+        //if this fails once it might happen everytime or it might fail because theres already a check scheduled
+        console.log(err);
+      }
+    } else if (te[0].status == MatchStatus.live) {
+      //created a new live match need to schedule a conclusion
+      // if its creating the live match no one could bet on it anyway so just do an hour
+      //this doesnt have to be good cause if we were making it good we would have a better api and wouldnt have to scrape everything
+      let executionTime = new Date(
+        new_match.match_start.getTime() + 3600000 // wait an hour and check
+      );
+      try {
+        schedule_conclusion_check(new_match.id, executionTime);
+      } catch (err) {
+        //if this fails once it might happen everytime or it might fail because theres already a check scheduled
+        console.log(err);
+        // i need to remove the match because i dont have a way to recover schedules
+        // the only way this can happen is if i delete a match without removeing the queue
+        //i think instead of timestamp for name it should be match_id
+        //but that would require redoing the scraper to only lookup indiviudal matches and i dont care enought to do that
+      }
+    } else {
+      console.log('Match started but no task or schedule was created for it');
+      console.log(new_match);
+    }
+    return te[0];
+    //data_response.push(te[0]);
+    //find the team ids
+    //calculate odds for the team
+    //put entry in database
+    //add object to return response
   }
 }
 async function debugService(req: Request, res: Response) {
