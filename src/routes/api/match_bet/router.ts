@@ -6,7 +6,7 @@ import match_model, {
   MatchWithTeams,
 } from '@/models/matches.js';
 import {randomInt} from 'crypto';
-import {VlrMatch, VlrMatches} from '@/services/matchUpdates.js';
+import {DirectResponse, VlrMatch, VlrMatches} from '@/services/matchUpdates.js';
 import {
   badRequest,
   HTTP_STATUS,
@@ -60,6 +60,18 @@ async function fetchMatch(bet: MatchBet) {
       return null;
     }
     const match = matches[0];
+    let score_a = null;
+    let score_b = null;
+    if (match.status == MatchStatus.live) {
+      const response = await fetch(
+        `${config.scraper_url}/api/v1/matches/${match.match_id}`
+      );
+      if (response.ok) {
+        let data = (await response.json()) as DirectResponse;
+        score_a = data.data.teams[0].score;
+        score_b = data.data.teams[1].score;
+      }
+    }
     return {
       match_id: bet.match_id,
       team_a: match.a_name,
@@ -71,8 +83,8 @@ async function fetchMatch(bet: MatchBet) {
       payout: bet.payout,
       ended: bet.ended,
       bet_won: bet.bet_won,
-      score_a: null,
-      score_b: null,
+      score_a: score_a,
+      score_b: score_b,
       match_status: match.status,
       timestamp: match.match_start,
     } as UserBet;
