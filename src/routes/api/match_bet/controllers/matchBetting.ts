@@ -94,7 +94,7 @@ export async function placeUserMatchBet(
   }
   if (multiplier < 0)
     throw new Error(`Multipler is negative ${multiplier}, ${odds}`);
-  const payout = wager + wager * multiplier;
+  const payout = wager * multiplier; //wager is always atleast self + winnings becasuse percent is 0-1 so dividing by it will always be 1.
   const options: MatchBetOptions = {
     user_id: uuid,
     match_id: match_id,
