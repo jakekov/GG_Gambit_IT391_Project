@@ -1,4 +1,17 @@
+
+
 window.addEventListener("DOMContentLoaded", domLoaded);
+const matchArrayPromise = fetchTodos();
+const teamArrayPromise = fetchTeamTodos();
+async function domLoaded() {
+  console.log("hi");
+  const matchArray = await matchArrayPromise;
+
+  console.log(matchArray);
+  generateMatches(matchArray);
+  const teamArray = await teamArrayPromise;
+  infoLoadedUpdateMatches(teamArray.data);
+  //updateMatches(matchArray, teamArray);
 
 async function domLoaded(){
 console.log("hi");
@@ -37,14 +50,14 @@ popoverTriggerList.forEach(btn => {
   });
 
   document.addEventListener('click', function (e) {
-  if (e.target.closest('.popover') || e.target.matches('[data-bs-toggle="popover"]')) {
-    e.stopPropagation(); // don’t close popover when interacting inside it
-  } else {
-    // Close all open popovers
-    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(btn => {
-      bootstrap.Popover.getInstance(btn)?.hide();
-    });
-  }
+    if (e.target.closest('.popover') || e.target.matches('[data-bs-toggle="popover"]')) {
+      e.stopPropagation(); // don’t close popover when interacting inside it
+    } else {
+      // Close all open popovers
+      document.querySelectorAll('[data-bs-toggle="popover"]').forEach(btn => {
+        bootstrap.Popover.getInstance(btn)?.hide();
+      });
+    }
   });
 
   // button.addEventListener("click", (event) => {
@@ -109,7 +122,8 @@ console.log(data);
 });
 
 
-   document.addEventListener("click", (event) => {
+
+  document.addEventListener("click", (event) => {
     const isPopover = event.target.closest(".popover");
     const isButton = event.target.matches('[data-bs-toggle="popover"]');
     if (!isPopover && !isButton) {
@@ -122,10 +136,63 @@ console.log(data);
   });
 
 
-  
+
+}
+function findMatch(matchInfoArr, matchIdstr) {
+  const numid = parseInt(matchIdstr);
+  for (let i = 0; i < matchInfoArr.length; i++) {
+    if (matchInfoArr[i].MatchID === numid) return i
+  }
+  return -1;
+}
+function infoLoadedUpdateMatches(matchInfoArr) {
+  const matches = document.querySelectorAll(".match");
+  REALindex = 0;
+  for (const matchEl of matches) {
+    const matchId = matchEl.id;
+    const idx = findMatch(matchInfoArr, matchId);
+    if (idx == -1) continue;
+    // ---- Team buttons ----
+    const team1Btn = matchEl.querySelector(".team1.bet-btn");
+    const team2Btn = matchEl.querySelector(".team2.bet-btn");
+
+    // Dataset fields (teamName, teamId, matchId)
+    team1Btn.dataset.teamId = matchInfoArr[idx].Team1ID;
+    team1Btn.dataset.matchId = matchId;
+    team2Btn.dataset.teamId = matchInfoArr[idx].Team2ID;
+    team2Btn.dataset.matchId = matchId;
+    // ---- Images ----
+    const team1Img = matchEl.querySelector(".match-team:nth-child(1) img");
+    const team2Img = matchEl.querySelector(".match-team:nth-child(3) img");
+    team1Img.src = matchInfoArr[idx].Team1Img;
+    team2Img.src = matchInfoArr[idx].Team2Img;
+
+    // ---- Odds ----
+    const team1OddsEl = matchEl.querySelector(".team1-odds");
+    const team2OddsEl = matchEl.querySelector(".team2-odds");
+    team1OddsEl.textContent = matchInfoArr[idx].BetOdds
+    t2odds = Number(matchInfoArr[idx].BetOdds);
+    t2odds = t2odds * -1;
+    team2OddsEl.textContent = t2odds;
+  }
+
 }
 
+async function updateMatches(matchArray, teamStuff) {
+  console.log(matchArray);
+  const matches = document.querySelectorAll(".match");
+  console.log(matches);
+  REALindex = 0;
 
+  for (index = 0; REALindex < 10; index++) {
+
+    const matchData = matchArray.data[index];
+    const teamdata = teamStuff.data[index];
+    console.log(teamdata.CurrentStatus);
+    if (teamdata.CurrentStatus.toLowerCase() == "upcoming") {
+      const matchElement = matches[REALindex];
+      console.log(teamdata);
+      if (!matchData) return;
 
 async function updateMatches(matchArray,teamStuff) {
    console.log(matchArray);
@@ -203,7 +270,7 @@ async function updateMatches(matchArray,teamStuff) {
 
 
 async function fetchTodos() {
-    
+
   try {
     const data = await fetch("https://vlr.orlandomm.net/api/v1/matches");
     if (!data.ok) {
@@ -235,7 +302,7 @@ async function fetchTodos() {
     };
     console.log(matchArray);
     return matchArray;
-    
+
   } catch (error) {
     console.error("There was a problem with your fetch request: ", error)
   }
