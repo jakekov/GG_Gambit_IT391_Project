@@ -271,3 +271,42 @@ async function fetchTeamTodos() {
 console.log(teamArray);
   return teamArray; // return it if needed
 }
+
+async function loadPlayerBalance() {
+  const balanceElement = document.getElementById("playerBalance");
+  if (!balanceElement) return;
+
+  try {
+    const res = await fetch("/api/user/balance", {
+      method: "GET",
+      credentials: "include", // sends cookies for login session
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!res.ok) {
+      balanceElement.textContent = "Balance Error";
+      return;
+    }
+
+    const data = await res.json();
+
+    // If value is numeric
+    if (typeof data.balance === "number") {
+      balanceElement.textContent = `${data.balance.toFixed(2)} G`;
+    } else {
+      balanceElement.textContent = "Unknown";
+    }
+
+  } catch (err) {
+    console.error("Failed to load balance:", err);
+    balanceElement.textContent = "Offline";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadPlayerBalance();
+});
+// refresh every 10 seconds
+setInterval(loadPlayerBalance, 1000);
