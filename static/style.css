@@ -412,7 +412,13 @@
   text-align: center;
   margin-top: 5px;
 }
-
+.match-time {
+  width: 100%;
+  font-size: 0.95rem;
+  color: #dd6363;
+  text-align: center;
+  margin-top: 5px;
+}
 
 .bet-banner {
   background-color: #212529; /* fully opaque dark background */
