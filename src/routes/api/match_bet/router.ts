@@ -123,15 +123,24 @@ async function getMatchBets(req: Request, res: Response) {
     all_bets.push(fetchMatch(bet));
   }
   const data = await Promise.all(all_bets);
-  const output = [];
+  const upcoming = [];
+  const ended = [];
   for (const match of data) {
     if (match == null) {
       continue;
     }
-    output.push(match);
+    if (match.ended) {
+      ended.push(match);
+    } else {
+      upcoming.push(match);
+    }
   }
-  output.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  return res.status(200).json({data: output});
+  //sort upcoming matches by start time
+  upcoming.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  //sort ended matches by descending
+  ended.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  upcoming.push(...ended);
+  return res.status(200).json({data: upcoming});
 }
 /**
  * User submited post for making a bet on a match
